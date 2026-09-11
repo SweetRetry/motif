@@ -46,10 +46,20 @@ Nine cells, one cosine. A cell's phase is the anti-diagonal it sits on — `row 
 so the crest runs from the top-left corner to the bottom-right and back. There is no
 per-cell tuning and no second animation: one sampled curve, nine start times.
 
-A full cycle takes `WAVE_MS` (2000ms) to travel `WAVE_SPREAD` (5.5) diagonals. The lattice
+A full cycle takes `WAVE_MS` (1200ms) to travel `WAVE_SPREAD` (5.5) diagonals. The lattice
 only spans five of them, so a little under one whole wave is ever on screen — which is
 what makes the pulse read as motion instead of nine cells blinking together. Cell opacity
 runs between `CELL_TROUGH` (0.2) and `CELL_CREST` (0.6).
+
+The cycle is set by where the cosine dawdles, not by taste. The curve is flat at both ends,
+so a cell holds a tone to within a hair for the middle of its cycle, and a still image stops
+reading as a mark mid-motion somewhere around half a second. A slower wave outlives that
+line, which is how a row can look busy and stalled at once. Speeding the cycle up squeezes
+those rests back under it. There is a floor under that too: much shorter than a second and
+the crest stops being a thing to follow and becomes a lattice blinking. And the tempo is
+read as the tempo of the work behind it — a crest that comes round every 1200ms reads as a
+machine that is working, where one that comes round every two seconds reads as a machine
+that is idling.
 
 Every cell runs the same keyframes and `lead()` shifts where each one starts, by a _negative_
 delay — park an animation part-way through its first cycle and the wave is already
@@ -63,13 +73,15 @@ The label is one span per letter, and each letter runs the grid's cosine offset 
 it sits in the word — the same wave, one dimension down. Two things are different, because
 a word is not a lattice:
 
-- **It runs on its own clock.** `LETTER_WAVE_MS` is 1400ms against the grid's 2000ms. A
+- **It runs on its own clock.** `LETTER_WAVE_MS` is 900ms against the grid's 1200ms. A
   shimmer is read at the speed it crosses the word, and a short word crossed at the grid's
   tempo reads as a slow swell.
 - **Its crest is pulled in.** `LETTER_FOCUS` raises the cosine to the third power before
   it is used. At `1` the bright half of the cycle is half the curve — wider than the word —
   so nothing appears to travel. At `3` it is a band about two letters wide with a rest on
-  either side, crossed at `LETTER_MS` (130ms) per letter.
+  either side, crossed at `LETTER_MS` (90ms) per letter. `LETTER_MS` is the launch interval
+  rather than the fade — a letter's own brightening still takes most of a cycle, so nothing
+  flashes; only the crest's arrival is that quick.
 
 The trough stays at `0.55`, so the word is readable the whole way through, and that is the
 whole trick — **the only property either wave touches is `opacity`**, which the compositor

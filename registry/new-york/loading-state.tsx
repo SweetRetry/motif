@@ -14,9 +14,18 @@ import { cn } from "@/lib/utils";
  * nothing here repaints the page on a frame.
  * --------------------------------------------------------------------------- */
 
-/** The grid's cycle, in ms. Slow on purpose: a nine-cell lattice that pulses any faster
- *  than this reads as a flicker. */
-const WAVE_MS = 2000;
+/** The grid's cycle, in ms. This number is a compromise between two floors, not a taste.
+ *
+ *  The low one is stillness. A cosine is flat at both ends, so a cell spends the middle
+ *  of its cycle holding a tone to within a hair — and a still image outlasts roughly half
+ *  a second before the eye stops reading it as a mark mid-motion and starts reading it as
+ *  a mark that has stopped. At 2000ms that flat top ran longer than that, which is why the
+ *  old tempo could be watched for a while and still feel like nothing was happening.
+ *
+ *  The high one is composure: much under a second and nine cells stop reading as one
+ *  travelling crest and start reading as a lattice blinking. 1200ms keeps the crest
+ *  something you follow from corner to corner, which is the point of drawing it. */
+const WAVE_MS = 1200;
 
 /** Keyframe resolution. Sampling the cosine this many times is smoother than any easing
  *  curve a browser ships, and it keeps every mark honest to the curve it came from. */
@@ -76,12 +85,16 @@ const restingOpacity = (index: number) => {
 /* -- The label ---------------------------------------------------------------- */
 
 /** The label's own cycle, in ms — shorter than the grid's, because a shimmer is read at
- *  the speed it crosses the word and this word is short. */
-const LETTER_WAVE_MS = 1400;
+ *  the speed it crosses the word and this word is short. Shortened with the grid rather
+ *  than instead of it: a quick band that only comes round every second and a half still
+ *  leaves the word sitting flat between passes, and flat is the thing being fixed. */
+const LETTER_WAVE_MS = 900;
 
-/** Milliseconds each letter trails the one before it by. At 130ms a six-letter label is
- *  crossed in under a second. */
-const LETTER_MS = 130;
+/** Milliseconds each letter trails the one before it by — the launch interval rather than
+ *  the fade: what a letter does takes most of a cycle, and only the crest's arrival is this
+ *  quick. At 90ms a six-letter label is crossed in half a second, so the band is gone from
+ *  the word and back again before a glance can arrive twice in the same place. */
+const LETTER_MS = 90;
 
 /** How hard the crest is pulled in. `3` leaves a band about two letters wide with a rest
  *  on either side of it, instead of a swell that never quite leaves. */
@@ -109,8 +122,13 @@ const LETTER_KEYFRAMES = waveKeyframes(
  * a hundred, and both are rare enough to live with. The other half is `tabular-nums`,
  * which stops a *single* digit changing width when it changes value, and lives on the
  * element below.
+ *
+ * Exported because a finished row still owes the reader the number: the thinking block
+ * prints "Thought for 9s" off the same count, so the two can never disagree about a
+ * second.
  */
-const formatDuration = (total: number) => `${Math.max(0, Math.floor(total))}s`;
+export const formatDuration = (total: number) =>
+  `${Math.max(0, Math.floor(total))}s`;
 
 /**
  * Writes the clock straight into the DOM. React is not involved: re-rendering a tree
