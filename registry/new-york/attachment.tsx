@@ -118,6 +118,14 @@ const glyphFor = (name: string) => {
 
 const clamp = (value: number) => Math.max(0, Math.min(100, value));
 
+/** `primary` is near-black, so a preview needs a light arc to stay visible. */
+const ringTone = ({ failed, image }: { failed: boolean; image: boolean }) => {
+  if (failed) {
+    return "stroke-destructive";
+  }
+  return image ? "stroke-white" : "stroke-primary";
+};
+
 const resolveStatus = ({
   progress,
   status,
@@ -163,9 +171,11 @@ const resolveA11y = ({
 
 const AttachmentRing = ({
   failed,
+  image,
   percent,
 }: {
   failed: boolean;
+  image: boolean;
   percent: number;
 }) => (
   <svg
@@ -179,7 +189,7 @@ const AttachmentRing = ({
     <path
       className={cn(
         "transition-[stroke-dashoffset] duration-500 ease-linear",
-        failed ? "stroke-destructive" : "stroke-primary"
+        ringTone({ failed, image })
       )}
       d={RING_PATH}
       pathLength={100}
@@ -209,57 +219,67 @@ const AttachmentGlyph = ({
   }
 
   return (
-    <span className="grid size-[28.6cqw] shrink-0 place-items-center rounded-[7.1cqw] bg-muted">
-      <span className="relative grid place-items-center">
-        {/* White page so the per-type detail lines stay legible on the grey tile. */}
-        <Glyph
-          className="size-[21.4cqw] fill-card stroke-muted-foreground/40"
-          strokeWidth="1.5"
+    // No tile behind the glyph — the icon stands on the card, at the full slot size.
+    <span className="relative grid size-[28.6cqw] shrink-0 place-items-center">
+      <Glyph
+        className="size-[28.6cqw] fill-card stroke-muted-foreground"
+        strokeWidth="1.5"
+      />
+      {/* Card-coloured disc: it knocks the clip out of the page outline. */}
+      <span className="absolute -bottom-[5.4cqw] -left-[7.1cqw] grid size-[17.9cqw] place-items-center rounded-full bg-card">
+        <Paperclip
+          className="size-[14.3cqw] stroke-muted-foreground"
+          strokeWidth="2"
         />
-        <span className="absolute -bottom-[3.6cqw] -left-[5.4cqw] grid size-[14.3cqw] place-items-center rounded-full bg-muted">
-          <Paperclip className="size-[12.5cqw] stroke-card" strokeWidth="2.5" />
-        </span>
       </span>
     </span>
   );
 };
 
-const AttachmentFile = ({
+const AttachmentBody = ({
   failed,
   icon,
+  image,
   name,
   percent,
   uploading,
 }: {
   failed: boolean;
   icon?: ReactNode;
+  image: boolean;
   name: string;
   percent: number;
   uploading: boolean;
 }) => (
-  <>
+  // Container units resolve against an ancestor container, never the element that
+  // declares it, so the padding has to sit one layer in.
+  <div className="absolute inset-0 flex flex-col p-[12.5cqw]">
     <div className="flex items-start justify-between gap-2">
-      <AttachmentGlyph name={name}>{icon}</AttachmentGlyph>
+      {image ? null : <AttachmentGlyph name={name}>{icon}</AttachmentGlyph>}
       {uploading ? (
         <span
           className={cn(
             // Ratios would render 8px type at the 56px floor, so text keeps a minimum.
-            "pt-0.5 font-medium text-[max(10px,14.3cqw)] text-primary tabular-nums"
+            "ml-auto pt-0.5 font-medium text-[max(10px,14.3cqw)] tabular-nums",
+            image ? "text-white drop-shadow-sm" : "text-primary"
           )}
         >
           {percent}%
         </span>
       ) : null}
     </div>
-    <p
-      className={cn(
-        "mt-auto truncate text-[max(9px,12.5cqw)]",
-        failed ? "text-destructive" : "text-muted-foreground"
-      )}
-    >
-      {name}
-    </p>
-  </>
+    {/* A preview carries its own identity, so it never shows the name. */}
+    {image ? null : (
+      <p
+        className={cn(
+          "mt-auto truncate text-[max(9px,12.5cqw)]",
+          failed ? "text-destructive" : "text-muted-foreground"
+        )}
+      >
+        {name}
+      </p>
+    )}
+  </div>
 );
 
 const AttachmentRemove = ({
@@ -274,16 +294,16 @@ const AttachmentRemove = ({
   <button
     aria-label={`Remove ${name}`}
     className={cn(
-      "absolute top-[3.6cqw] right-[3.6cqw] grid size-[35.7cqw] cursor-pointer place-items-center rounded-full outline-none transition-[background-color,color,scale] duration-150 ease-out focus-visible:ring-2 focus-visible:ring-ring active:scale-95",
+      "absolute top-[3.6cqw] right-[3.6cqw] grid size-[30.4cqw] cursor-pointer place-items-center rounded-full outline-none transition-[background-color,color,scale] duration-150 ease-out focus-visible:ring-2 focus-visible:ring-ring active:scale-95",
       image
-        ? "bg-white/25 text-white/70 backdrop-blur-md hover:bg-white/40 hover:text-white/95"
-        : "text-muted-foreground/40 hover:bg-muted hover:text-foreground"
+        ? "bg-white/15 text-white/55 backdrop-blur-sm hover:bg-white/30 hover:text-white/90"
+        : "text-muted-foreground/40 hover:bg-foreground/10 hover:text-foreground"
     )}
     onClick={onRemove}
     type="button"
   >
     <X
-      className={cn("size-[17.9cqw]", image && "drop-shadow-sm")}
+      className={cn("size-[16.1cqw]", image && "drop-shadow-sm")}
       strokeWidth="1.75"
     />
   </button>
@@ -317,31 +337,41 @@ export const Attachment = ({
       data-state={state}
     >
       {image ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          alt={name}
-          className={cn(
-            "absolute inset-0 size-full rounded-[21.4%] object-cover",
-            uploading && "opacity-40"
-          )}
-          src={src}
-        />
-      ) : (
-        // Container units resolve against an ancestor container, never the element that
-        // declares it, so the padding has to sit one layer in.
-        <div className="absolute inset-0 flex flex-col p-[12.5cqw]">
-          <AttachmentFile
-            failed={failed}
-            icon={icon}
-            name={name}
-            percent={percent}
-            uploading={uploading}
+        // The preview replaces the glyph. Only the ring, the percentage and the tint
+        // carry state, so a preview stays clean and never shows the name.
+        <span className="absolute inset-0 overflow-hidden rounded-[21.4%]">
+          {/* The name still labels the image for assistive tech. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            alt={uploading || failed ? "" : name}
+            className="size-full object-cover"
+            src={src}
           />
-        </div>
-      )}
+          <span
+            aria-hidden="true"
+            className={cn(
+              "absolute inset-0",
+              (uploading || failed) && "bg-black/40"
+            )}
+          />
+        </span>
+      ) : null}
+
+      <AttachmentBody
+        failed={failed}
+        icon={icon}
+        image={image}
+        name={name}
+        percent={percent}
+        uploading={uploading}
+      />
 
       {uploading || failed ? (
-        <AttachmentRing failed={failed} percent={failed ? 100 : percent} />
+        <AttachmentRing
+          failed={failed}
+          image={image}
+          percent={failed ? 100 : percent}
+        />
       ) : null}
 
       {removable && onRemove ? (

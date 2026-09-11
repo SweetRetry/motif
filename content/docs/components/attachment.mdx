@@ -42,17 +42,23 @@ legible at 56px.
 ## States
 
 `status` defaults to `uploading` while `progress` is under 100 and `ready` after, so
-passing `progress` is usually enough.
+passing `progress` is usually enough. Every attachment shares one status layer — the
+percentage marker, the ring and the remove button; `src` only swaps the glyph for a
+preview, which carries its own identity and never shows the name.
 
-| Status      | Renders                                                                                                                          |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `uploading` | Progress arc around the card plus the percentage; the thumbnail dims to 40%                                                      |
-| `ready`     | Thumbnail or glyph with the file name, and the remove button when `onRemove` is set (`ready` only — the mock keeps uploads bare) |
-| `error`     | The same layout with the arc and name in `text-destructive`, arc full                                                            |
+| Status      | Renders                                                                               |
+| ----------- | ------------------------------------------------------------------------------------- |
+| `uploading` | Progress arc around the card plus the percentage; a preview darkens under a scrim     |
+| `ready`     | Glyph and file name, or a bare preview, with the remove button when `onRemove` is set |
+| `error`     | The arc fills and turns `text-destructive`; a file's name follows suit                |
+
+The remove button stays hidden while uploading — the mock keeps in-flight chips bare, so
+cancelling mid-upload is out of scope.
 
 The arc is an SVG `path` tracing the chip's border: it starts at the top centre and runs
-clockwise, in the theme's `primary` (the reference mock used a blue accent — swap
-`stroke-primary` / `text-primary` for a literal blue if you want that hue).
+clockwise in the theme's `primary` — or `white` over a preview, where `primary` would
+disappear. The reference mock used a blue accent; swap the token for a literal blue if you
+want that hue.
 
 ## Glyph
 

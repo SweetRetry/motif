@@ -70,6 +70,41 @@
           "target": "@components/ui/attachment.tsx"
         }
       ]
+    },
+    {
+      "name": "scroll-rail",
+      "type": "registry:component",
+      "title": "Scroll rail",
+      "description": "A tick rail that mirrors a long scroll region: width carries distance from the reading line, colour carries focus. Hover a tick to preview the turn, click to jump to it.",
+      "dependencies": ["clsx", "motion", "tailwind-merge"],
+      "registryDependencies": ["popover"],
+      "files": [
+        {
+          "path": "registry/new-york/scroll-rail/index.tsx",
+          "type": "registry:component",
+          "target": "@components/scroll-rail/index.tsx"
+        },
+        {
+          "path": "registry/new-york/scroll-rail/types.ts",
+          "type": "registry:component",
+          "target": "@components/scroll-rail/types.ts"
+        },
+        {
+          "path": "lib/hooks/use-scroll-focus.ts",
+          "type": "registry:hook",
+          "target": "@lib/hooks/use-scroll-focus.ts"
+        },
+        {
+          "path": "lib/hooks/use-hover-capable.ts",
+          "type": "registry:hook",
+          "target": "@lib/hooks/use-hover-capable.ts"
+        },
+        {
+          "path": "lib/ease.ts",
+          "type": "registry:lib",
+          "target": "@lib/ease.ts"
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,143 @@
+---
+title: Scroll rail
+description: "A tick rail that mirrors a long scroll region: width carries distance from the reading line, colour carries focus. Hover a tick to preview the turn, click to jump to it."
+---
+
+import { ScrollRailDemo, ScrollRailProgressDemo } from "@/examples/scroll-rail";
+
+<ComponentPreview name="scroll-rail">
+  <ScrollRailDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/scroll-rail.json
+```
+
+## Usage
+
+The rail draws; the hooks measure. Focus is one continuous number — `0` is the first
+tick, `items.length - 1` the last — so anything that can produce that number can drive
+the rail.
+
+```tsx
+import { useRef } from "react";
+
+import { ScrollRail, ScrollRailPreview } from "@/components/scroll-rail";
+import { useMessageFocus } from "@/lib/hooks/use-scroll-focus";
+
+export function Transcript() {
+  const scroller = useRef<HTMLDivElement>(null);
+  const nodes = useRef<(HTMLElement | null)[]>([]);
+  const focus = useMessageFocus(scroller, nodes);
+
+  return (
+    <div className="flex gap-4">
+      <ScrollRail
+        focus={focus}
+        label="Transcript"
+        items={messages.map((message) => ({
+          id: message.id,
+          label: message.question,
+          preview: (
+            <ScrollRailPreview title={message.question}>
+              {message.answer}
+            </ScrollRailPreview>
+          ),
+        }))}
+        onSelect={(index) =>
+          nodes.current[index]?.scrollIntoView({ block: "center" })
+        }
+      />
+      <div ref={scroller} className="h-96 overflow-y-auto">
+        {messages.map((message, index) => (
+          <article
+            key={message.id}
+            ref={(node) => {
+              nodes.current[index] = node;
+            }}
+          >
+            {message.answer}
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+## Focus
+
+Two focus modes ship as hooks, and both return a motion value — the rail never
+re-renders React while you scroll, it only writes styles.
+
+| Mode     | Hook                                           | Reading line                                                                                                                                                                 |
+| -------- | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Item     | `useMessageFocus(scroller, nodes, { offset })` | Measures every item and puts the reading line on whichever one it lands in. Focus is interpolated between neighbouring item centres, so the peak glides instead of stepping. |
+| Progress | `useScrollProgress(scroller, { count })`       | Pure scrolled distance, mapped across the tick count. No measurement, no reading line.                                                                                       |
+
+`offset` places that line inside the viewport: `0` is the top edge, `0.5` the centre,
+`1` the bottom edge. A transcript usually reads at the centre; a document with a sticky
+header often reads a third of the way down.
+
+The ends of the scroll are anchors of their own, because a reading line in the middle
+of the viewport can never reach the centre of an item sitting closer to the end of the
+content than half a viewport. Without them the first and last ticks would be
+unreachable: scrolled all the way down, the rail would still point a tick or two short
+of the end. Item mode also works when the container does not scroll at all — the
+reading line simply lands on the item it lands on.
+
+<ScrollRailProgressDemo />
+
+## Anatomy
+
+One tick per item, left-aligned, `pitch` apart. Two Gaussian falloffs away from the
+focus decide how a tick looks, and they are deliberately different widths:
+
+- **Width** is the read-out. `spread` sets how far the lengthening reaches, in ticks.
+  Between `minLength` and `maxLength`, which default to `10` and `28`.
+- **Colour** is the pointer. `highlight` sets how far the brightening reaches — keep it
+  tighter than `spread` so one tick reads as the position and its neighbours only hint
+  at direction. `minOpacity` is how faint the far end gets.
+
+Colour is `bg-current` at varying opacity, so the rail inherits
+`text-foreground` and any colour you put on it: `className="text-primary"` recolours
+the whole rail without touching a single prop.
+
+| Prop                      | Default     | Meaning                                                                    |
+| ------------------------- | ----------- | -------------------------------------------------------------------------- |
+| `pitch`                   | `10`        | Vertical distance between ticks, in px                                     |
+| `thickness`               | `2`         | Tick thickness, in px                                                      |
+| `minLength` / `maxLength` | `10` / `28` | Resting and focused tick length, in px                                     |
+| `spread`                  | `1.35`      | Width falloff, in ticks                                                    |
+| `highlight`               | `0.45`      | Colour falloff, in ticks                                                   |
+| `minOpacity`              | `0.2`       | Opacity at the far end                                                     |
+| `side`                    | `"left"`    | Which edge the rail sits on; flips the grow direction and the popover side |
+
+## Interaction
+
+Interaction is optional. With an `onSelect` or any `preview` the rail becomes a
+control; with neither it is a read-out, hidden from assistive tech and from the
+pointer.
+
+Hovering or focusing a tick lengthens it, brightens it, and opens its `preview` in a
+popover anchored to the tick. Both waits are deliberate: a preview opens only after
+the pointer has _rested_ on a tick, so sweeping down the rail opens nothing, and it
+survives for a beat after the pointer leaves — long enough to cross the gap into the
+panel itself. Previewing is gated behind `useHoverCapable`, and only keyboard focus
+(`:focus-visible`) holds a preview open, so a mouse click never pins one to a tick you
+have moved away from.
+
+The rail is one tab stop, not one per message: arrows, `Home` and `End` move between
+ticks, and the tick you land on keeps `aria-current`. Every tick names itself
+("3 of 11: question text") for screen readers. Bring your own reduced-motion handling
+when you scroll on select — the demo switches `behavior` from `smooth` to `auto`.
+
+## Component source
+
+<ComponentSource
+  name="scroll-rail"
+  src="registry/new-york/scroll-rail/index.tsx"
+  title="scroll-rail.tsx"
+/>

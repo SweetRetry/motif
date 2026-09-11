@@ -27,6 +27,7 @@ export default defineConfig({
         "lib/ease.ts",
         "lib/hooks/use-hover-capable.ts",
         "registry/new-york/agents/**",
+        "registry/new-york/scroll-rail/**",
       ],
       rules: {
         "@typescript-eslint/no-inferrable-types": "off",
