@@ -9,7 +9,13 @@ export const DurationSelectDemo = () => {
 
   return (
     <div className="w-full max-w-sm">
+      {/* The heading is the caller's: the control ships none, so the words on screen
+          and the words a screen reader hears are written in one place. */}
+      <div className="mb-2 font-medium text-muted-foreground text-xs">
+        Duration
+      </div>
       <DurationSelect
+        aria-label="Duration"
         max={15}
         min={1}
         onCommit={setDuration}
@@ -25,8 +31,11 @@ export const DurationSelectDemo = () => {
 /** A tighter range, to show the track reads at any span. */
 export const DurationSelectSecondsDemo = () => (
   <div className="w-full max-w-sm">
+    <div className="mb-2 font-medium text-muted-foreground text-xs">
+      Clip length
+    </div>
     <DurationSelect
-      label="Clip length"
+      aria-label="Clip length"
       max={30}
       min={5}
       // eslint-disable-next-line no-empty-function -- the range is the point; nothing to commit

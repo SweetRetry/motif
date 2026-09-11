@@ -9,7 +9,16 @@ export const RatioSelectDemo = () => {
 
   return (
     <div className="w-full max-w-sm">
-      <RatioSelect value={ratio} onChange={setRatio} />
+      {/* The heading is the caller's: the control ships none, so the words on screen
+          and the words a screen reader hears are written in one place. */}
+      <div className="mb-2 font-medium text-muted-foreground text-xs">
+        Aspect ratio
+      </div>
+      <RatioSelect
+        aria-label="Aspect ratio"
+        onChange={setRatio}
+        value={ratio}
+      />
       <p className="mt-3 font-mono text-muted-foreground text-xs">
         value: {ratio}
       </p>
@@ -20,8 +29,9 @@ export const RatioSelectDemo = () => {
 /** The glyphs on their own, to show the fixed window the shapes are drawn in. */
 export const RatioSelectAdaptiveDemo = () => (
   <div className="w-full max-w-sm">
+    <div className="mb-2 font-medium text-muted-foreground text-xs">Canvas</div>
     <RatioSelect
-      label="Canvas"
+      aria-label="Canvas"
       options={["1:1", "16:9", "9:16", "adaptive"]}
       // eslint-disable-next-line no-empty-function -- the value is pinned; the demo is the glyphs
       onChange={() => {}}

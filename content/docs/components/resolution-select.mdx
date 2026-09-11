@@ -26,9 +26,30 @@ import { ResolutionSelect } from "@/components/ui/resolution-select";
 export function Output() {
   const [resolution, setResolution] = useState("2K");
 
-  return <ResolutionSelect value={resolution} onChange={setResolution} />;
+  return (
+    <div className="space-y-2">
+      <div className="font-medium text-muted-foreground text-xs">
+        Resolution
+      </div>
+      <ResolutionSelect
+        aria-label="Resolution"
+        onChange={setResolution}
+        value={resolution}
+      />
+    </div>
+  );
 }
 ```
+
+## The heading is yours
+
+The control draws no label. A field's label belongs to the form around it — above,
+beside, in a `<legend>` — and that is layout the caller owns, not something a select
+should decide for the page it lands in. So the component renders the row and nothing
+else.
+
+That leaves one line of wiring: a heading you write is plain text, so pass `aria-label`
+with the same words and the name reaches a screen reader too.
 
 ## The plate, not the button
 
@@ -56,7 +77,8 @@ one the glyphs treat as the smallest.
 ## Accessibility
 
 The row is a group of `<button>`s with `aria-pressed`, focusable and operable by keyboard.
-The dots are `aria-hidden` — the tier is decorative and the label already says `2K`.
+The grid is a `role="group"` named by `aria-label`, so it is announced as one control. The
+dots are `aria-hidden` — the tier is decorative and the value already says `2K`.
 
 ## Component source
 

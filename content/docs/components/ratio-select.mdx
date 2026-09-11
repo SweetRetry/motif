@@ -26,16 +26,37 @@ import { RatioSelect } from "@/components/ui/ratio-select";
 export function Frame() {
   const [ratio, setRatio] = useState("16:9");
 
-  return <RatioSelect value={ratio} onChange={setRatio} />;
+  return (
+    <div className="space-y-2">
+      <div className="font-medium text-muted-foreground text-xs">
+        Aspect ratio
+      </div>
+      <RatioSelect
+        aria-label="Aspect ratio"
+        onChange={setRatio}
+        value={ratio}
+      />
+    </div>
+  );
 }
 ```
+
+## The heading is yours
+
+The control draws no label. A field's label belongs to the form around it — above,
+beside, in a `<legend>` — and that is layout the caller owns, not something a select
+should decide for the page it lands in. So the component renders the grid and nothing
+else.
+
+That leaves one line of wiring: a heading you write is plain text, so pass `aria-label`
+with the same words and the name reaches a screen reader too.
 
 Pass your own list when the model offers a different set. Five fit a row before the grid
 wraps, and `"adaptive"` / `"auto"` swap the glyph for a scan mark:
 
 ```tsx
 <RatioSelect
-  label="Canvas"
+  aria-label="Canvas"
   options={["1:1", "16:9", "9:16", "adaptive"]}
   value={ratio}
   onChange={setRatio}
@@ -63,8 +84,10 @@ rather than a string of digits, a trigger button being the obvious one.
 
 Each cell is a real `<button>` carrying `aria-pressed`, so the group is reachable and
 operable by keyboard and the current choice is announced rather than only coloured in.
-The glyph is `aria-hidden` throughout: the visible label is the value, and a screen
-reader should hear `16:9`, not a description of a rectangle.
+The grid is a `role="group"` named by `aria-label`, so the row is announced as one control
+rather than as five unrelated buttons. The glyph is `aria-hidden` throughout: the visible
+value is the label, and a screen reader should hear `16:9`, not a description of a
+rectangle.
 
 ## Component source
 

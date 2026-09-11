@@ -91,9 +91,13 @@ export const RatioIcon = ({
 };
 
 export interface RatioSelectProps {
+  /**
+   * Names the grid for assistive tech, e.g. `"Aspect ratio"` or `"Canvas"`. The
+   * heading above the control is the caller's to draw — the component ships no label,
+   * because a field's label belongs to the form around it.
+   */
+  "aria-label"?: string;
   className?: string;
-  /** Heading above the grid. Defaults to `"Aspect ratio"`. */
-  label?: string;
   /** Called with the chosen ratio, e.g. a `"16:9"` string. */
   onChange: (value: string) => void;
   /** Choices to offer, in display order. Five fit a row before wrapping. */
@@ -104,11 +108,12 @@ export interface RatioSelectProps {
 
 /**
  * The aspect ratio as a grid of to-scale glyphs. The frame answers "what shape am I
- * asking for" at a glance — the label under it is only there to confirm the number.
+ * asking for" at a glance — the ratio printed under it is only there to confirm the
+ * number.
  */
 export const RatioSelect = ({
+  "aria-label": ariaLabel,
   className,
-  label = "Aspect ratio",
   onChange,
   options = DEFAULT_OPTIONS,
   value,
@@ -118,41 +123,35 @@ export const RatioSelect = ({
   const columns = Math.max(1, Math.min(options.length, 5));
 
   return (
-    <div className={cn("space-y-2", className)}>
-      <div className="font-medium text-muted-foreground text-xs">{label}</div>
+    <div
+      aria-label={ariaLabel}
+      className={cn("grid gap-1.5", className)}
+      role="group"
+      style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
+    >
+      {options.map((ratio) => {
+        const isSelected = value === ratio;
 
-      <div
-        className="grid gap-1.5"
-        style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
-      >
-        {options.map((ratio) => {
-          const isSelected = value === ratio;
-
-          return (
-            <button
-              aria-pressed={isSelected}
-              className={cn(
-                "flex h-13 flex-col items-center justify-center gap-1 rounded-lg border p-1 text-xs outline-none transition-all focus-visible:ring-2 focus-visible:ring-ring/50",
-                isSelected
-                  ? "border-foreground/80 bg-accent font-semibold text-accent-foreground shadow-xs"
-                  : "border-border/40 bg-muted/20 text-muted-foreground hover:border-border hover:bg-muted/50 hover:text-foreground"
-              )}
-              key={ratio}
-              onClick={() => onChange(ratio)}
-              type="button"
-            >
-              <RatioIcon
-                ratio={ratio}
-                showReferenceBox={isSelected}
-                size={18}
-              />
-              <span className="font-mono text-xs leading-none tracking-tight">
-                {ratio}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+        return (
+          <button
+            aria-pressed={isSelected}
+            className={cn(
+              "flex h-13 flex-col items-center justify-center gap-1 rounded-lg border p-1 text-xs outline-none transition-all focus-visible:ring-2 focus-visible:ring-ring/50",
+              isSelected
+                ? "border-foreground/80 bg-accent font-semibold text-accent-foreground shadow-xs"
+                : "border-border/40 bg-muted/20 text-muted-foreground hover:border-border hover:bg-muted/50 hover:text-foreground"
+            )}
+            key={ratio}
+            onClick={() => onChange(ratio)}
+            type="button"
+          >
+            <RatioIcon ratio={ratio} showReferenceBox={isSelected} size={18} />
+            <span className="font-mono text-xs leading-none tracking-tight">
+              {ratio}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 };
