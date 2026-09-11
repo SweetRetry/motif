@@ -1,0 +1,231 @@
+---
+title: Activity Heatmap
+description: "A year of daily counts as a GitHub-style grid — a column per week, a row per weekday, one square per day, shaded by how much happened."
+---
+
+import { ActivityHeatmapDemo } from "@/examples/activity-heatmap";
+
+<ComponentPreview name="activity-heatmap">
+  <ActivityHeatmapDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/activity-heatmap.json
+```
+
+## Usage
+
+```tsx
+import { ActivityHeatmap } from "@/components/ui/activity-heatmap";
+
+export function AgentActivity() {
+  return <ActivityHeatmap className="text-chart-2" data={days} />;
+}
+```
+
+`days` is one entry per day you have something to say about:
+
+```ts
+const days = [
+  { date: "2025-03-03", value: 14 },
+  { date: "2025-03-04", value: 41 },
+  { date: "2025-03-05", value: 0 },
+];
+```
+
+Days with no entry are drawn as empty squares rather than skipped, so a gap in the data
+looks like a gap. Pass `Date` objects or calendar-day strings; either way the grid shows
+the day you meant.
+
+## Data and dates
+
+A contribution graph is about calendar days, not instants, and the two are easy to
+confuse. `new Date("2025-03-04")` is UTC midnight — which is March 3rd for anyone west of
+Greenwich, and a heatmap that is one day off is worse than no heatmap. So a plain
+`YYYY-MM-DD` string is read as a local calendar day, an ISO string with a time in it is
+parsed normally, and everything is then flattened to local midnight. Day arithmetic never
+touches epoch milliseconds, so nothing slips on a DST boundary either.
+
+The grid ends on a real day — today unless `end` says otherwise — and starts on the first
+day of a week, so a year of history comes out as 53 columns rather than 52.1. Data past
+`end` extends the range instead of being hidden, because a component that silently drops
+rows is a component you stop trusting.
+
+## Levels
+
+Five of them: empty, then four shades. The cut points between the shades are quantiles of
+the non-empty counts — the top quarter of days, the top half, and so on — with level 4
+pinned to the 95th percentile rather than the maximum, so a dark square keeps meaning
+"that day was unusual" instead of "that was a Tuesday".
+
+Quantiles are what GitHub uses and they are the right default for activity data, which is
+skewed: a handful of burst days would flatten a linear scale into one shade. Their cost is
+real, though — a level describes a day relative to the others, so the same count can change
+colour when the dataset does. When a level has to keep its meaning, pass the cut points:
+
+```tsx
+// Fixed meaning: 1–4 runs is light, 40+ is the darkest.
+<ActivityHeatmap data={days} thresholds={[4, 10, 20, 40]} />
+```
+
+Cut points are read from the whole dataset rather than the visible range, so narrowing the
+window rearranges the grid without repainting what is left of it.
+
+When the level is known before the component sees it, put it on the datum and the scale is
+skipped:
+
+```ts
+{ date: "2025-03-04", value: 41, level: 4 }
+```
+
+Ties land on the lower level, so a plateau of identical days reads as one shade instead of
+splitting across two.
+
+## Range and geometry
+
+| Prop           | Default | Does                                                     |
+| -------------- | ------- | -------------------------------------------------------- |
+| `weeks`        | `53`    | Columns of history; 53 is a year and a day               |
+| `weekStartsOn` | `0`     | Which day a column starts on, `0` Sunday to `6` Saturday |
+| `end`          | today   | The last day on the grid; data past it extends the range |
+| `cellSize`     | `11`    | Side of a square, in px                                  |
+| `gap`          | `3`     | Space between squares, in px — and around the grid       |
+
+53 columns is a year plus a day on purpose: it puts a given weekday in the same row as
+it was a year ago, which is what makes the vertical bands of a weekly rhythm line up.
+
+Anything older than the first column is simply outside the grid — the window is `weeks`
+wide, not "everything you passed". Narrowing `weeks` is how a range switch is built.
+
+The grid is wider than a phone, so it scrolls inside its own container with the page body
+left alone. Everything on it is sized in px rather than in a fluid unit — squares that
+resize with the viewport stop being a calendar and start being a chart.
+
+Summarising is the caller's job. The component draws the grid; the line above it —
+"_4,102 runs in the last 12 months_" — belongs to whoever knows what a run is. If the
+summary and the grid have to agree, derive both from the same `weeks` the way the demo
+does.
+
+## Colour
+
+The scale is one colour at five alphas rather than five hand-picked hexes: it is one
+decision instead of four, it holds on both themes, and it leaves the hue to the caller —
+so a token class at the call site is the whole palette.
+
+```tsx
+<ActivityHeatmap className="text-chart-2" data={days} />
+```
+
+`text-chart-2`, `text-primary`, `text-muted-foreground` — anything that sets a text colour
+works, because the ramp is built from `currentColor`. Leaving `className` off is not an
+unset colour either: the root carries `text-foreground`, so the default is a neutral grey
+scale that reads as "no opinion" beside whatever accent the page already uses. `className`
+is merged rather than concatenated, so the caller's token wins over that default without an
+override prop.
+
+Three layers decide what a square is painted with, each overriding the one under it:
+
+| Layer                | Set with    | Use it for                                        |
+| -------------------- | ----------- | ------------------------------------------------- |
+| `--heatmap-0` … `-4` | `style`     | a curated ramp, one level at a time               |
+| `--heatmap-tint`     | `style`     | the whole ramp in one line, e.g. `var(--chart-3)` |
+| `currentColor`       | `className` | the everyday case — any `text-*` token            |
+
+The middle layer is the one that matters most in practice, because a chart palette is
+already a sequence:
+
+```tsx
+// The whole scale, from one token, without touching the five levels.
+<ActivityHeatmap data={days} style={{ "--heatmap-tint": "var(--chart-2)" }} />
+```
+
+The alphas are 12% for an empty day and 26 / 46 / 70 / 100% for levels 1–4. Level 0 is
+deliberately much lower than the next step: an empty square should read as empty, not as
+the first shade of busy.
+
+Alpha rather than a fixed ramp is the one decision here worth defending. `--chart-1` …
+`--chart-5` are defined once and used in both themes, and in this theme they run from
+`blue-300` to `blue-800` — so mapping level 1 to `--chart-1` and level 4 to `--chart-4`
+would make the busiest days the _darkest_ squares on a dark background, and the scale would
+read backwards. An alpha ramp cannot invert: it always moves away from whatever surface it
+is on, in either theme, with no second set of values to maintain.
+
+When a curated ramp is what you want, define it per theme — the values below look right on
+light and would need a `.dark` counterpart that moves the other way:
+
+```tsx
+<ActivityHeatmap
+  data={days}
+  style={{
+    "--heatmap-0": "oklch(0.97 0 0)",
+    "--heatmap-1": "oklch(0.87 0.08 150)",
+    "--heatmap-2": "oklch(0.75 0.16 150)",
+    "--heatmap-3": "oklch(0.6 0.16 150)",
+    "--heatmap-4": "oklch(0.45 0.13 150)",
+  }}
+/>
+```
+
+Anything unset falls back down the chain, so setting one level does not cost the others.
+
+## Tooltip and locale
+
+| Prop          | Default                 | Does                              |
+| ------------- | ----------------------- | --------------------------------- |
+| `formatValue` | count, or "No activity" | The count in the tooltip          |
+| `formatDate`  | `Mar 4, 2025`           | The date in the tooltip           |
+| `locale`      | `en-US`                 | Month, weekday and date names     |
+| `legend`      | `true`                  | The Less/More ramp under the grid |
+
+```tsx
+<ActivityHeatmap
+  data={days}
+  formatValue={(value) => `${value} tool calls`}
+  formatDate={(date) => date.toDateString()}
+/>
+```
+
+There is one tooltip for the whole grid, not one per square. It is moved and retyped
+through the DOM on hover, which is why a 371-square grid does not re-render when the
+pointer crosses it — the same string is already on the square as the label a screen reader
+reads. It is positioned `fixed` so that it escapes the grid's own scroll container; an
+absolutely positioned bubble would be clipped at the container's edge, which is exactly
+where a tooltip is most likely to want to go. It hides on scroll, on leaving the grid, and
+on hovering a day that has not happened yet.
+
+`locale` is fixed rather than read from the browser so that the server and the client
+render the same string — hydration does not care which language you prefer, only that both
+sides agree. Pass `Intl`'s locale string for the one you want.
+
+## Reduced motion
+
+On mount the grid fills in column by column, left to right: a year of squares appearing at
+once reads as texture, and appearing as a wave reads as a year _accumulating_, which is the
+same story the numbers tell. It is a CSS animation, one per square, staggered 12ms a column
+and capped at 44 columns, so a longer history does not turn the tail into a pause.
+
+With `prefers-reduced-motion` the animation is dropped and the grid is simply there. New
+squares that appear later — a live dataset gaining a day — animate on their own, because
+the wave is attached to the element rather than run by the component.
+
+## Accessibility
+
+The grid is a real `<table>`: a column per week, a row per weekday, a `<th scope="row">` on
+each weekday, a `<th scope="colgroup">` per month. Table navigation is how a screen reader
+moves through it cell by cell, and each square carries its own label — "41 runs on Mar 4,
+2025" — so a level never has to be inferred from a colour. A `sr-only` `<caption>` names
+the whole thing: the range it covers and the total it adds up to.
+
+Squares are not individually focusable. 371 tab stops is a worse experience than none, and
+the content is reachable without them, so the grid is left out of the tab order entirely
+and the tooltip stays a pointer affordance.
+
+## Component source
+
+<ComponentSource
+  name="activity-heatmap"
+  src="registry/new-york/activity-heatmap.tsx"
+  title="activity-heatmap.tsx"
+/>

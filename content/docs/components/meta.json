@@ -2,6 +2,7 @@
   "title": "Components",
   "pages": [
     "index",
+    "activity-heatmap",
     "aspect-ratio-picker",
     "attachment",
     "cover-fan",

@@ -3,6 +3,20 @@
   "homepage": "https://github.com/shadcn-labs/startercn",
   "items": [
     {
+      "name": "activity-heatmap",
+      "type": "registry:ui",
+      "title": "Activity Heatmap",
+      "description": "A year of daily activity as a GitHub-style grid: a column per week, a row per weekday, one square per day, shaded by how much happened.",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [
+        {
+          "path": "registry/new-york/activity-heatmap.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/activity-heatmap.tsx"
+        }
+      ]
+    },
+    {
       "name": "approval-card",
       "type": "registry:component",
       "title": "Approval Card",
