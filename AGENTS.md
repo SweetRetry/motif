@@ -1,5 +1,64 @@
 # AGENTS.md
 
+## The inherited template is not ours to edit
+
+`startercn` came with a whole site: page chrome, docs infrastructure, the `components/ui`
+primitives, `styles/`, and a placeholder registry entry. Those files are the upstream's and
+stay as they came. Our work lands in files we add — registry items under
+`registry/new-york/`, their docs pages and their examples — and in the entries we add to
+`registry.json`.
+
+Two consequences. A sweep — an animation audit, a colour audit, a dead-code hunt — reports
+on inherited files and stops there: `components/announcement.tsx` is unused downstream code
+that belongs to the template, not a file to delete. And when an inherited file genuinely
+has to change, it is one named decision inside the task — never a side effect of a sweep.
+
+Which side a file is on is mechanical: `git cat-file -e 5e5c379:<path>` — the scaffold
+commit — exits 0 for the template's files.
+
+## Compound components
+
+A surface ships as a compound component: a root that owns the state and named parts that
+compose it — `PromptInput` over `PromptInputHeader` / `PromptInputTextarea` /
+`PromptInputFooter`, `SettingsDialog` over its rows and sections. Parts are the product.
+A caller rearranges them, drops one into a different frame, or leaves one out; a prop on a
+monolith cannot be rearranged, and every surface that outgrows it becomes a second prop.
+
+Two rules follow. A slot with nothing in it draws nothing. A part with no handler behind
+it is not drawn at all.
+
+## Base components come first
+
+A higher-order component is assembled from base components: it imports them at the path
+they are installed to — `@/components/ui/waiting-row`, `@/components/ui/button` — declares
+them in the registry item's `registryDependencies`, and lets `shadcn add` bring them along.
+Thinking Block is Waiting Row plus a window, a mask and a follow; Prompt Input is
+Attachment, Button and Dropdown Menu, plus a field of its own.
+
+So the base comes first. When a composite needs a piece the registry does not have yet,
+the piece ships on its own — source, docs page, registry item — and the composite is then
+written against it. The base is what every later surface reuses; a composite that inlines
+the primitive makes the next one write it again.
+
+## Colors come from the theme
+
+Every color a component draws is a shadcn token — `bg-card`, `text-muted-foreground`,
+`border-ring/50`, `bg-primary`, `text-success` — so dark mode and a theme swap restyle it
+for free. A token names the role the component actually knows (`muted`, `destructive`); a
+palette hue (`bg-zinc-800`, `#1c1c1c`) bakes in a guess about the theme it will be drawn
+on and is wrong the moment that changes.
+
+A state is a token like any other: reject and failure are `destructive`, success is
+`success`, a step walked past is `warning`. When a component needs a state the theme does
+not name yet, the theme gets the token — in `:root`, `.dark` and `@theme`, and in the
+registry item's `cssVars` so `shadcn add` brings it along — and the component is written
+against it. The tell that a token is missing: a literal carrying its own dark value, like
+`text-rose-600 dark:text-rose-400`, is a token being re-written by hand.
+
+Literal color is right when what it is measured against is not the theme: a scrim over
+user artwork, the full-opacity stop inside an SVG mask, a cast shadow landing on a photo.
+Those are content-independent by nature rather than a shortcut around the palette.
+
 ## Browser use requires confirmation
 
 Reaching for a browser — ego-browser, or any other browser automation — is a
