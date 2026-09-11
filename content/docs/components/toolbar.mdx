@@ -1,0 +1,118 @@
+---
+title: Toolbar
+description: "A floating dock that names itself on approach: the glyph under the pointer swells and its label arrives above it. The bar never moves — and an item that earns the width can pin its label into the row."
+---
+
+import { ToolbarDemo, ToolbarPinnedDemo } from "@/examples/toolbar";
+
+<ComponentPreview name="toolbar">
+  <ToolbarDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/toolbar.json
+```
+
+## Usage
+
+```tsx
+import {
+  Toolbar,
+  ToolbarItem,
+  ToolbarSeparator,
+} from "@/components/ui/toolbar";
+
+export function Dock() {
+  const [section, setSection] = useState("work");
+
+  return (
+    <Toolbar aria-label="Sections">
+      <ToolbarItem
+        icon={<House />}
+        label="Overview"
+        active={section === "overview"}
+        onSelect={() => setSection("overview")}
+      />
+      <ToolbarItem
+        icon={<LayoutGrid />}
+        label="Work"
+        active={section === "work"}
+        onSelect={() => setSection("work")}
+      />
+      <ToolbarSeparator />
+      <ToolbarItem
+        icon={<GithubIcon />}
+        label="Source code on GitHub"
+        displayLabel="Source"
+        href="/source"
+      />
+    </Toolbar>
+  );
+}
+```
+
+Pass `href` instead of `onSelect` and the item renders an anchor rather than a button;
+add `external` to send it out to a new tab with the right `rel`. `active` is the item's own
+state — the bar does not track a selection for you, so it works the same whether the value
+lives in `useState` or comes from the router.
+
+## The name arrives; the bar does not
+
+An icon-only row is a memory test, so every item names itself on hover. The first cut of
+this component unrolled the label _into_ the row: the hovered item widened, the label
+uncovered from the left, and the neighbours slid across to make room. It looks good in a
+still image, and it feels like a twitch in the hand — every hover reflows the whole bar, so
+the glyph you were aiming at is no longer where you left it. Reaching for a second item
+means chasing it.
+
+So the label travels instead. The plate stays 36px, the row never changes width, and the
+word arrives above the glyph. The only thing that moves is the glyph's own transform — a
+swell to about 1.08× on the shared spring — which costs no layout at all. Aiming is
+stable, and a sweep across the bar is silent.
+
+Hovering is gated behind `(hover: hover) and (pointer: fine)`, so a touch device does not
+leave a phantom hover stuck to a glyph after a tap.
+
+## Pinned labels
+
+Some items earn the width: the action the bar exists for, or a state the user needs to read
+without reaching for it. Pass `displayLabel` and that word is pinned into the row — the
+item becomes a pill rather than a plate.
+
+The two labels are separate jobs, and the component keeps them separate. `label` is the
+full name: the tooltip, and the accessible name. `displayLabel` is the shorthand the row
+can afford. An item can be a lone glyph, a glyph with `Source` beside it, and a tooltip
+that still spells out `Source code on GitHub` — the row is short, the name is not.
+
+So the tooltip stays on every item, pinned word or not. Keep the visible word inside
+`label` — `Source` inside `Source code on GitHub` — and the name a screen reader hears
+matches the name on screen.
+
+<ComponentPreview name="toolbar" align="start">
+  <ToolbarPinnedDemo />
+</ComponentPreview>
+
+Icon-only and pinned items mix in the same bar; the separator works the same on both sides
+of it.
+
+## Accessibility
+
+The bar is a `role="toolbar"` with arrow keys bound to it: <kbd>←</kbd> and <kbd>→</kbd>
+walk the glyphs, <kbd>Home</kbd> and <kbd>End</kbd> jump to the ends, and every item
+remains a tab stop so the row can also be crossed with <kbd>Tab</kbd>.
+
+A glyph carries `label` as its accessible name and describes itself with the tooltip
+through Radix's `aria-describedby` — the two never disagree, because both are the same
+`label` prop, which is why the row's shorthand never becomes the accessible name. An
+`active` item carries `aria-current` — `page` when it is a link, `true` otherwise — so the
+current section is announced rather than only coloured in.
+
+## Component source
+
+<ComponentSource
+  name="toolbar"
+  src="registry/new-york/toolbar.tsx"
+  title="toolbar.tsx"
+/>

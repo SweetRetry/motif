@@ -208,6 +208,31 @@
           "target": "@components/ui/generation-surface.tsx"
         }
       ]
+    },
+    {
+      "name": "toolbar",
+      "type": "registry:ui",
+      "title": "Toolbar",
+      "description": "A floating dock of glyphs that names itself on approach: the icon under the pointer swells and its label arrives above it, while the bar itself never moves. Items that earn the width can pin their label into the row.",
+      "dependencies": ["clsx", "motion", "tailwind-merge"],
+      "registryDependencies": ["tooltip"],
+      "files": [
+        {
+          "path": "registry/new-york/toolbar.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/toolbar.tsx"
+        },
+        {
+          "path": "lib/hooks/use-hover-capable.ts",
+          "type": "registry:hook",
+          "target": "@lib/hooks/use-hover-capable.ts"
+        },
+        {
+          "path": "lib/ease.ts",
+          "type": "registry:lib",
+          "target": "@lib/ease.ts"
+        }
+      ]
     }
   ]
 }

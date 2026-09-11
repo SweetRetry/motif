@@ -9,6 +9,7 @@
     "loading-state",
     "ratio-select",
     "resolution-select",
-    "scroll-rail"
+    "scroll-rail",
+    "toolbar"
   ]
 }
