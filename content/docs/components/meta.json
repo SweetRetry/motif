@@ -2,12 +2,14 @@
   "title": "Components",
   "pages": [
     "index",
+    "animated-edge",
     "attachment",
     "duration-select",
     "generation-surface",
     "ratio-select",
     "resolution-select",
     "scroll-rail",
+    "settings-modal",
     "toolbar"
   ]
 }

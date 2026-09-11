@@ -210,6 +210,20 @@
       ]
     },
     {
+      "name": "animated-edge",
+      "type": "registry:ui",
+      "title": "Animated edge",
+      "description": "A bezier connector that carries a pulse of light from one end to the other while work is in flight — bright in the middle, faded at both ends — and rests as a plain line when it is not.",
+      "dependencies": ["clsx", "motion", "tailwind-merge"],
+      "files": [
+        {
+          "path": "registry/new-york/animated-edge.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/animated-edge.tsx"
+        }
+      ]
+    },
+    {
       "name": "toolbar",
       "type": "registry:ui",
       "title": "Toolbar",
@@ -226,6 +240,31 @@
           "path": "lib/hooks/use-hover-capable.ts",
           "type": "registry:hook",
           "target": "@lib/hooks/use-hover-capable.ts"
+        },
+        {
+          "path": "lib/ease.ts",
+          "type": "registry:lib",
+          "target": "@lib/ease.ts"
+        }
+      ]
+    },
+    {
+      "name": "settings-modal",
+      "type": "registry:component",
+      "title": "Settings modal",
+      "description": "Destinations down the left, one panel on the right: a rail you can walk with the arrow keys, a panel that fades in, and the row, section and card the panel is built from.",
+      "dependencies": ["clsx", "lucide-react", "motion", "tailwind-merge"],
+      "registryDependencies": ["dialog"],
+      "files": [
+        {
+          "path": "registry/new-york/settings-modal/index.tsx",
+          "type": "registry:component",
+          "target": "@components/settings-modal/index.tsx"
+        },
+        {
+          "path": "registry/new-york/settings-modal/types.ts",
+          "type": "registry:component",
+          "target": "@components/settings-modal/types.ts"
         },
         {
           "path": "lib/ease.ts",
