@@ -330,6 +330,31 @@
           "target": "@components/ui/cover-fan.tsx"
         }
       ]
+    },
+    {
+      "name": "skill-detail",
+      "type": "registry:component",
+      "title": "Skill Detail",
+      "description": "A skill's detail surface: a card that opens it, and a panel that says what it is, what it is for, and what is inside it. Tags, cover and example prompts up top, then a file tree whose preview is your renderer — with only the toolbar controls you wired up.",
+      "dependencies": ["clsx", "lucide-react", "motion", "tailwind-merge"],
+      "registryDependencies": ["button", "dialog", "switch"],
+      "files": [
+        {
+          "path": "registry/new-york/agents/skill-detail/index.tsx",
+          "type": "registry:component",
+          "target": "@components/agents/skill-detail/index.tsx"
+        },
+        {
+          "path": "registry/new-york/agents/skill-detail/types.ts",
+          "type": "registry:component",
+          "target": "@components/agents/skill-detail/types.ts"
+        },
+        {
+          "path": "lib/ease.ts",
+          "type": "registry:lib",
+          "target": "@lib/ease.ts"
+        }
+      ]
     }
   ]
 }

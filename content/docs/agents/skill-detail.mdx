@@ -1,0 +1,212 @@
+---
+title: Skill Detail
+description: "A skill's detail surface, in two columns: a rail that says what the skill is and a workspace that shows what is inside it. A card opens it, the dialog is optional."
+---
+
+import { SkillDetailDemo } from "@/examples/skill-detail";
+
+<ComponentPreview
+  name="skill-detail"
+  align="start"
+  previewClassName="p-4 sm:p-6"
+>
+  <SkillDetailDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/skill-detail.json
+```
+
+## Usage
+
+```tsx
+import {
+  SkillCard,
+  SkillDetailDialog,
+} from "@/components/agents/skill-detail";
+
+export function Library({ skills }: { skills: Skill[] }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+  const open = skills.find((skill) => skill.id === openId);
+
+  return (
+    <>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        {skills.map((skill) => (
+          <SkillCard
+            cover={skill.cover}
+            description={skill.summary}
+            key={skill.id}
+            onOpen={() => setOpenId(skill.id)}
+            title={skill.name}
+          />
+        ))}
+      </div>
+
+      {open ? (
+        <SkillDetailDialog
+          author={open.author}
+          cover={open.cover}
+          description={open.description}
+          files={open.files}
+          folder={open.slug}
+          onOpenChange={(next) => setOpenId(next ? open.id : null)}
+          open
+          prompts={open.prompts}
+          renderPreview={(file) => (
+            <Markdown source={read(open.id, file.path)} />
+          )}
+          tags={open.tags}
+          title={open.name}
+        />
+      ) : null}
+    </>
+  );
+}
+```
+
+## Card, panel, dialog
+
+The panel is not a modal and the card is not a button the panel knows about: three
+pieces, three jobs, and you can leave any of them out.
+
+- **`SkillCard`** is the summary and nothing else — cover, name, one clamped line. It
+  holds no actions of its own, because every action a skill has belongs in the panel,
+  where there is room to explain it. Pass `href` instead of `onOpen` and the card
+  navigates to a page of its own rather than opening in place. Its cover is drawn at 16:9
+  whatever the art is, so a portrait poster loses its top and its tail.
+- **`SkillDetail`** is the surface: a rail of identity, examples and description, next to
+  a workspace of files and their contents. It fills whatever box you give it — give it a
+  height and it behaves like a sheet, leave the height off and it grows with its contents.
+- **`SkillDetailDialog`** is the handful of lines of plumbing: it sizes the panel at
+  `min(46rem, 88dvh)` and `max-w-5xl`, names the dialog for assistive tech, and wires the
+  panel's close control to closing. Leave it out and the panel sits in a page just as
+  happily.
+
+The dialog leans on the panel rather than the other way around: `onClose` is dropped from
+`SkillDetailDialog` because the dialog owns it. Everything else passes straight through,
+and `open` works controlled or uncontrolled with `defaultOpen`, like the panel's own
+selection.
+
+## Two jobs, two columns
+
+A detail panel is opened to answer one of two questions, and they are not read in the same
+way. *What is this?* is read once, top to bottom, and it is short: a name, a line about
+who made it, a paragraph, three examples. *What is inside it?* is browsed — the tree is
+scanned, one file is read, another file is read. Stacked, the second question starts below
+a screen of prose, so the panel becomes a document you scroll rather than a surface you
+use; the files may as well not be there until you have read everything above them.
+
+So they sit side by side: a 20rem rail for the reading, and everything left over for the
+browsing. Each column scrolls on its own, and only when it has to — the rail is short
+enough that it usually does not, and the preview is the one thing that always can.
+
+The split keys off the panel's own width rather than the viewport's, with a container
+query at 56rem. The same panel is a dialog here, a sheet there, a route of its own
+somewhere else, and only its own box decides whether there is room for two columns. Under
+that width — a phone, a narrow sheet — the rail and the workspace stack into one scroller
+in that order, which is the only arrangement that fits.
+
+## Examples, not example cards
+
+An example prompt is a line you might have typed, so it is drawn as one: a rule down the
+side, two lines of text, and the whole row is the button. Three of these cost the height
+of a single bordered card with an icon in the corner, which matters most in the column
+that has the least room. Without `onPrompt` they are not buttons at all — the rows render
+as plain text, because an example that cannot be sent anywhere is just documentation.
+
+## Files are paths
+
+`files` is a list of paths — `references/api.md` — and folders are implied by the
+slashes. There is no nested model to build and nothing is sorted: the order you wrote the
+paths in is the order the tree draws them, because a skill folder has an intended reading
+order and a generic sort (`SKILL.md` above `LICENSE.txt`) is a guess.
+
+Pass `folder` and that name becomes the root row, expanded, with everything nested under
+it collapsed to start — a deep tree opens as a short list. The first file is selected
+until told otherwise: a panel that opens on an empty preview pane reads as broken rather
+than as unselected.
+
+A folder row carries the disclosure chevron and a folder glyph — open while it is open —
+and a file row carries a glyph picked from its extension. Files keep the chevron's width
+as an empty slot, so every glyph in a level sits in one column and the labels never
+stagger.
+
+Selection and expansion are uncontrolled by default. Pass `selectedPath` and you own the
+selection; pass `onFileSelect` and you get told about it either way.
+
+## The preview is yours
+
+The panel hands `renderPreview` the selected `SkillFile` and draws whatever comes back, so
+a markdown pipeline, a syntax highlighter, a diff or an iframe all sit behind one prop
+without the panel knowing what a file is. Omit it and the tree stands on its own as a
+read-only manifest, in a single column.
+
+`SkillCode` is exported for the common case — a labelled, read-only block with a copy
+button that confirms in place — and it is deliberately uncoloured. Highlighting a skill's
+front matter would mean pulling a highlighter into the bundle to colour four lines that
+read fine in the foreground.
+
+```tsx
+<div className="flex flex-col gap-6">
+  <SkillCode code={frontMatter} language="YAML" />
+  <Markdown source={body} />
+</div>
+```
+
+## Anatomy
+
+The toolbar is a header, not a sticky bar over the scroller: the body is its own scroll
+box, so nothing ever passes underneath the controls and there is no translucent corner to
+get wrong. It draws a control only when you pass the handler that makes it do something —
+no `onClose` means no close button, and the panel never offers an action it cannot
+perform. `menu` is where a "…" dropdown goes when you have one.
+
+The tree is one tab stop with a roving focus, and the arrow keys walk it the way a file
+tree is expected to: down and up move a row, right opens a folder (or steps into an open
+one), left closes it (or steps back out to the folder that owns the row), `Home` and `End`
+jump to the ends. Enter and Space are the row's own click, so a folder toggles and a file
+selects.
+
+Because the tree is drawn flat — one list of rows, indented — a collapsing folder animates
+every row it owns at once instead of one nested block, and the levels are named in ARIA
+(`aria-level`, `aria-posinset`, `aria-setsize`) rather than implied by real nesting. The
+enable switch is a real switch with a label of its own (`Enable {title}`), not a
+decoration beside the heading.
+
+| Region   | Prop                            | Notes                                                        |
+| -------- | ------------------------------- | ------------------------------------------------------------ |
+| Card     | `cover`, `title`, `description` | The summary: one line, clamped to two, cover at 16:9         |
+| Card     | `onOpen` / `href`               | Opens in place, or navigates when the skill has a page        |
+| Rail     | `tags`, `title`, `author`       | The heading is the only required prop                         |
+| Rail     | `cover`                         | Flat and small beside the heading, at the card's own ratio    |
+| Rail     | `updatedAt`                     | Already formatted — the panel does not touch dates            |
+| Rail     | `onTry` / `tryLabel`            | The primary button, dropped when there is no handler          |
+| Rail     | `description`                   | A paragraph, not a subtitle                                   |
+| Rail     | `prompts` / `promptsLabel`      | Rows become buttons once `onPrompt` is passed                 |
+| Toolbar  | `enabled` / `defaultEnabled`    | Passing either draws the switch, controlled or not            |
+| Toolbar  | `menu`                          | Slot for a "…" dropdown; the panel ships no menu of its own   |
+| Files    | `files`, `folder`               | Paths in; the tree is built for you                           |
+| Files    | `renderPreview`                 | The only part of the tree the panel does not draw             |
+| Dialog   | `open` / `onOpenChange`         | Uncontrolled with `defaultOpen`, like the panel's selection   |
+
+## Motion
+
+Expanding a folder is a layout change, so it stays short and eases out, with a fade that
+keeps rows from landing at full strength while their height is still near zero. A file's
+contents are a place rather than a direction, so the incoming preview fades instead of
+sliding in from one side — and only the incoming one animates, so half the duration never
+lands between the click and the contents.
+
+Under `prefers-reduced-motion` the rows still open and close, but without the height
+animation, and the preview swaps without the fade.
+
+## Component source
+
+<ComponentSource
+  name="skill-detail"
+  src="registry/new-york/agents/skill-detail/index.tsx"
+  title="skill-detail.tsx"
+/>
