@@ -1,0 +1,70 @@
+---
+title: Attachment
+description: A square attachment chip for composer rows — image thumbnails, file glyphs, and upload progress drawn around the card's own border.
+---
+
+import { AttachmentDemo } from "@/examples/attachment";
+
+<ComponentPreview name="attachment">
+  <AttachmentDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/attachment.json
+```
+
+## Usage
+
+```tsx
+import { Attachment } from "@/components/ui/attachment";
+
+export function Composer() {
+  return (
+    <div className="flex flex-wrap gap-4">
+      <Attachment name="raven.jpg" src="/raven.jpg" onRemove={remove} />
+      <Attachment name="payrollz.xlsx" progress={72} />
+      <Attachment name="report.pdf" onRemove={remove} />
+    </div>
+  );
+}
+```
+
+## Size
+
+The chip is 56px, which is the floor — smaller and the name and remove button stop being
+usable. There is no `size` prop: the chip is a container query context and every internal
+dimension is a share of its own width, so a width in `className` scales the whole thing
+(glyph, type, ring, button) proportionally. Text keeps an absolute minimum so it stays
+legible at 56px.
+
+## States
+
+`status` defaults to `uploading` while `progress` is under 100 and `ready` after, so
+passing `progress` is usually enough.
+
+| Status      | Renders                                                                                                                          |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `uploading` | Progress arc around the card plus the percentage; the thumbnail dims to 40%                                                      |
+| `ready`     | Thumbnail or glyph with the file name, and the remove button when `onRemove` is set (`ready` only — the mock keeps uploads bare) |
+| `error`     | The same layout with the arc and name in `text-destructive`, arc full                                                            |
+
+The arc is an SVG `path` tracing the chip's border: it starts at the top centre and runs
+clockwise, in the theme's `primary` (the reference mock used a blue accent — swap
+`stroke-primary` / `text-primary` for a literal blue if you want that hue).
+
+## Glyph
+
+File attachments pick their glyph from the extension — `pdf`/`docx`/`txt` a page,
+`xlsx`/`csv` a spreadsheet, `zip`/`tar` an archive, `mp3`/`wav` audio, `mp4`/`mov` video,
+`ts`/`js` code, `json`, and images an image — falling back to a plain page for anything
+unlisted. Pass `icon` to override it, or `src` to render a real thumbnail instead.
+
+## Component source
+
+<ComponentSource
+  name="attachment"
+  src="registry/new-york/attachment.tsx"
+  title="attachment.tsx"
+/>

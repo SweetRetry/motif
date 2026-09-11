@@ -56,6 +56,20 @@
           "target": "@lib/hooks/use-hover-capable.ts"
         }
       ]
+    },
+    {
+      "name": "attachment",
+      "type": "registry:ui",
+      "title": "Attachment",
+      "description": "A square attachment chip for composer rows: image thumbnails, file glyphs and upload progress traced around the card border.",
+      "dependencies": ["clsx", "lucide-react", "tailwind-merge"],
+      "files": [
+        {
+          "path": "registry/new-york/attachment.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/attachment.tsx"
+        }
+      ]
     }
   ]
 }
