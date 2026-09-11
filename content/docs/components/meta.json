@@ -1,4 +1,4 @@
 {
   "title": "Components",
-  "pages": ["index", "agents", "attachment", "scroll-rail"]
+  "pages": ["index", "agents", "attachment", "loading-state", "scroll-rail"]
 }

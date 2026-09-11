@@ -72,6 +72,20 @@
       ]
     },
     {
+      "name": "loading-state",
+      "type": "registry:ui",
+      "title": "Loading State",
+      "description": "A nine-square wave, a shimmering label and a live duration — the row a surface shows while it waits for work to come back.",
+      "dependencies": ["clsx", "motion", "tailwind-merge"],
+      "files": [
+        {
+          "path": "registry/new-york/loading-state.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/loading-state.tsx"
+        }
+      ]
+    },
+    {
       "name": "scroll-rail",
       "type": "registry:component",
       "title": "Scroll rail",

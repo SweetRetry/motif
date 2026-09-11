@@ -44,6 +44,7 @@ export const ComponentSource = async ({
   collapsible = true,
   className,
   language,
+  maxLines,
 }: {
   name?: string;
   src?: string;
@@ -51,6 +52,8 @@ export const ComponentSource = async ({
   collapsible?: boolean;
   className?: string;
   language?: string;
+  /** Truncates the source to its first n lines, for a preview peek. */
+  maxLines?: number;
 }) => {
   let code: string | null = null;
 
@@ -67,6 +70,10 @@ export const ComponentSource = async ({
   }
 
   code = await formatCode(code);
+
+  if (maxLines) {
+    code = code.split("\n").slice(0, maxLines).join("\n");
+  }
 
   const lang = language ?? title?.split(".").pop() ?? "tsx";
   const highlightedCode = await highlightCode(code, lang);
