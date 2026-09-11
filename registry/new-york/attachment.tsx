@@ -118,13 +118,9 @@ const glyphFor = (name: string) => {
 
 const clamp = (value: number) => Math.max(0, Math.min(100, value));
 
-/** `primary` is near-black, so a preview needs a light arc to stay visible. */
-const ringTone = ({ failed, image }: { failed: boolean; image: boolean }) => {
-  if (failed) {
-    return "stroke-destructive";
-  }
-  return image ? "stroke-white" : "stroke-primary";
-};
+/** Failed uploads read in the destructive token, everything else in `primary`. */
+const ringTone = (failed: boolean) =>
+  failed ? "stroke-destructive" : "stroke-primary";
 
 const resolveStatus = ({
   progress,
@@ -171,11 +167,9 @@ const resolveA11y = ({
 
 const AttachmentRing = ({
   failed,
-  image,
   percent,
 }: {
   failed: boolean;
-  image: boolean;
   percent: number;
 }) => (
   <svg
@@ -189,7 +183,7 @@ const AttachmentRing = ({
     <path
       className={cn(
         "transition-[stroke-dashoffset] duration-500 ease-linear",
-        ringTone({ failed, image })
+        ringTone(failed)
       )}
       d={RING_PATH}
       pathLength={100}
@@ -258,11 +252,8 @@ const AttachmentBody = ({
       {image ? null : <AttachmentGlyph name={name}>{icon}</AttachmentGlyph>}
       {uploading ? (
         <span
-          className={cn(
-            // Ratios would render 8px type at the 56px floor, so text keeps a minimum.
-            "ml-auto pt-0.5 font-medium text-[max(10px,14.3cqw)] tabular-nums",
-            image ? "text-white drop-shadow-sm" : "text-primary"
-          )}
+          // Ratios would render 8px type at the 56px floor, so text keeps a minimum.
+          className="ml-auto pt-0.5 font-medium text-[max(10px,14.3cqw)] text-primary tabular-nums"
         >
           {percent}%
         </span>
@@ -296,7 +287,7 @@ const AttachmentRemove = ({
     className={cn(
       "absolute top-[3.6cqw] right-[3.6cqw] grid size-[30.4cqw] cursor-pointer place-items-center rounded-full outline-none transition-[background-color,color,scale] duration-150 ease-out focus-visible:ring-2 focus-visible:ring-ring active:scale-95",
       image
-        ? "bg-white/15 text-white/55 backdrop-blur-sm hover:bg-white/30 hover:text-white/90"
+        ? "bg-background/50 text-foreground/60 backdrop-blur-sm hover:bg-background/80 hover:text-foreground"
         : "text-muted-foreground/40 hover:bg-foreground/10 hover:text-foreground"
     )}
     onClick={onRemove}
@@ -337,8 +328,8 @@ export const Attachment = ({
       data-state={state}
     >
       {image ? (
-        // The preview replaces the glyph. Only the ring, the percentage and the tint
-        // carry state, so a preview stays clean and never shows the name.
+        // The preview replaces the glyph. The wash pulls the photo towards the theme
+        // background so the shared ring and percentage stay legible in either mode.
         <span className="absolute inset-0 overflow-hidden rounded-[21.4%]">
           {/* The name still labels the image for assistive tech. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -351,7 +342,7 @@ export const Attachment = ({
             aria-hidden="true"
             className={cn(
               "absolute inset-0",
-              (uploading || failed) && "bg-black/40"
+              (uploading || failed) && "bg-background/60"
             )}
           />
         </span>
@@ -367,11 +358,7 @@ export const Attachment = ({
       />
 
       {uploading || failed ? (
-        <AttachmentRing
-          failed={failed}
-          image={image}
-          percent={failed ? 100 : percent}
-        />
+        <AttachmentRing failed={failed} percent={failed ? 100 : percent} />
       ) : null}
 
       {removable && onRemove ? (

@@ -46,19 +46,21 @@ passing `progress` is usually enough. Every attachment shares one status layer �
 percentage marker, the ring and the remove button; `src` only swaps the glyph for a
 preview, which carries its own identity and never shows the name.
 
-| Status      | Renders                                                                               |
-| ----------- | ------------------------------------------------------------------------------------- |
-| `uploading` | Progress arc around the card plus the percentage; a preview darkens under a scrim     |
-| `ready`     | Glyph and file name, or a bare preview, with the remove button when `onRemove` is set |
-| `error`     | The arc fills and turns `text-destructive`; a file's name follows suit                |
+| Status      | Renders                                                                                 |
+| ----------- | --------------------------------------------------------------------------------------- |
+| `uploading` | Progress arc around the card plus the percentage; a preview fades toward the background |
+| `ready`     | Glyph and file name, or a bare preview, with the remove button when `onRemove` is set   |
+| `error`     | The arc fills and turns `text-destructive`; a file's name follows suit                  |
 
 The remove button stays hidden while uploading — the mock keeps in-flight chips bare, so
 cancelling mid-upload is out of scope.
 
 The arc is an SVG `path` tracing the chip's border: it starts at the top centre and runs
-clockwise in the theme's `primary` — or `white` over a preview, where `primary` would
-disappear. The reference mock used a blue accent; swap the token for a literal blue if you
-want that hue.
+clockwise in the theme's `primary`, or `destructive` once an upload has failed. Because a
+preview can be any image, its uploading and error states fade it toward `background`
+instead of dimming it, so the arc and percentage keep the same contrast as they do on a
+glyph chip. The reference mock used a blue accent; swap the token for a literal blue if
+you want that hue.
 
 ## Glyph
 
