@@ -1,0 +1,182 @@
+---
+title: Thinking block
+description: "A collapsible window onto a reasoning stream — fixed height, a mask that says the thought runs on below the fold, and a follow that lets the newest line rise into place instead of jumping the scroll."
+---
+
+import {
+  ThinkingBlockDemo,
+  ThinkingBlockStatesDemo,
+} from "@/examples/thinking-block";
+
+<ComponentPreview name="thinking-block">
+  <ThinkingBlockDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/thinking-block.json
+```
+
+Streamdown carries its markdown chrome as utility classes inside its own bundle, and
+Tailwind does not scan `node_modules` on its own. Point the scanner at it once:
+
+```css
+/* globals.css */
+@source "../node_modules/streamdown/dist/*.js";
+```
+
+## Usage
+
+```tsx
+import { ThinkingBlock } from "@/components/agents/thinking-block";
+
+export function Reasoning({ thought }: { thought: Thought }) {
+  return (
+    <ThinkingBlock
+      startedAt={thought.startedAt}
+      streaming={thought.status === "streaming"}
+    >
+      {thought.text}
+    </ThinkingBlock>
+  );
+}
+```
+
+## The window
+
+Reasoning is written longer than anyone wants to read and slower than the answer it is
+reasoning towards, so the block is a window onto it rather than a transcript of it: a
+fixed height (`208px` by default, `height` to change it) over a scroll container whose
+scrollbar is hidden. The height is the block's one hard promise — a thought that runs to
+forty paragraphs takes the same room as one that runs to two, and the answer underneath
+never gets pushed down the page while the model is still thinking.
+
+What the missing scrollbar would have said, the mask says instead. Two ramps off one
+constant: the bottom edge fades in over the last `FADE` (28px) of hidden content, the top
+one does the same for whatever is above the fold, so a window scrolled into the middle of
+a thought does not shear the previous line off at the lid. Each ramp is eased across that
+last stretch rather than switched — the alpha is the distance that is actually hidden — so
+the gradient is fully gone by the time the final line arrives, and nothing snaps off at
+the moment the reader reaches the end. The mask is written to the DOM from the scroll
+handler, not held in state: a mask that re-rendered would re-render the markdown under it.
+
+The mask is also the whole reason the scrollbar is hidden. Two affordances for the same
+fact, one of them appearing and disappearing with the content, is noise over the text.
+
+## The follow
+
+This is the part worth being careful about. Appending a line and pinning `scrollTop` to
+the bottom is what every transcript does, and it is a visible step: the scroll jumps by
+the height of the new lines and the whole passage lurches up. Set against a stream that
+arrives in bursts, it reads as a stutter per line.
+
+So the jump is taken and immediately cancelled. On every commit that changed the text the
+block re-pins the window, notes what the pin actually took, translates the stream down by
+exactly that much, and leaves the transform to relax to zero:
+
+```ts
+// How far the scroll really went. Zero while the stream is shorter than the window.
+const moved = pinToBottom();
+
+stream.animate(
+  [{ transform: `translateY(${moved}px)` }, { transform: "translateY(0)" }],
+  { duration: RISE_MS, easing: RISE_EASING }
+);
+```
+
+The scroll moves and the transform cancels it in the same frame, so there is no frame in
+which the passage is anywhere it should not be. What the eye gets is one continuous rise,
+composited rather than laid out, and the scroll position itself is never animated — which
+is the animation browsers are worst at.
+
+Five details keep it from being a twitch in its own right:
+
+- **The rise is sized by the scroll, not by the growth.** Under the window's height the two
+  are different numbers, and the pin takes nothing: a passage that still fits its window
+  must not move at all when a line wraps. Sizing the rise off the growth is the version of
+  this that bobs on every wrap.
+- **Everything is read off the laid-out height**, never `scrollHeight`. A rise in flight
+  really has translated the stream past the bottom of its box, and the browser counts that
+  as overflow — a follow that believed `scrollHeight` would be chasing the animation that
+  is trying to hide the movement.
+- **Growth is measured, not assumed.** A token that only lengthens a line changes nothing
+  below it and moves nothing; only a wrap or a new block is worth a rise.
+- **An interrupted rise is picked up where it stopped.** `getComputedStyle` reads the
+  animated value, so a rise that is still in flight when the next line lands starts from
+  its current offset instead of from rest. A fast stream reads as one glide.
+- **A reader who has scrolled up is left alone.** The stream only follows while the window
+  is within `SLACK` (8px) of the bottom. Scrolling back down resumes the follow.
+- **`overflow-anchor` is off.** The browser's own scroll anchoring adjusts the position
+  around the pin, by a different amount, every time a line wraps. The position is the
+  component's to hold.
+
+The mount is exempt — the first measurement is the baseline, not growth — so the opening
+frame shows the thought as it is rather than sliding the whole passage into place.
+
+## Streaming
+
+While the work is happening the header is a `LoadingState` row — the nine-square wave, the
+shimmering label, the seconds so far. That is the pairing the two components exist for:
+the shimmer is the only part of the block that says _now_, and it is replaced by a fact
+once the truth is available.
+
+| Prop        | Behaviour                                                                   |
+| ----------- | --------------------------------------------------------------------------- |
+| `streaming` | Live row, follows its own tail, and holds the finished count when it stops. |
+| `startedAt` | Epoch ms the pass began, so a remount does not restart the count.           |
+| `duration`  | Seconds, when the caller owns the number. Wins over the measurement.        |
+| `label`     | What the row says while it waits. Defaults to `Thinking`.                   |
+| `doneLabel` | What the finished pass is called. Defaults to `Thought`.                    |
+
+Under way the header reads **Thinking 4s**; afterwards it reads **Thought for 9s**. The
+count is captured off the falling edge of `streaming` rather than ticked in state — a
+second-by-second re-render would land in the middle of the rise above, which is the one
+thing that must not stutter. It is the same `formatDuration` the loading row prints with,
+so the two can never disagree about a second. With no pass measured and no `duration`
+passed, the label stands alone as **Thought** rather than claiming a zero.
+
+The body is a Streamdown in `streaming` mode while tokens are arriving and in `static`
+mode once they have stopped, so half-written markdown is held together and complete
+markdown is memoised by block. `controls` and `lineNumbers` are off: the window is for
+reading reasoning, not for using code. If you turn on Streamdown's `animated` word
+stagger, import its stylesheet as well (`import "streamdown/styles.css"`).
+
+## Collapsing
+
+The header is the toggle, and it is the only toggle: a `button` with `aria-expanded` and
+`aria-controls`, so a screen reader hears the state and the keyboard reaches a control
+that does what it says. The reveal is the shared `AgentDisclosure` — a clip-path wipe with
+the same `EASE_OUT` and the same two durations as the approval card, so the two agent
+surfaces move alike.
+
+Open is the default, and it is the useful one: the block is only interesting while it is
+still being written. `defaultOpen={false}` starts it behind a click, `open` and
+`onOpenChange` make it controlled. Opened mid-stream it pins to the tail, because the
+newest text is the whole reason to look.
+
+<ThinkingBlockStatesDemo />
+
+## Accessibility
+
+The header button's accessible name is the label alone — the wave is decorative, the
+shimmering copy is `aria-hidden` with a clean copy in a visually hidden span, and the
+clock is `aria-hidden` because a polite region announcing a new number every second is not
+a live region anyone wants. The body is not a live region at all: a stream of tokens
+announced token by token is worse than saying nothing, so the row carries the status and
+the reasoning stays a document.
+
+Collapsed, the window is `inert` and `aria-hidden`, so it cannot hold focus and is not
+read.
+
+Under `prefers-reduced-motion` the follow still pins, but without the transform: the
+window lands on the new bottom edge instead of gliding to it, and the chevron swaps
+without rotating.
+
+## Component source
+
+<ComponentSource
+  name="thinking-block"
+  src="registry/new-york/agents/thinking-block/index.tsx"
+  title="thinking-block.tsx"
+/>

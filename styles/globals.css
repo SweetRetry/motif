@@ -3,6 +3,11 @@
 
 @import "./themes.css";
 
+/* Streamdown ships its markdown chrome as utility classes inside its own bundle, and
+   Tailwind does not scan `node_modules` on its own. The thinking block is built on it,
+   so the scanner is pointed at its dist. */
+@source "../node_modules/streamdown/dist/*.js";
+
 @custom-variant dark (&:is(.dark *));
 
 @custom-variant fixed (&:is(.layout-fixed *));

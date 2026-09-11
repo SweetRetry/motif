@@ -163,6 +163,39 @@
       ]
     },
     {
+      "name": "thinking-block",
+      "type": "registry:component",
+      "title": "Thinking block",
+      "description": "A collapsible window onto a reasoning stream: a fixed height, a mask that says there is more below, and a follow that lets the newest line rise into place instead of jumping the scroll.",
+      "dependencies": [
+        "clsx",
+        "lucide-react",
+        "motion",
+        "streamdown",
+        "tailwind-merge"
+      ],
+      "registryDependencies": [
+        "https://startercn.vercel.app/r/loading-state.json"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/agents/thinking-block/index.tsx",
+          "type": "registry:component",
+          "target": "@components/agents/thinking-block/index.tsx"
+        },
+        {
+          "path": "components/agents/agent-disclosure.tsx",
+          "type": "registry:component",
+          "target": "@components/agents/agent-disclosure.tsx"
+        },
+        {
+          "path": "lib/ease.ts",
+          "type": "registry:lib",
+          "target": "@lib/ease.ts"
+        }
+      ]
+    },
+    {
       "name": "generation-surface",
       "type": "registry:ui",
       "title": "Generation surface",
