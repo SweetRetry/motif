@@ -14,6 +14,61 @@
           "target": "components/ui/your-component.tsx"
         }
       ]
+    },
+    {
+      "name": "approval-card",
+      "type": "registry:component",
+      "title": "Approval Card",
+      "description": "A human-in-the-loop decision surface for approvals, single or multiple-choice questions, custom responses, and multi-step review flows.",
+      "dependencies": ["clsx", "lucide-react", "motion", "tailwind-merge"],
+      "registryDependencies": ["tooltip"],
+      "files": [
+        {
+          "path": "registry/new-york/agents/approval-card/index.tsx",
+          "type": "registry:component",
+          "target": "@components/agents/approval-card/index.tsx"
+        },
+        {
+          "path": "registry/new-york/agents/approval-card/types.ts",
+          "type": "registry:component",
+          "target": "@components/agents/approval-card/types.ts"
+        },
+        {
+          "path": "components/agents/agent-disclosure.tsx",
+          "type": "registry:component",
+          "target": "@components/agents/agent-disclosure.tsx"
+        },
+        {
+          "path": "components/motion/button/index.tsx",
+          "type": "registry:component",
+          "target": "@components/motion/button/index.tsx"
+        },
+        {
+          "path": "components/motion/button/base.tsx",
+          "type": "registry:component",
+          "target": "@components/motion/button/base.tsx"
+        },
+        {
+          "path": "components/motion/input.tsx",
+          "type": "registry:component",
+          "target": "@components/motion/input.tsx"
+        },
+        {
+          "path": "components/motion/radio.tsx",
+          "type": "registry:component",
+          "target": "@components/motion/radio.tsx"
+        },
+        {
+          "path": "lib/ease.ts",
+          "type": "registry:lib",
+          "target": "@lib/ease.ts"
+        },
+        {
+          "path": "lib/hooks/use-hover-capable.ts",
+          "type": "registry:hook",
+          "target": "@lib/hooks/use-hover-capable.ts"
+        }
+      ]
     }
   ]
 }

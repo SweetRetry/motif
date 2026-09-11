@@ -15,4 +15,30 @@ export default defineConfig({
     ".web-kits/**",
     "audio/**",
   ],
+  overrides: [
+    {
+      // Vendored component code is kept as close to its upstream source as possible
+      // so it can be diffed and re-synced. Only the stylistic rules it trips are
+      // relaxed here; it is still formatted by oxfmt and type-checked. Repo-owned
+      // code (examples/, docs, app) is not exempt.
+      files: [
+        "components/motion/**",
+        "components/agents/agent-disclosure.tsx",
+        "lib/ease.ts",
+        "lib/hooks/use-hover-capable.ts",
+        "registry/new-york/agents/**",
+      ],
+      rules: {
+        "@typescript-eslint/no-inferrable-types": "off",
+        complexity: "off",
+        "func-style": "off",
+        "no-negated-condition": "off",
+        "no-nested-ternary": "off",
+        "no-plusplus": "off",
+        "no-shadow": "off",
+        "react-hooks/exhaustive-deps": "off",
+        "unicorn/no-nested-ternary": "off",
+      },
+    },
+  ],
 });

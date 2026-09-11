@@ -1,0 +1,73 @@
+---
+title: Approval card
+description: A human-in-the-loop decision surface for approvals, single-choice questions, custom responses, and multi-step review flows.
+---
+
+import { ApprovalCardDemo } from "@/examples/approval-card";
+
+<ComponentPreview name="approval-card">
+  <ApprovalCardDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/approval-card.json
+```
+
+## Usage
+
+```tsx
+import { ApprovalCard } from "@/components/agents/approval-card";
+
+export function Review() {
+  return (
+    <ApprovalCard
+      questions={[
+        {
+          id: "scope",
+          title: "How focused should the first release be?",
+          options: [
+            { value: "focused", label: "A focused starter set" },
+            { value: "broad", label: "A broader collection" },
+          ],
+        },
+      ]}
+      onAnswersChange={(answers) => console.log(answers)}
+      onSubmit={(answers) => console.log("submitted", answers)}
+    />
+  );
+}
+```
+
+## Status
+
+The card has two modes. Without `questions` it is a plain approval surface — `Approve`,
+`Request changes` and `Reject` are only rendered when their handlers are passed. With
+`questions` it walks through the list one step at a time. There is one answer shape:
+a single choice plus free text. Picking an option clears the text field, typing in the
+field clears the pick, and the answer is stored in an `answers` map keyed by question id.
+Step position lives in the footer as one bar per question, which is also the only step
+control. Width carries position: the question you are on is twice the resting width.
+Colour carries state: the current bar is at full strength, an answered one sits at 55%,
+one not reached yet at 20%, and one walked past without an answer turns amber. Clicking a bar jumps to that
+question (hovering lengthens it, nudges the rest of the row along, and previews the
+question in a tooltip), and every bar names itself to assistive tech
+("Question 2 of 3: Who signs off… (answered)"). Navigation is free — `Skip` and `Continue`
+both move on without an answer — and only `Submit` on the last question enforces that
+every question is answered.
+
+| Status                           | Meaning                                         |
+| -------------------------------- | ----------------------------------------------- |
+| `pending`                        | Waiting for the user, controls enabled          |
+| `submitting`                     | Controls locked while the request is in flight  |
+| `answered` / `approved`          | Done, no controls: `result` or the status text  |
+| `rejected` / `changes-requested` | Closed without submitting: `result` or the text |
+
+## Component source
+
+<ComponentSource
+  name="approval-card"
+  src="registry/new-york/agents/approval-card/index.tsx"
+  title="approval-card.tsx"
+/>
