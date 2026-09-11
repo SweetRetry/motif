@@ -1,0 +1,67 @@
+---
+title: Resolution select
+description: "A segmented resolution row with a sliding plate and a dot matrix that carries sampling density — two dots standard, three high, four retina."
+---
+
+import {
+  ResolutionSelectDemo,
+  ResolutionSelectPairDemo,
+} from "@/examples/resolution-select";
+
+<ComponentPreview name="resolution-select">
+  <ResolutionSelectDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/resolution-select.json
+```
+
+## Usage
+
+```tsx
+import { ResolutionSelect } from "@/components/ui/resolution-select";
+
+export function Output() {
+  const [resolution, setResolution] = useState("2K");
+
+  return <ResolutionSelect value={resolution} onChange={setResolution} />;
+}
+```
+
+## The plate, not the button
+
+The selected state is a plate that slides between cells rather than a cell that lights up
+and another that goes dark. A highlight appearing and disappearing in two places reads as
+two independent buttons; one plate travelling between positions reads as a single control
+changing state, which is what it is. The travel uses the same `0.25rem` gutter the grid
+uses, so the plate lands exactly on the cell it belongs to rather than near it, and
+`motion-reduce:transition-none` parks it instantly for anyone who has asked for less
+movement.
+
+## The dot matrix
+
+Resolution is sampling density, so the glyph is a matrix of dots and its count encodes
+the tier: two dots for standard, three for high, four for retina. The mapping is
+_positional_ — the component never parses `"2K"` — which is why it works for any list of
+resolutions you pass. Two options get the endpoints (two dots and four) instead of a false
+middle tier.
+
+Because the tiers are ordered, keep `options` in ascending order; the first entry is the
+one the glyphs treat as the smallest.
+
+<ResolutionSelectPairDemo />
+
+## Accessibility
+
+The row is a group of `<button>`s with `aria-pressed`, focusable and operable by keyboard.
+The dots are `aria-hidden` — the tier is decorative and the label already says `2K`.
+
+## Component source
+
+<ComponentSource
+  name="resolution-select"
+  src="registry/new-york/resolution-select.tsx"
+  title="resolution-select.tsx"
+/>

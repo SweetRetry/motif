@@ -1,0 +1,159 @@
+---
+title: Generation surface
+description: "The overlay a media node wears while it generates: a two-tone flow drifting behind the result, a blur-to-focus reveal once it decodes, and a failure line when it never arrives."
+---
+
+import {
+  GenerationSurfaceDemo,
+  GenerationSurfaceFailureDemo,
+  GenerationSurfaceSeedsDemo,
+} from "@/examples/generation-surface";
+
+<ComponentPreview
+  name="generation-surface"
+  src="registry/new-york/generation-surface.tsx"
+>
+  <GenerationSurfaceDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/generation-surface.json
+```
+
+## Usage
+
+Wrap whatever the node renders and tell the surface what is pending. The surface keeps
+its children hidden while it waits, then reveals them once `mediaSrc` has decoded:
+
+```tsx
+import { GenerationSurface } from "@/components/ui/generation-surface";
+
+export function ImageNode({ run }) {
+  const pending = run.phase === "generating";
+  const mediaSrc = run.phase === "done" ? run.url : undefined;
+
+  return (
+    <GenerationSurface
+      id={run.nodeId}
+      pending={pending}
+      mediaSrc={mediaSrc}
+      prompt={run.prompt}
+    >
+      {mediaSrc ? (
+        <img src={mediaSrc} alt="" className="h-full w-full object-cover" />
+      ) : null}
+    </GenerationSurface>
+  );
+}
+```
+
+`overlay` is the escape hatch for anything the product wants on top — a retry button, a
+status line, a toolbar. The surface deliberately ships no status UI of its own:
+
+```tsx
+<GenerationSurface
+  pending={pending}
+  mediaSrc={mediaSrc}
+  overlay={failed ? <RetryBar onRetry={retry} /> : null}
+>
+  {children}
+</GenerationSurface>
+```
+
+## Waiting honestly
+
+A spinner says "something is happening"; it does not say whether the result is ready.
+This surface splits those two questions:
+
+- **In flight** — `pending` is `true`. The placeholder is shown.
+- **Finished, not yet paintable** — `pending` is `false`, but the media has not decoded.
+  `loading` stays `true`, so the result stays hidden.
+
+That second state is the reason `useMediaReveal` exists. An `<img>` fires `load` while its
+pixels are still being unpacked, so revealing on `load` shows a half-painted frame. The hook
+awaits `decode()` instead, which resolves when the bitmap is actually ready to composite —
+the reveal only starts from a frame that is done. Video settles on `loadeddata`, and audio
+on `loadedmetadata`.
+
+The handlers are attached in the **capture phase** on the surface itself. `load` and `error`
+do not bubble, so capture is what lets one set of handlers cover whatever media the caller
+happens to render — one `<img>`, a `<video>`, or both.
+
+## One seed, one motion
+
+The colours are fixed: one warm blue, one cool violet, the same on every surface. What
+the `seed` changes is the movement — so a canvas of concurrent nodes reads as separate
+pieces of work instead of one animation playing in every tile.
+
+| Seeded by `seed` | Range                                |
+| ---------------- | ------------------------------------ |
+| Start angle      | 0–360°, per layer                    |
+| Layer separation | second layer 120–240° from the first |
+| Direction        | each layer turns cw or ccw           |
+| Spin             | ~4.5–6s and ~6.5–8.5s                |
+| Focal points     | one of five diagonal pairs           |
+
+`seed` defaults to `id`, so variety is automatic: give each node its own id and no two
+placeholders share a starting point or a path. Pass a constant to pin one motion
+everywhere, or derive the seed from the task so regenerating a node keeps its movement.
+
+<GenerationSurfaceSeedsDemo />
+
+Three details keep the layers from collapsing into one another. The second layer's start
+is forced 120–240° away from the first, so the two glows never begin stacked into a single
+blob. The layers turn in opposite directions, so their paths cross instead of running
+parallel. And their speeds are drawn independently, which is what stops two surfaces from
+drifting back into sync after a few seconds.
+
+The spec is hashed once per seed, so the same seed always draws the same motion. A
+remount, a re-render, or the server pass and the client pass all agree — nothing jumps
+when the surface re-renders mid-generation.
+
+## The flow
+
+Two radial gradients rotate at different speeds and are screened together, in a fixed
+blue-and-violet pair. Only the motion varies — start angle, direction, speed and focal
+point all come from the seed — so surfaces never fall into lockstep.
+
+The flow is entirely decorative. **Everything that carries meaning is elsewhere** — the
+prompt line, the failure line, the caller's `overlay` — so animating it costs nothing but
+paint. With `prefers-reduced-motion` the gradients hold their initial rotation and the
+pulse stops.
+
+## The reveal
+
+When the media settles, the children do not simply appear. They fade in over
+`duration(1.4)` and sharpen from `blur(6px)` to `blur(0px)` over `duration(1.6)`, while the
+placeholder fades and the glow lingers slightly longer than the rest — light disperses
+slower than it arrives. Every one of those durations goes through `duration()`, which
+returns `0` under reduced motion, so the reveal becomes an instantaneous swap rather than
+a ceremony.
+
+`inert` is set on the children while loading, so a keyboard user cannot tab into media that
+is not on screen yet.
+
+## Failure
+
+If the media errors — or `decode()` rejects — the glow gives way to a bar at the bottom
+with `failureLabel`. It is a `role="alert"`, so the failure is announced rather than only
+drawn.
+
+<GenerationSurfaceFailureDemo />
+
+## Accessibility
+
+`aria-busy` tracks `loading` on the root, so assistive tech knows the region is still
+working. Everything decorative — both gradient layers — is `aria-hidden`, the prompt line
+is plain text, and the failure bar is a live `alert`. The surface renders no buttons;
+whatever actions belong to a failure come in through `overlay`, where the caller can label
+them.
+
+## Component source
+
+<ComponentSource
+  name="generation-surface"
+  src="registry/new-york/generation-surface.tsx"
+  title="generation-surface.tsx"
+/>

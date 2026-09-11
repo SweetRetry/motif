@@ -119,6 +119,62 @@
           "target": "@lib/ease.ts"
         }
       ]
+    },
+    {
+      "name": "ratio-select",
+      "type": "registry:ui",
+      "title": "Ratio select",
+      "description": "Aspect ratio as a grid of to-scale glyphs, each drawn inside the same square window so the shapes line up and the ratio reads without the label.",
+      "dependencies": ["clsx", "lucide-react", "tailwind-merge"],
+      "files": [
+        {
+          "path": "registry/new-york/ratio-select.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/ratio-select.tsx"
+        }
+      ]
+    },
+    {
+      "name": "resolution-select",
+      "type": "registry:ui",
+      "title": "Resolution select",
+      "description": "A segmented resolution control with a sliding plate and a dot-matrix glyph that carries sampling density: two dots standard, three high, four retina.",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [
+        {
+          "path": "registry/new-york/resolution-select.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/resolution-select.tsx"
+        }
+      ]
+    },
+    {
+      "name": "duration-select",
+      "type": "registry:ui",
+      "title": "Duration select",
+      "description": "Duration as a compact clip on a timeline: drag the playhead, read the live value in a HUD, commit one settled number on release.",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [
+        {
+          "path": "registry/new-york/duration-select.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/duration-select.tsx"
+        }
+      ]
+    },
+    {
+      "name": "generation-surface",
+      "type": "registry:ui",
+      "title": "Generation surface",
+      "description": "The overlay a media node wears while it generates: a two-tone flow drifting behind the result, a blur-to-focus reveal once the media decodes, and a failure line when it never arrives.",
+      "dependencies": ["clsx", "motion", "tailwind-merge"],
+      "files": [
+        {
+          "path": "registry/new-york/generation-surface.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/generation-surface.tsx"
+        }
+      ]
     }
   ]
 }

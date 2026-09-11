@@ -1,4 +1,14 @@
 {
   "title": "Components",
-  "pages": ["index", "agents", "attachment", "loading-state", "scroll-rail"]
+  "pages": [
+    "index",
+    "agents",
+    "attachment",
+    "duration-select",
+    "generation-surface",
+    "loading-state",
+    "ratio-select",
+    "resolution-select",
+    "scroll-rail"
+  ]
 }

@@ -1,0 +1,76 @@
+---
+title: Duration select
+description: "Duration as a compact clip on a timeline: drag the playhead, read the live value in a HUD, commit one settled number on release."
+---
+
+import {
+  DurationSelectDemo,
+  DurationSelectSecondsDemo,
+} from "@/examples/duration-select";
+
+<ComponentPreview name="duration-select">
+  <DurationSelectDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/duration-select.json
+```
+
+## Usage
+
+```tsx
+import { DurationSelect } from "@/components/ui/duration-select";
+
+export function Clip() {
+  const [duration, setDuration] = useState("5");
+
+  return (
+    <DurationSelect min={1} max={15} value={duration} onCommit={setDuration} />
+  );
+}
+```
+
+## Committing, not streaming
+
+A duration is a value someone settles on, not a continuous gesture to broadcast. The
+control keeps the in-flight number in its own state and calls `onCommit` **once**, when
+the drag ends or a key is pressed — so the state that owns the value is written once per
+interaction instead of once per pointer move. `value` still wins: change it from outside
+and the track follows, except mid-drag, where following would yank the handle out from
+under the pointer.
+
+`step` snaps the committed number, and the arrow keys move by one step so the control is
+operable without a pointer.
+
+## The track
+
+The chosen span is drawn as a clip with the playhead pinned to its leading edge — the
+amount of time is a length, so it is shown as a length. A fixed `CLIP_MIN_WIDTH` keeps the
+handle a real target at the very start of the range, and the pointer is mapped over the
+same travel the clip uses, so the handle always sits under the cursor.
+
+The number itself lives in a HUD above the track, clamped off the edges so it never gets
+cut off. It is shown while hovering or dragging and hidden otherwise: the read-out is for
+the moment you are choosing, and leaving it up all the time would compete with the track.
+
+The read-out is the only thing that changes as you drag — the track's fill is a single
+width transition on release, not a stream of re-renders.
+
+<DurationSelectSecondsDemo />
+
+## Accessibility
+
+The track is a `role="slider"` with `aria-valuemin`, `aria-valuemax` and `aria-valuenow`,
+plus `tabIndex={0}` so it is keyboard reachable. `↑`/`→` raise the value by a step and
+`↓`/`←` lower it, with the commit firing on each press. `touch-none` stops the browser
+from claiming the horizontal drag as a scroll.
+
+## Component source
+
+<ComponentSource
+  name="duration-select"
+  src="registry/new-york/duration-select.tsx"
+  title="duration-select.tsx"
+/>

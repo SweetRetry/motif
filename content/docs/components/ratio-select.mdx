@@ -1,0 +1,75 @@
+---
+title: Ratio select
+description: "Aspect ratio as a grid of to-scale glyphs: every shape is drawn inside the same square window, so the grid stays aligned and the ratio reads before the label does."
+---
+
+import {
+  RatioSelectAdaptiveDemo,
+  RatioSelectDemo,
+} from "@/examples/ratio-select";
+
+<ComponentPreview name="ratio-select">
+  <RatioSelectDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/ratio-select.json
+```
+
+## Usage
+
+```tsx
+import { RatioSelect } from "@/components/ui/ratio-select";
+
+export function Frame() {
+  const [ratio, setRatio] = useState("16:9");
+
+  return <RatioSelect value={ratio} onChange={setRatio} />;
+}
+```
+
+Pass your own list when the model offers a different set. Five fit a row before the grid
+wraps, and `"adaptive"` / `"auto"` swap the glyph for a scan mark:
+
+```tsx
+<RatioSelect
+  label="Canvas"
+  options={["1:1", "16:9", "9:16", "adaptive"]}
+  value={ratio}
+  onChange={setRatio}
+/>
+```
+
+## The fixed window
+
+The thing that makes a row of ratios readable is that nothing in it moves except the
+shape. Every glyph is drawn inside a square of the same `size` — 18px here — and the
+rectangle inside is scaled to fit that square. A `1:1` and a `16:9` therefore occupy the
+same footprint; the eye compares the two rectangles directly instead of comparing two
+boxes of different widths.
+
+`showReferenceBox` draws the square itself as a dashed outline. It is on for the selected
+cell only, which is what makes the selection read as "this shape, in this frame" rather
+than just a highlighted tile.
+
+`RatioIcon` is exported on its own — it is useful anywhere a ratio needs a 16px shape
+rather than a string of digits, a trigger button being the obvious one.
+
+<RatioSelectAdaptiveDemo />
+
+## Accessibility
+
+Each cell is a real `<button>` carrying `aria-pressed`, so the group is reachable and
+operable by keyboard and the current choice is announced rather than only coloured in.
+The glyph is `aria-hidden` throughout: the visible label is the value, and a screen
+reader should hear `16:9`, not a description of a rectangle.
+
+## Component source
+
+<ComponentSource
+  name="ratio-select"
+  src="registry/new-york/ratio-select.tsx"
+  title="ratio-select.tsx"
+/>
