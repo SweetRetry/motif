@@ -45,7 +45,7 @@ export function Dock() {
       <ToolbarItem
         icon={<GithubIcon />}
         label="Source code on GitHub"
-        displayLabel="Source"
+        pinnedLabel="Source"
         href="/source"
       />
     </Toolbar>
@@ -78,11 +78,11 @@ leave a phantom hover stuck to a glyph after a tap.
 ## Pinned labels
 
 Some items earn the width: the action the bar exists for, or a state the user needs to read
-without reaching for it. Pass `displayLabel` and that word is pinned into the row — the
+without reaching for it. Pass `pinnedLabel` and that word is pinned into the row — the
 item becomes a pill rather than a plate.
 
 The two labels are separate jobs, and the component keeps them separate. `label` is the
-full name: the tooltip, and the accessible name. `displayLabel` is the shorthand the row
+full name: the tooltip, and the accessible name. `pinnedLabel` is the shorthand the row
 can afford. An item can be a lone glyph, a glyph with `Source` beside it, and a tooltip
 that still spells out `Source code on GitHub` — the row is short, the name is not.
 

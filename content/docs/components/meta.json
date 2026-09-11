@@ -2,14 +2,15 @@
   "title": "Components",
   "pages": [
     "index",
-    "animated-edge",
+    "aspect-ratio-picker",
     "attachment",
-    "duration-select",
-    "generation-surface",
-    "ratio-select",
-    "resolution-select",
+    "cover-fan",
+    "duration-slider",
+    "flow-edge",
+    "generation-overlay",
+    "resolution-segmented",
     "scroll-rail",
-    "settings-modal",
+    "settings-dialog",
     "toolbar"
   ]
 }

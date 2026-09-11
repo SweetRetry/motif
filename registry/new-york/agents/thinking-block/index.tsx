@@ -13,7 +13,7 @@ import {
 import { Streamdown } from "streamdown";
 
 import { AgentDisclosure } from "@/components/agents/agent-disclosure";
-import { LoadingState, formatDuration } from "@/components/ui/loading-state";
+import { WaitingRow, formatDuration } from "@/components/ui/waiting-row";
 import { EASE_OUT } from "@/lib/ease";
 import { cn } from "@/lib/utils";
 
@@ -332,7 +332,7 @@ export const ThinkingBlock = ({
         type="button"
       >
         {streaming ? (
-          <LoadingState
+          <WaitingRow
             className="text-muted-foreground transition-colors group-hover/thinking:text-foreground"
             label={label}
             startedAt={startedAt}

@@ -1,4 +1,4 @@
 {
   "title": "Agents",
-  "pages": ["approval-card", "loading-state", "thinking-block"]
+  "pages": ["approval-card", "waiting-row", "thinking-block"]
 }

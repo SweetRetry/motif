@@ -55,13 +55,13 @@ function QuestionOptions({
   answer,
   disabled,
   onChange,
-  onSingleSelect,
+  onAutoAdvance,
 }: {
   question: ApprovalCardQuestion;
   answer: ApprovalCardAnswer;
   disabled: boolean;
   onChange: (answer: ApprovalCardAnswer) => void;
-  onSingleSelect?: () => void;
+  onAutoAdvance?: () => void;
 }) {
   const custom = answer.custom ?? "";
 
@@ -72,7 +72,7 @@ function QuestionOptions({
           value={answer.selected[0] ?? ""}
           onValueChange={(value) => {
             onChange({ custom: "", selected: [value] });
-            onSingleSelect?.();
+            onAutoAdvance?.();
           }}
           className="gap-0.5"
         >
@@ -377,7 +377,7 @@ export function ApprovalCard({
                 answer={currentAnswer}
                 disabled={busy}
                 onChange={updateCurrentAnswer}
-                onSingleSelect={queueAutoAdvance}
+                onAutoAdvance={queueAutoAdvance}
               />
             </motion.div>
           ) : (

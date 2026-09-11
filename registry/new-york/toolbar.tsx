@@ -34,7 +34,7 @@ import { cn } from "@/lib/utils";
  *
  * Most items name themselves on hover and nothing more. A few earn the width —
  * the one action the bar exists for, a filter that is currently on — and those
- * can pin the label into the row with `showLabel`.
+ * can pin the label into the row with `pinnedLabel`.
  * --------------------------------------------------------------------------- */
 
 /** What an item needs to know about the bar it sits in. */
@@ -83,11 +83,17 @@ const nextIndex = (
 };
 
 /** The plate behind the glyph: held down when current, raised on hover. */
-const surfaceClass = ({ active, open }: { active: boolean; open: boolean }) => {
+const surfaceClass = ({
+  active,
+  hovered,
+}: {
+  active: boolean;
+  hovered: boolean;
+}) => {
   if (active) {
     return "bg-accent text-foreground";
   }
-  if (open) {
+  if (hovered) {
     return "bg-accent/60 text-foreground";
   }
   return "text-muted-foreground hover:text-foreground";
@@ -185,7 +191,7 @@ export interface ToolbarItemProps {
    * state the user needs to read without reaching for it. The tooltip stays
    * either way — it is where the unabbreviated name lives.
    */
-  displayLabel?: string;
+  pinnedLabel?: string;
   /** Opens `href` in a new tab, with the matching `rel`. */
   external?: boolean;
   /** Renders an anchor rather than a button. */
@@ -205,7 +211,7 @@ export interface ToolbarItemProps {
 /**
  * One glyph in the bar: a 36px plate that swells under the pointer while its
  * name arrives above it, or a plate with a pinned word already in it when the
- * caller asks for `displayLabel`. Either way the tooltip carries the full name,
+ * caller asks for `pinnedLabel`. Either way the tooltip carries the full name,
  * so a shortened word on the bar is never the only version of it.
  *
  * Nothing about the item changes size with hover, so the row is stable — the
@@ -215,7 +221,7 @@ export const ToolbarItem = ({
   active = false,
   className,
   disabled = false,
-  displayLabel,
+  pinnedLabel,
   external = false,
   href,
   icon,
@@ -236,7 +242,7 @@ export const ToolbarItem = ({
       "transition-colors duration-200",
       "focus-visible:ring-2 focus-visible:ring-ring/60",
       "disabled:pointer-events-none disabled:opacity-40",
-      surfaceClass({ active, open: hovered }),
+      surfaceClass({ active, hovered }),
       className
     ),
     "data-toolbar-item": "",
@@ -254,9 +260,9 @@ export const ToolbarItem = ({
         {icon}
       </motion.span>
 
-      {displayLabel ? (
+      {pinnedLabel ? (
         <span className="whitespace-nowrap pr-3 pl-0.5 font-medium text-sm">
-          {displayLabel}
+          {pinnedLabel}
         </span>
       ) : null}
     </>

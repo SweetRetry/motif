@@ -1,0 +1,123 @@
+---
+title: Cover Fan
+description: "A fan of cover cards for an empty state: full-bleed art, the title sitting on it, and enough of every card left showing that the whole set can be read in one look. Hover lifts a card out of the fan; click starts it."
+---
+
+import { CoverFanCompactDemo, CoverFanDemo } from "@/examples/cover-fan";
+
+<ComponentPreview name="cover-fan">
+  <CoverFanDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/cover-fan.json
+```
+
+## Usage
+
+```tsx
+import { CoverFan } from "@/components/ui/cover-fan";
+
+const PRESETS = [
+  {
+    id: "unbound-bloom",
+    src: "/covers/unbound-bloom.webp",
+    title: "Unbound Bloom",
+  },
+  { id: "refraction", src: "/covers/refraction.webp", title: "Refraction" },
+  // …
+];
+
+export function EmptyState() {
+  return (
+    <CoverFan items={PRESETS} onSelect={(preset) => startSession(preset.id)} />
+  );
+}
+```
+
+`items` is `{ id, title, src, alt? }` per cover. `title` is the card's label and its
+accessible name; `alt` is only for art that carries meaning a title does not, so most
+covers leave it out. `onSelect` is required — a fan of covers that cannot be picked is
+a screenshot.
+
+## Anatomy
+
+The card is the cover. There is no body, no padding and no button inside it: full-bleed
+art, the title on top of it bottom-left, and one line of type that truncates rather than
+wrapping. Anything more turns a fan of images back into a list of rows.
+
+Four numbers place the hand, all as shares of the card:
+
+| Share                                 | Reference card (200 × 267) | What it does                                          |
+| ------------------------------------- | -------------------------- | ----------------------------------------------------- |
+| `0.76` pitch                          | 152px                      | Leaves a quarter of every cover showing               |
+| drift `0.067 / 0.127 / 0.015 / 0.052` | 18 / 34 / 4 / 14px         | Uneven, on purpose — middles sit lower than the ends  |
+| `2.5°` tilt                           | ±3.75° at four cards       | Turns with distance from the middle, so the fan opens |
+| `0.067` lift                          | 18px                       | How far a card rises out of the fan, growing 6%       |
+
+The drift wraps for fans longer than four. A repeating rhythm beats one deep arc there —
+and beats numbers that keep growing with the count until a card is pushed out of the box.
+
+The pitch is the load-bearing number. Anything much under `0.76` and the covers stop
+being readable, which defeats the point of choosing between them; anything much over it
+and the fan is a row.
+
+## Sizing
+
+There is no `size` prop. The fan is a container query context and every dimension inside
+it — card width, pitch, drift, radius, title size — is a share of the container's width,
+so the container decides the size and the whole thing scales together:
+
+```tsx
+<CoverFan className="max-w-xl" items={PRESETS} onSelect={pick} />
+```
+
+The fan needs as many cards across as it holds, plus a gutter for the tilted corners:
+four covers want about `3.5` card widths. The container reserves that automatically, so
+the usual move is a `max-w-*` on the component or on the column that holds it.
+
+<CoverFanCompactDemo />
+
+The title has an 11px floor. Below roughly a 150px card the reference ratio stops being a
+label and starts being a caption squeezed into a corner.
+
+## States
+
+| State          | Renders                                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------------- |
+| Rest           | The fan, left to right, each card overlapping the one before it                                         |
+| Lifted         | On hover or focus: up `0.067` of its height, tilt straightened to 0, 6% larger, to the front of the fan |
+| Keyboard focus | The same lift, plus a focus ring — the lift alone is not a focus indicator                              |
+
+Hover is a lift rather than a scale on its own because a card that only grows stays
+inside the fan and loses which card the pointer is on. Straightening the tilt is what
+makes the lifted card read as taken out of the hand.
+
+One index drives both hover and focus, so two cards can never be out of the fan at once.
+A lifted card is always in front of its neighbours, which is also why hover raises
+`z-index` instead of relying on `scale` alone.
+
+Taps work: on touch the lift arrives with the tap and the selection follows it. Motion is
+CSS-only and drops to none under `prefers-reduced-motion`; the lift still happens, it
+just stops being animated.
+
+## In an empty state
+
+Three to five covers is the range. Fewer is not a fan — one or two cards read as a
+carousel with nothing in it — and more than five makes every cover too small to tell
+apart at the pitch that keeps them readable. Past that, the fan is the wrong shape and a
+grid is the honest one.
+
+The fan does not animate itself. An empty state that shuffles its own options turns the
+one moment where the user is deciding into decoration, and it moves the target while the
+pointer is on its way to it.
+
+## Component source
+
+<ComponentSource
+  name="cover-fan"
+  src="registry/new-york/cover-fan.tsx"
+  title="cover-fan.tsx"
+/>

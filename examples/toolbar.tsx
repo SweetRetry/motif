@@ -43,7 +43,7 @@ export const ToolbarDemo = () => {
       />
       <ToolbarSeparator />
       <ToolbarItem
-        displayLabel="Source"
+        pinnedLabel="Source"
         external
         href="https://github.com/shadcn-labs/startercn"
         icon={<GithubIcon />}
@@ -64,7 +64,7 @@ export const ToolbarPinnedDemo = () => (
     <ToolbarSeparator />
     <ToolbarItem
       active
-      displayLabel="Generate"
+      pinnedLabel="Generate"
       icon={<Sparkles />}
       label="Generate a result from the current prompt"
     />

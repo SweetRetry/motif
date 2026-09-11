@@ -6,7 +6,7 @@
       "name": "approval-card",
       "type": "registry:component",
       "title": "Approval Card",
-      "description": "A human-in-the-loop decision surface for approvals, single or multiple-choice questions, custom responses, and multi-step review flows.",
+      "description": "A human-in-the-loop decision surface for approvals, single-choice questions, custom responses, and multi-step review flows.",
       "dependencies": ["clsx", "lucide-react", "motion", "tailwind-merge"],
       "registryDependencies": ["tooltip"],
       "files": [
@@ -72,23 +72,23 @@
       ]
     },
     {
-      "name": "loading-state",
+      "name": "waiting-row",
       "type": "registry:ui",
-      "title": "Loading State",
+      "title": "Waiting Row",
       "description": "A nine-square wave, a shimmering label and a live duration — the row a surface shows while it waits for work to come back.",
       "dependencies": ["clsx", "motion", "tailwind-merge"],
       "files": [
         {
-          "path": "registry/new-york/loading-state.tsx",
+          "path": "registry/new-york/waiting-row.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/loading-state.tsx"
+          "target": "@components/ui/waiting-row.tsx"
         }
       ]
     },
     {
       "name": "scroll-rail",
       "type": "registry:component",
-      "title": "Scroll rail",
+      "title": "Scroll Rail",
       "description": "A tick rail that mirrors a long scroll region: width carries distance from the reading line, colour carries focus. Hover a tick to preview the turn, click to jump to it.",
       "dependencies": ["clsx", "motion", "tailwind-merge"],
       "registryDependencies": ["popover"],
@@ -121,51 +121,51 @@
       ]
     },
     {
-      "name": "ratio-select",
+      "name": "aspect-ratio-picker",
       "type": "registry:ui",
-      "title": "Ratio select",
+      "title": "Aspect Ratio Picker",
       "description": "Aspect ratio as a grid of to-scale glyphs, each drawn inside the same square window so the shapes line up and the ratio reads without the label.",
       "dependencies": ["clsx", "lucide-react", "tailwind-merge"],
       "files": [
         {
-          "path": "registry/new-york/ratio-select.tsx",
+          "path": "registry/new-york/aspect-ratio-picker.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/ratio-select.tsx"
+          "target": "@components/ui/aspect-ratio-picker.tsx"
         }
       ]
     },
     {
-      "name": "resolution-select",
+      "name": "resolution-segmented",
       "type": "registry:ui",
-      "title": "Resolution select",
+      "title": "Resolution Segmented",
       "description": "A segmented resolution control with a sliding plate and a dot-matrix glyph that carries sampling density: two dots standard, three high, four retina.",
       "dependencies": ["clsx", "tailwind-merge"],
       "files": [
         {
-          "path": "registry/new-york/resolution-select.tsx",
+          "path": "registry/new-york/resolution-segmented.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/resolution-select.tsx"
+          "target": "@components/ui/resolution-segmented.tsx"
         }
       ]
     },
     {
-      "name": "duration-select",
+      "name": "duration-slider",
       "type": "registry:ui",
-      "title": "Duration select",
+      "title": "Duration Slider",
       "description": "Duration as a compact clip on a timeline: drag the playhead, read the live value in a HUD, commit one settled number on release.",
       "dependencies": ["clsx", "tailwind-merge"],
       "files": [
         {
-          "path": "registry/new-york/duration-select.tsx",
+          "path": "registry/new-york/duration-slider.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/duration-select.tsx"
+          "target": "@components/ui/duration-slider.tsx"
         }
       ]
     },
     {
       "name": "thinking-block",
       "type": "registry:component",
-      "title": "Thinking block",
+      "title": "Thinking Block",
       "description": "A collapsible window onto a reasoning stream: a fixed height, a mask that says there is more below, and a follow that lets the newest line rise into place instead of jumping the scroll.",
       "dependencies": [
         "clsx",
@@ -175,7 +175,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "https://startercn.vercel.app/r/loading-state.json"
+        "https://startercn.vercel.app/r/waiting-row.json"
       ],
       "files": [
         {
@@ -196,30 +196,30 @@
       ]
     },
     {
-      "name": "generation-surface",
+      "name": "generation-overlay",
       "type": "registry:ui",
-      "title": "Generation surface",
+      "title": "Generation Overlay",
       "description": "The overlay a media node wears while it generates: a two-tone flow drifting behind the result, a blur-to-focus reveal once the media decodes, and a failure line when it never arrives.",
       "dependencies": ["clsx", "motion", "tailwind-merge"],
       "files": [
         {
-          "path": "registry/new-york/generation-surface.tsx",
+          "path": "registry/new-york/generation-overlay.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/generation-surface.tsx"
+          "target": "@components/ui/generation-overlay.tsx"
         }
       ]
     },
     {
-      "name": "animated-edge",
+      "name": "flow-edge",
       "type": "registry:ui",
-      "title": "Animated edge",
+      "title": "Flow Edge",
       "description": "A bezier connector that carries a pulse of light from one end to the other while work is in flight — bright in the middle, faded at both ends — and rests as a plain line when it is not.",
       "dependencies": ["clsx", "motion", "tailwind-merge"],
       "files": [
         {
-          "path": "registry/new-york/animated-edge.tsx",
+          "path": "registry/new-york/flow-edge.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/animated-edge.tsx"
+          "target": "@components/ui/flow-edge.tsx"
         }
       ]
     },
@@ -249,27 +249,41 @@
       ]
     },
     {
-      "name": "settings-modal",
+      "name": "settings-dialog",
       "type": "registry:component",
-      "title": "Settings modal",
+      "title": "Settings Dialog",
       "description": "Destinations down the left, one panel on the right: a rail you can walk with the arrow keys, a panel that fades in, and the row, section and card the panel is built from.",
       "dependencies": ["clsx", "lucide-react", "motion", "tailwind-merge"],
       "registryDependencies": ["dialog"],
       "files": [
         {
-          "path": "registry/new-york/settings-modal/index.tsx",
+          "path": "registry/new-york/settings-dialog/index.tsx",
           "type": "registry:component",
-          "target": "@components/settings-modal/index.tsx"
+          "target": "@components/settings-dialog/index.tsx"
         },
         {
-          "path": "registry/new-york/settings-modal/types.ts",
+          "path": "registry/new-york/settings-dialog/types.ts",
           "type": "registry:component",
-          "target": "@components/settings-modal/types.ts"
+          "target": "@components/settings-dialog/types.ts"
         },
         {
           "path": "lib/ease.ts",
           "type": "registry:lib",
           "target": "@lib/ease.ts"
+        }
+      ]
+    },
+    {
+      "name": "cover-fan",
+      "type": "registry:ui",
+      "title": "Cover Fan",
+      "description": "A fan of cover cards for an empty state: full-bleed art, the title sitting on it, and enough of every card left showing that the whole set reads in one look. Hover lifts a card out of the fan.",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [
+        {
+          "path": "registry/new-york/cover-fan.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/cover-fan.tsx"
         }
       ]
     }
