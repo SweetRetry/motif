@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useMemo } from "react";
 
 import {
   Sidebar,
@@ -16,6 +17,7 @@ import {
 import { ROUTES } from "@/constants/routes";
 import { EXCLUDED_SECTIONS, isComponentsFolder } from "@/lib/docs";
 import { getAllPagesFromFolder, getPagesFromFolder } from "@/lib/page-tree";
+import type { PageTreeFolder } from "@/lib/page-tree";
 import type { source } from "@/lib/source";
 
 const TOP_LEVEL_SECTIONS = [
@@ -28,14 +30,71 @@ const TOP_LEVEL_SECTIONS = [
 const MENU_BUTTON_CLS =
   "relative h-[30px] w-fit overflow-visible border border-transparent text-[0.8rem] font-medium after:absolute after:inset-x-0 after:-inset-y-1 after:z-0 after:rounded-md data-[active=true]:border-accent data-[active=true]:bg-accent 3xl:fixed:w-full 3xl:fixed:max-w-48";
 
+interface SidebarLink {
+  url: string;
+  name: React.ReactNode;
+}
+
+type TransitionTypesByUrl = Map<string, string[]>;
+
+const getSidebarPages = (folder: PageTreeFolder): SidebarLink[] =>
+  isComponentsFolder(folder)
+    ? getAllPagesFromFolder(folder).filter(
+        (page) => page.url !== ROUTES.DOCS_COMPONENTS
+      )
+    : getPagesFromFolder(folder);
+
+/** Hrefs in the order they appear in the sidebar, used to infer slide direction. */
+const getSidebarOrder = (tree: typeof source.pageTree): string[] => {
+  const urls: string[] = TOP_LEVEL_SECTIONS.map(({ href }) => href);
+
+  for (const item of tree.children) {
+    if (item.type !== "folder" || EXCLUDED_SECTIONS.has(item.$id ?? "")) {
+      continue;
+    }
+
+    for (const page of getSidebarPages(item)) {
+      urls.push(page.url);
+    }
+  }
+
+  return urls;
+};
+
+/**
+ * Animates links that move down the sidebar forwards and links that move up
+ * backwards. Pages outside the sidebar keep the page's default (no animation).
+ */
+const getTransitionTypesByUrl = (
+  order: string[],
+  pathname: string
+): TransitionTypesByUrl => {
+  const currentIndex = order.indexOf(pathname);
+  const map: TransitionTypesByUrl = new Map();
+
+  if (currentIndex === -1) {
+    return map;
+  }
+
+  for (const [index, url] of order.entries()) {
+    if (index !== currentIndex) {
+      map.set(url, [index > currentIndex ? "nav-forward" : "nav-back"]);
+    }
+  }
+
+  return map;
+};
+
 const SidebarPageGroup = ({
   label,
   pages,
   pathname,
+  transitionTypesByUrl,
 }: {
   label: React.ReactNode;
-  pages: { url: string; name: React.ReactNode }[];
+  pages: SidebarLink[];
   pathname: string;
+  transitionTypesByUrl: TransitionTypesByUrl;
 }) => {
   if (pages.length === 0) {
     return null;
@@ -55,7 +114,10 @@ const SidebarPageGroup = ({
                 className={MENU_BUTTON_CLS}
                 isActive={page.url === pathname}
               >
-                <Link href={page.url}>
+                <Link
+                  href={page.url}
+                  transitionTypes={transitionTypesByUrl.get(page.url)}
+                >
                   <span className="absolute inset-0 flex w-(--sidebar-menu-width) bg-transparent" />
                   {page.name}
                 </Link>
@@ -73,6 +135,10 @@ export const DocsSidebar = ({
   ...props
 }: React.ComponentProps<typeof Sidebar> & { tree: typeof source.pageTree }) => {
   const pathname = usePathname();
+  const transitionTypesByUrl = useMemo(
+    () => getTransitionTypesByUrl(getSidebarOrder(tree), pathname),
+    [tree, pathname]
+  );
 
   return (
     <Sidebar
@@ -101,7 +167,10 @@ export const DocsSidebar = ({
                         : pathname.startsWith(href)
                     }
                   >
-                    <Link href={href}>
+                    <Link
+                      href={href}
+                      transitionTypes={transitionTypesByUrl.get(href)}
+                    >
                       <span className="absolute inset-0 flex w-(--sidebar-menu-width) bg-transparent" />
                       {name}
                     </Link>
@@ -119,11 +188,7 @@ export const DocsSidebar = ({
             return null;
           }
 
-          const pages = isComponentsFolder(item)
-            ? getAllPagesFromFolder(item).filter(
-                (page) => page.url !== ROUTES.DOCS_COMPONENTS
-              )
-            : getPagesFromFolder(item);
+          const pages = getSidebarPages(item);
 
           return (
             <SidebarPageGroup
@@ -131,6 +196,7 @@ export const DocsSidebar = ({
               label={item.name}
               pages={pages}
               pathname={pathname}
+              transitionTypesByUrl={transitionTypesByUrl}
             />
           );
         })}
