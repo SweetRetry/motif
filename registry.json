@@ -274,6 +274,50 @@
       ]
     },
     {
+      "name": "prompt-input",
+      "type": "registry:component",
+      "title": "Prompt Input",
+      "description": "The box a message is written in, assembled from parts: a field that grows and then scrolls, the files riding with the draft as chips above it, the model answering it, and the one button that ends the turn.",
+      "dependencies": ["clsx", "lucide-react", "tailwind-merge"],
+      "registryDependencies": [
+        "button",
+        "dropdown-menu",
+        "https://startercn.vercel.app/r/attachment.json"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/agents/prompt-input/index.tsx",
+          "type": "registry:component",
+          "target": "@components/agents/prompt-input/index.tsx"
+        },
+        {
+          "path": "registry/new-york/agents/prompt-input/parts.tsx",
+          "type": "registry:component",
+          "target": "@components/agents/prompt-input/parts.tsx"
+        },
+        {
+          "path": "registry/new-york/agents/prompt-input/context.ts",
+          "type": "registry:component",
+          "target": "@components/agents/prompt-input/context.ts"
+        },
+        {
+          "path": "registry/new-york/agents/prompt-input/model-picker.tsx",
+          "type": "registry:component",
+          "target": "@components/agents/prompt-input/model-picker.tsx"
+        },
+        {
+          "path": "registry/new-york/agents/prompt-input/provider-icons.tsx",
+          "type": "registry:component",
+          "target": "@components/agents/prompt-input/provider-icons.tsx"
+        },
+        {
+          "path": "registry/new-york/agents/prompt-input/types.ts",
+          "type": "registry:component",
+          "target": "@components/agents/prompt-input/types.ts"
+        }
+      ]
+    },
+    {
       "name": "cover-fan",
       "type": "registry:ui",
       "title": "Cover Fan",

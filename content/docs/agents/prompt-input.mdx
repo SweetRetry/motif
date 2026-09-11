@@ -1,0 +1,269 @@
+---
+title: Prompt Input
+description: "The box a message is written in, assembled from parts: a field that grows and then scrolls, the files riding with the draft as chips above it, the model answering it, and the one button that ends the turn."
+---
+
+import {
+  PromptInputDemo,
+  PromptInputStreamingDemo,
+} from "@/examples/prompt-input";
+
+<ComponentPreview name="prompt-input">
+  <PromptInputDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/prompt-input.json
+```
+
+Pulls in [attachment](https://startercn.vercel.app/docs/components/attachment) for the chips
+in the header, plus `dropdown-menu` for the model picker.
+
+## Usage
+
+The root owns the state and draws the card; everything in it is a part. This is the whole
+frame in one place — a header that holds chips, the field, and a footer with an attach
+button, a model picker and submit.
+
+```tsx
+import { useState } from "react";
+
+import {
+  ModelPicker,
+  PromptInput,
+  PromptInputAttach,
+  PromptInputAttachment,
+  PromptInputFooter,
+  PromptInputHeader,
+  PromptInputSubmit,
+  PromptInputTextarea,
+  type PromptAttachment,
+  type PromptModel,
+} from "@/components/agents/prompt-input";
+
+const MODELS: PromptModel[] = [
+  { id: "gpt-5.2", name: "GPT-5.2", provider: "openai" },
+  { id: "claude-sonnet-4.5", name: "Claude Sonnet 4.5", provider: "anthropic" },
+];
+
+export function Composer() {
+  const [model, setModel] = useState(MODELS[0].id);
+  const [attachments, setAttachments] = useState<PromptAttachment[]>([]);
+
+  return (
+    <PromptInput onSubmit={(message) => send({ message, model })}>
+      <PromptInputHeader>
+        {attachments.map(({ id, ...chip }) => (
+          <PromptInputAttachment
+            key={id}
+            {...chip}
+            onRemove={() =>
+              setAttachments((current) =>
+                current.filter((file) => file.id !== id)
+              )
+            }
+          />
+        ))}
+      </PromptInputHeader>
+
+      <PromptInputTextarea placeholder="Review the current implementation and suggest the next improvement." />
+
+      <PromptInputFooter>
+        <PromptInputAttach onFiles={(files) => upload(files, setAttachments)} />
+        <ModelPicker models={MODELS} onValueChange={setModel} value={model} />
+        <PromptInputSubmit />
+      </PromptInputFooter>
+    </PromptInput>
+  );
+}
+```
+
+The draft is the composer's own until you pass `value`, and a send clears it. A controlled
+draft is never cleared for you — `onValueChange` reports every keystroke and `onSubmit`
+hands over the trimmed text, so the caller decides where the sentence goes next.
+
+## The frame is the frame
+
+A composer is where a surface grows its own conventions. A tools menu, a microphone, a
+quoted reply, a token counter, a composer in a thread with no attach button — every one of
+those is an arrangement of these parts, and none of them is a prop the root has to learn
+about first. So the root takes the message and nothing else.
+
+| Part                    | What it is                                                                   |
+| ----------------------- | ---------------------------------------------------------------------------- |
+| `PromptInput`           | The root: the card, the draft, the submit contract                           |
+| `PromptInputHeader`     | Flex row above the field; draws nothing while it holds nothing               |
+| `PromptInputTextarea`   | The field, with the growth cap, the two-line floor and the Enter binding     |
+| `PromptInputFooter`     | Flex row under the field                                                     |
+| `PromptInputAttachment` | A chip in the header: the attachment card plus its entrance                  |
+| `PromptInputButton`     | A round control for the row: the platform `Button` at `size-10 rounded-full` |
+| `PromptInputAttach`     | The plus, and the file dialog behind it                                      |
+| `PromptInputSubmit`     | Send, or stop while `streaming`; takes the trailing edge of the row          |
+| `ModelPicker`           | Which model answers; standalone, and usable outside a composer               |
+
+`PromptInputHeader`, `PromptInputFooter` and `PromptInputAttachment` take no composer state
+— they are ordinary elements named after where they sit. `PromptInputTextarea`,
+`PromptInputAttach` and `PromptInputSubmit` read the root from context, so they must be
+inside one.
+
+Two of the parts are other components rather than new ones: the chip is
+[attachment](https://startercn.vercel.app/docs/components/attachment), and the round controls
+in the row are the platform [`button`](https://ui.shadcn.com/docs/components/button) at one
+size — hover, focus ring, disabled treatment and sound/haptic feedback all come from it, so
+`PromptInputButton` takes `ButtonProps` with the geometry already applied. The field is the
+one piece with no base to build on: the platform ships no textarea, and the growth cap, the
+two-line floor and the Enter binding are the composer's own.
+
+Nothing here is drawn that cannot act: `PromptInputAttach` without `onFiles` renders
+nothing, a header with no children renders nothing, and a submit button with an empty draft
+is disabled rather than hidden — the send button is the one fixed point of the row, and a
+row where it comes and goes is a row you have to re-find.
+
+## The field grows, then scrolls
+
+The textarea is measured against its content on every change and capped at `maxHeight`
+(200px by default, four lines of `text-base` and a wrap). Past the cap it scrolls, and it
+never shrinks below two lines — one line of text in a box this wide reads as a single-line
+input, which is not what this is.
+
+Both halves of that matter. A composer is anchored to the bottom of the window in every
+app that has one, so a draft that grows the card without a ceiling ends up being a draft
+whose beginning is off-screen. And a field that scrolls while it is still short is a field
+that hides a line for no reason, which is why the size is measured rather than fixed.
+
+## Enter sends
+
+<kbd>Enter</kbd> submits, <kbd>Shift</kbd>+<kbd>Enter</kbd> breaks the line. A
+composer is typed into and then sent far more often than it is asked to hold a
+second line, and the reverse binding is right for a form, not for this one.
+
+A composition in progress is left alone: an IME's <kbd>Enter</kbd> commits the candidate
+under it, and sending on that key would eat the word the user was still assembling.
+
+## Attachments ride in the header
+
+Files sit above the field as the same chips used everywhere else — the same component, the
+same size, the same ring while an upload is in flight. They are what the message is
+_about_, so they go on the near side of the thing that says what the message says. In the
+footer they would have to share a line with controls that are deliberately one fixed size,
+and a row of 56px chips would set that size for everything.
+
+`PromptInputAttachment` is the chip with one thing added: it fades in. Chips land one at a
+time and the row reflows around them, so a chip that appears whole is a tear in the row.
+Everything else is the chip's own props — `name`, `src` for a preview, `progress` while an
+upload is in flight, `onRemove` to make it removable.
+
+`PromptInputAttach` is what makes the plus real: the composer opens the file dialog and
+hands over the `File`s as `onFiles`. Whatever you do with them — upload them, read them,
+keep the last one — ends in the same place: new chips in the header with progress running
+from 0 to 100.
+
+## Models
+
+The picker is one mark, one name and one chevron. The mark is the loud part because it is
+the part read at a glance; the name sits in the muted tone the rest of the row uses, so
+the row has one subject instead of two. The menu opens upward — a composer lives at the
+bottom of the window, and a menu that unfolds over the message you are about to send is a
+menu covering the thing you are deciding about.
+
+`models` takes `{ id, name, provider }`. `value` and `onValueChange` make the pick
+controlled; on its own the picker holds it, starting at `defaultValue` or the first model.
+
+`ProviderMark` is a 20px mono mark in `currentColor`, taken verbatim from
+[LobeHub's icon set](https://github.com/lobehub/lobe-icons) (MIT) and inlined as path
+data. The package itself is not a dependency: it ships every icon it has ever drawn —
+around nine megabytes — behind an `antd` peer, which is not a price a composer should put
+on an app. Fifteen providers ship here: `anthropic`, `deepseek`, `gemini`, `google`,
+`groq`, `meta`, `mistral`, `moonshot`, `ollama`, `openai`, `openrouter`, `perplexity`,
+`qwen`, `xai` and `zhipu`. A provider that is missing is one path in
+`provider-icons.tsx`; colour marks and avatar framing are what the real package is for.
+
+```tsx
+import { ProviderMark } from "@/components/agents/prompt-input";
+
+<ProviderMark className="size-5 text-foreground" provider="anthropic" />;
+```
+
+`PROVIDER_NAMES` is exported beside it for the times the mark is not enough — a menu
+that has to say "Anthropic" somewhere.
+
+## While an answer is arriving
+
+Pass `streaming` and submit becomes stop — one button with two jobs, because while an
+answer is streaming the only thing worth doing to the composer is stopping it, and a
+second button beside send would make the reader choose between two live actions on every
+frame. Enter cannot send while it is true. `onStop` is called when it is pressed; flipping
+`streaming` back to false is what returns the arrow.
+
+<ComponentPreview name="prompt-input" align="start">
+  <PromptInputStreamingDemo />
+</ComponentPreview>
+
+## Props
+
+### PromptInput
+
+| Prop            | Default | Meaning                                                             |
+| --------------- | ------- | ------------------------------------------------------------------- |
+| `value`         | —       | Controlled draft, never cleared by a send                           |
+| `defaultValue`  | `""`    | Draft the composer starts with                                      |
+| `onValueChange` | —       | Called with the draft on every change                               |
+| `onSubmit`      | —       | Called with the trimmed draft; <kbd>Enter</kbd> or submit           |
+| `streaming`     | `false` | Swaps the submit part's arrow for stop, and blocks <kbd>Enter</kbd> |
+| `onStop`        | —       | Called when the stop face is pressed                                |
+| `disabled`      | `false` | Disables the field and the submit button                            |
+| `className`     | —       | Extra classes for the card                                          |
+
+Anything else goes to the underlying `form`.
+
+### Parts
+
+| Part                                      | Props                                                                       |
+| ----------------------------------------- | --------------------------------------------------------------------------- |
+| `PromptInputTextarea`                     | `maxHeight`, plus `textarea` props; `onKeyDown` runs before the binding     |
+| `PromptInputAttachment`                   | `AttachmentProps` — `name`, `src`, `progress`, `status`, `icon`, `onRemove` |
+| `PromptInputAttach`                       | `onFiles`, `accept`, plus `ButtonProps`                                     |
+| `PromptInputSubmit`                       | `ButtonProps`; `className` lands on the button                              |
+| `PromptInputButton`                       | `ButtonProps` — `variant`, `size`, `sound`, `haptic`; geometry fixed        |
+| `PromptInputHeader` / `PromptInputFooter` | `div` props                                                                 |
+| `ModelPicker`                             | `models`, `value`, `defaultValue`, `onValueChange`, `className`             |
+
+## Component source
+
+<ComponentSource
+  name="prompt-input"
+  src="registry/new-york/agents/prompt-input/index.tsx"
+  title="prompt-input/index.tsx"
+/>
+
+<ComponentSource
+  name="prompt-input"
+  src="registry/new-york/agents/prompt-input/parts.tsx"
+  title="parts.tsx"
+/>
+
+<ComponentSource
+  name="prompt-input"
+  src="registry/new-york/agents/prompt-input/model-picker.tsx"
+  title="model-picker.tsx"
+/>
+
+<ComponentSource
+  name="prompt-input"
+  src="registry/new-york/agents/prompt-input/context.ts"
+  title="context.ts"
+/>
+
+<ComponentSource
+  name="prompt-input"
+  src="registry/new-york/agents/prompt-input/provider-icons.tsx"
+  title="provider-icons.tsx"
+/>
+
+<ComponentSource
+  name="prompt-input"
+  src="registry/new-york/agents/prompt-input/types.ts"
+  title="types.ts"
+/>
