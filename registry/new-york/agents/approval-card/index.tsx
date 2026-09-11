@@ -125,7 +125,7 @@ function barTone({
   skipped: boolean;
 }) {
   if (skipped) {
-    return "bg-amber-500";
+    return "bg-warning";
   }
   if (current) {
     return "bg-foreground";
@@ -454,7 +454,7 @@ export function ApprovalCard({
                   size="sm"
                   disabled={busy}
                   onClick={onReject}
-                  className="rounded-full text-muted-foreground hover:text-rose-600 dark:hover:text-rose-400"
+                  className="rounded-full text-muted-foreground hover:text-destructive"
                 >
                   Reject
                 </Button>

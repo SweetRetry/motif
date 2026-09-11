@@ -15,6 +15,11 @@ import { ApprovalCardDemo } from "@/examples/approval-card";
 npx shadcn@latest add https://startercn.vercel.app/r/approval-card.json
 ```
 
+The card reads its states in two tokens the base theme does not have: `warning` for a step
+walked past, `success` for a checkmark. The registry item carries both, so `shadcn add`
+adds them to your CSS — `:root`, `.dark` and `@theme`, the same three places
+`styles/globals.css` keeps them here.
+
 ## Usage
 
 ```tsx
@@ -50,7 +55,8 @@ field clears the pick, and the answer is stored in an `answers` map keyed by que
 Step position lives in the footer as one bar per question, which is also the only step
 control. Width carries position: the question you are on is twice the resting width.
 Colour carries state: the current bar is at full strength, an answered one sits at 55%,
-one not reached yet at 20%, and one walked past without an answer turns amber. Clicking a bar jumps to that
+one not reached yet at 20%, and one walked past without an answer turns the `warning`
+token's amber. Clicking a bar jumps to that
 question (hovering lengthens it, nudges the rest of the row along, and previews the
 question in a tooltip), and every bar names itself to assistive tech
 ("Question 2 of 3: Who signs off… (answered)"). Navigation is free — `Skip` and `Continue`
