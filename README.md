@@ -48,7 +48,8 @@
 pnpm install
 ```
 
-3. **Replace the placeholder component** at `registry/new-york/your-component.tsx`
+3. **Add your component** under `registry/new-york/` (the reference one is
+   `registry/new-york/agents/approval-card/`)
 
 4. **Update `registry.json`** with your component details
 
@@ -71,7 +72,7 @@ pnpm dev
 Once deployed, users can install your component with:
 
 ```bash
-npx shadcn@latest add https://your-domain.com/r/your-component.json
+npx shadcn@latest add https://your-domain.com/r/approval-card.json
 ```
 
 ## Project Structure
@@ -79,7 +80,7 @@ npx shadcn@latest add https://your-domain.com/r/your-component.json
 ```
 ├── registry/
 │   └── new-york/           # Your components go here
-│       └── your-component.tsx
+│       └── agents/approval-card/
 ├── registry.json           # Component registry manifest
 ├── content/docs/           # Documentation (MDX)
 ├── app/                    # Next.js app
