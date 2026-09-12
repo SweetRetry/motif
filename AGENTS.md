@@ -59,6 +59,27 @@ Literal color is right when what it is measured against is not the theme: a scri
 user artwork, the full-opacity stop inside an SVG mask, a cast shadow landing on a photo.
 Those are content-independent by nature rather than a shortcut around the palette.
 
+## Surfaces stack in a fixed order
+
+A component that draws its own container picks one of three levels, and the token names
+the level rather than the theme it happens to be drawn on: the page is `background`, an
+in-place container is `card` with `border-border`, a floating one is `popover`. A level is
+where the component will be nested, so a card is `bg-card` whichever parent it lands in —
+the caller's frame does not change what it is.
+
+`muted` and `accent` are not levels. They are fills for something that recedes or answers
+the pointer, and they are only safe _inside_ a container. That is exactly why a card
+cannot borrow one: `muted` sits below the page in light and above the card in dark, so a
+component that draws its own surface with it reads as recessed in one theme and floating in
+the other. The same goes for a recessed field or group — it draws `border-border`, not a
+fill, because a border is stable across the swap and a fill is not.
+
+"Brighter is closer" is a consequence of the order, not the rule for it. Dark mode reads
+that way (`background` 0.145 → `card` 0.205 → `popover` 0.269); light mode cannot, because
+its three levels are all white and the border is all that separates them. Writing the rule
+as "the nearer surface is brighter" would force `background` to go grey in light mode,
+which is a theme change, not a component fix.
+
 ## Browser use requires confirmation
 
 Reaching for a browser — ego-browser, or any other browser automation — is a
