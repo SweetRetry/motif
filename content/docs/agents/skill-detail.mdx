@@ -22,10 +22,7 @@ npx shadcn@latest add https://startercn.vercel.app/r/skill-detail.json
 ## Usage
 
 ```tsx
-import {
-  SkillCard,
-  SkillDetailDialog,
-} from "@/components/agents/skill-detail";
+import { SkillCard, SkillDetailDialog } from "@/components/agents/skill-detail";
 
 export function Library({ skills }: { skills: Skill[] }) {
   const [openId, setOpenId] = useState<string | null>(null);
@@ -80,6 +77,9 @@ pieces, three jobs, and you can leave any of them out.
 - **`SkillDetail`** is the surface: a rail of identity, examples and description, next to
   a workspace of files and their contents. It fills whatever box you give it — give it a
   height and it behaves like a sheet, leave the height off and it grows with its contents.
+  The cover heads the identity column rather than spanning the panel: it is the only colour
+  in an otherwise monochrome surface, and keeping it a thumbnail spends 63px of height on it
+  instead of 300.
 - **`SkillDetailDialog`** is the handful of lines of plumbing: it sizes the panel at
   `min(46rem, 88dvh)` and `max-w-5xl`, names the dialog for assistive tech, and wires the
   panel's close control to closing. Leave it out and the panel sits in a page just as
@@ -90,32 +90,75 @@ The dialog leans on the panel rather than the other way around: `onClose` is dro
 and `open` works controlled or uncontrolled with `defaultOpen`, like the panel's own
 selection.
 
-## Two jobs, two columns
+## The head is two-up
 
-A detail panel is opened to answer one of two questions, and they are not read in the same
-way. *What is this?* is read once, top to bottom, and it is short: a name, a line about
-who made it, a paragraph, three examples. *What is inside it?* is browsed — the tree is
-scanned, one file is read, another file is read. Stacked, the second question starts below
-a screen of prose, so the panel becomes a document you scroll rather than a surface you
-use; the files may as well not be there until you have read everything above them.
+The head is the only part of the panel that is read, and it is two columns: the skill on the
+left, what it is for on the right. The left column is the identity — cover, name, who made it,
+tags — and it holds nothing else, because an action wedged under a byline reads as one more
+line of metadata. The name opens that column rather than the tags: a row of chips is metadata,
+and metadata does not get the first line of the panel. It also decides where the summary sits —
+with the name at the top, the paragraph opposite shares its first line and reads as the name's
+expansion, where a paragraph opposite a row of chips reads as their caption. The paragraph opposite is the summary: the one place in the panel where
+somebody tells you what the skill does, instead of handing you a file that says it. The action
+follows that sentence — right-aligned, 16px under the last line — because proximity is how the
+eye decides what a button belongs to. Pushed to the foot of the column instead, it sat under a
+paragraph of empty space and belonged to nothing.
 
-So they sit side by side: a 20rem rail for the reading, and everything left over for the
-browsing. Each column scrolls on its own, and only when it has to — the rail is short
-enough that it usually does not, and the preview is the one thing that always can.
+Two columns rather than one stack because the two halves answer different questions and
+neither of them needs the full width. Stacked, the paragraph sat under the identity, so the
+first screen was a cover, a name, a button and a wall of prose before anything else appeared,
+and the right half of a 64rem panel stayed empty the whole way down. Now the identity column
+is a fixed 24rem, the prose takes what is left and is held to a `max-w-2xl` measure — a
+paragraph is not more readable at 1000px — and the examples get the full width underneath
+both.
 
-The split keys off the panel's own width rather than the viewport's, with a container
-query at 56rem. The same panel is a dialog here, a sheet there, a route of its own
-somewhere else, and only its own box decides whether there is room for two columns. Under
-that width — a phone, a narrow sheet — the rail and the workspace stack into one scroller
-in that order, which is the only arrangement that fits.
+The split happens at 48rem of the panel's own width, with a container query rather than a
+viewport one, and below it the two stack identity-first, which is the only order that fits in
+a column. The same panel is a dialog here, a sheet there, a route of its own somewhere else;
+only its own box knows whether there is room.
+
+The cover is a block, not a thumbnail: it fills the height of the head, so the left edge of
+the panel is one flush rectangle instead of a picture floating in a corner with a byline
+running past it. That means the art is cropped to the block's height rather than letterboxed
+— a cover that keeps its own ratio cannot also line up with a block whose height comes from
+the text beside it. Ship two crops of the art: 16:9 for the card, portrait for the panel.
+
+Two more things keep the head short: the toolbar is a header rather than a sticky bar over the
+body, and the examples are one ruled strip of three cells rather than three stacked rows or
+three cards.
+
+## One gutter, and no grid the panel cannot keep
+
+Every line in the panel starts on the same 24px gutter: the cover, the tags, the heading, the
+section label, the example cells, and the first level of the file tree — the tree's pane is
+inset 16px and its rows carry the last 8px, so a folder's chevron lands on the same edge as
+the heading above it. A panel whose left edge zigzags by four pixels reads as unfinished even
+when nobody can say why.
+
+The example strip has no vertical rules. It cannot: three columns and a two-column head have no
+common divisor, so a rule under one would never continue the rule above it — and a divider that
+lines up with nothing is a grid claim the layout cannot keep. The cells are separated by the
+head's own 40px gap instead, which still ties the two bands together without pretending they
+share columns.
 
 ## Examples, not example cards
 
-An example prompt is a line you might have typed, so it is drawn as one: a rule down the
-side, two lines of text, and the whole row is the button. Three of these cost the height
-of a single bordered card with an icon in the corner, which matters most in the column
-that has the least room. Without `onPrompt` they are not buttons at all — the rows render
-as plain text, because an example that cannot be sent anywhere is just documentation.
+An example prompt is a line you might have typed, so it is drawn as one rather than boxed
+like a card: a number to scan by, two clamped lines of text, and the whole cell as the
+button. Three of them sit across the panel under a single rule, which is the shape that
+matches the content — each example is a line, and a line does not need its own bordered panel
+to be understood. The arrow is there at rest, dimmed, because a hit target that only admits it
+is one under a pointer does not admit it at all on a touch screen.
+
+Side by side also spends the width instead of the height. Stacked, three examples are three
+rows of mostly empty space and 120px of the panel's first screen; across, they are 60px.
+Below 48rem of panel width the strip stacks back into rows, which is where a column of
+lines is the only thing that fits.
+
+The arrow only appears on the cell the pointer is on, and the text lifts to the foreground
+with it, so three examples read as things to try rather than three competing panels.
+Without `onPrompt` the cells are not buttons at all and render as plain text, because an
+example that cannot be sent anywhere is just documentation.
 
 ## Files are paths
 
@@ -176,21 +219,21 @@ every row it owns at once instead of one nested block, and the levels are named 
 enable switch is a real switch with a label of its own (`Enable {title}`), not a
 decoration beside the heading.
 
-| Region   | Prop                            | Notes                                                        |
-| -------- | ------------------------------- | ------------------------------------------------------------ |
-| Card     | `cover`, `title`, `description` | The summary: one line, clamped to two, cover at 16:9         |
-| Card     | `onOpen` / `href`               | Opens in place, or navigates when the skill has a page        |
-| Rail     | `tags`, `title`, `author`       | The heading is the only required prop                         |
-| Rail     | `cover`                         | Flat and small beside the heading, at the card's own ratio    |
-| Rail     | `updatedAt`                     | Already formatted — the panel does not touch dates            |
-| Rail     | `onTry` / `tryLabel`            | The primary button, dropped when there is no handler          |
-| Rail     | `description`                   | A paragraph, not a subtitle                                   |
-| Rail     | `prompts` / `promptsLabel`      | Rows become buttons once `onPrompt` is passed                 |
-| Toolbar  | `enabled` / `defaultEnabled`    | Passing either draws the switch, controlled or not            |
-| Toolbar  | `menu`                          | Slot for a "…" dropdown; the panel ships no menu of its own   |
-| Files    | `files`, `folder`               | Paths in; the tree is built for you                           |
-| Files    | `renderPreview`                 | The only part of the tree the panel does not draw             |
-| Dialog   | `open` / `onOpenChange`         | Uncontrolled with `defaultOpen`, like the panel's selection   |
+| Region   | Prop                            | Notes                                                       |
+| -------- | ------------------------------- | ----------------------------------------------------------- |
+| Card     | `cover`, `title`, `description` | The summary: one line, clamped to two, cover at 16:9        |
+| Card     | `onOpen` / `href`               | Opens in place, or navigates when the skill has a page       |
+| Identity | `tags`, `title`, `author`       | The heading is the only required prop                        |
+| Identity | `cover`                         | Fills the height of the head, cropped; portrait crop         |
+| Identity | `updatedAt`                     | Already formatted — the panel does not touch dates           |
+| Action   | `onTry` / `tryLabel`            | Closes the summary column, right-aligned; needs a handler    |
+| Prose    | `description`                   | The summary opposite the identity, held to a reading measure |
+| Prompts  | `prompts` / `promptsLabel`      | Rows become buttons once `onPrompt` is passed                |
+| Toolbar  | `enabled` / `defaultEnabled`    | Passing either draws the switch, controlled or not           |
+| Toolbar  | `menu`                          | Slot for a "…" dropdown; the panel ships no menu of its own  |
+| Files    | `files`, `folder`               | Paths in; the tree is built for you                          |
+| Files    | `renderPreview`                 | The only part of the tree the panel does not draw            |
+| Dialog   | `open` / `onOpenChange`         | Uncontrolled with `defaultOpen`, like the panel's selection  |
 
 ## Motion
 

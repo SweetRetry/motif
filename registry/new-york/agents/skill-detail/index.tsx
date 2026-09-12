@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowUpRight,
   Check,
   ChevronRight,
   Copy,
@@ -252,28 +253,9 @@ const IconButton = ({
   </button>
 );
 
-const Avatar = ({ author }: { author: SkillAuthor }) => {
-  const className =
-    "grid size-5 shrink-0 place-items-center overflow-hidden rounded-[6px] bg-muted text-[10px] font-medium text-muted-foreground";
-
-  const content = author.avatar ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img alt="" className="size-full object-cover" src={author.avatar} />
-  ) : (
-    <span aria-hidden="true">{author.name.trim().charAt(0).toUpperCase()}</span>
-  );
-
-  if (author.href) {
-    return (
-      <a className={className} href={author.href}>
-        {content}
-      </a>
-    );
-  }
-
-  return <span className={className}>{content}</span>;
-};
-
+/** The line under a heading: who made it, when it last moved. A real avatar is drawn
+ *  when there is one and nothing stands in for it when there is not — a letter in a
+ *  rounded square is a logo pretending to be a face. */
 const MetaLine = ({
   author,
   updatedAt,
@@ -283,68 +265,81 @@ const MetaLine = ({
   updatedAt?: string;
   updatedLabel: string;
 }) => (
-  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+  <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted-foreground">
     {author ? (
       <span className="flex items-center gap-1.5">
-        <Avatar author={author} />
-        <span className="font-medium">{author.name}</span>
+        {author.avatar ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            alt=""
+            className="size-4 shrink-0 rounded-full object-cover"
+            src={author.avatar}
+          />
+        ) : null}
+        <span className="font-medium text-foreground/80">{author.name}</span>
       </span>
     ) : null}
-    {author && updatedAt ? (
-      <span aria-hidden="true" className="text-muted-foreground/40">
-        |
-      </span>
-    ) : null}
+    {author && updatedAt ? <span aria-hidden="true">·</span> : null}
     {updatedAt ? (
-      <span className="text-muted-foreground">
+      <span>
         {updatedLabel} {updatedAt}
       </span>
     ) : null}
   </div>
 );
 
-/** Flat and small, because the panel is the content and the card is where the art lives. */
+/**
+ * The cover fills the height of the head rather than sitting at its top corner, so the left
+ * edge of the panel is one block and nothing has to line up with a thumbnail's bottom.
+ *
+ * The height is why the art is cropped rather than letterboxed: a cover that keeps its own
+ * ratio cannot also be flush with a block whose height comes from the text beside it. Ship a
+ * portrait crop for this and a 16:9 one for the card — they are different boxes.
+ */
 const Cover = ({ src }: { src: string }) => (
-  <div className="w-24 shrink-0">
+  <div className="w-28 shrink-0 self-start overflow-hidden rounded-lg ring-1 ring-border @3xl:self-stretch">
     {/* eslint-disable-next-line @next/next/no-img-element */}
-    <img
-      alt=""
-      className="aspect-video w-full rounded-lg object-cover ring-1 ring-border"
-      src={src}
-    />
+    <img alt="" className="size-full object-cover" src={src} />
   </div>
 );
 
-/** An example is a line you might have typed, not a card: a rule down the side and two
- *  lines of clamp is enough of a frame, and three of them cost the height of one card. */
-const PromptRow = ({
+/** An example is a line you might have typed, not a card: a number to scan by, the text,
+ *  and an arrow that only shows up when the cell is live. Three of them sit across the
+ *  panel as one ruled strip — stacked, they were three rows of mostly empty width. */
+const PromptCell = ({
+  index,
   onSelect,
   prompt,
 }: {
+  index: number;
   onSelect?: (prompt: string) => void;
   prompt: string;
 }) => {
-  const className =
-    "block w-full rounded-md border-l-2 border-border px-3 py-1.5 text-left text-sm text-muted-foreground";
+  const body = (
+    <>
+      <span className="shrink-0 pt-px font-mono text-[11px] text-muted-foreground/70 tabular-nums">
+        {String(index + 1).padStart(2, "0")}
+      </span>
+      <span className="line-clamp-2 min-w-0 flex-1 text-sm text-pretty text-muted-foreground transition-colors group-hover:text-foreground">
+        {prompt}
+      </span>
+      {onSelect ? (
+        <ArrowUpRight className="mt-0.5 size-3.5 shrink-0 text-muted-foreground opacity-40 transition-opacity group-hover:opacity-100" />
+      ) : null}
+    </>
+  );
 
   if (!onSelect) {
-    return (
-      <div className={className}>
-        <span className="line-clamp-2 text-pretty">{prompt}</span>
-      </div>
-    );
+    return <div className="flex items-start gap-2.5 py-3">{body}</div>;
   }
 
   return (
     <button
-      className={cn(
-        className,
-        "cursor-pointer outline-none transition-colors hover:border-foreground/30 hover:bg-muted/40 hover:text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
-      )}
+      className="group flex cursor-pointer items-start gap-2.5 py-3 text-left outline-none transition-colors hover:bg-muted/40 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
       onClick={() => onSelect(prompt)}
       type="button"
     >
-      <span className="line-clamp-2 text-pretty">{prompt}</span>
+      {body}
     </button>
   );
 };
@@ -657,15 +652,15 @@ export const SkillDetail = ({
   return (
     <div
       className={cn(
-        // A container, because the split below is about the panel's own width: the same
-        // panel sits in a page, a sheet or a dialog, and only its box decides.
+        // A container, because where this panel breaks into two columns is about the
+        // panel's own width: the same panel sits in a page, a sheet or a dialog.
         "@container relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl border border-border bg-card",
         className
       )}
     >
       {toolbar ? (
-        // A header, not a sticky bar: the body is its own scroll box, so nothing ever
-        // passes underneath it and there is no translucent corner to get wrong.
+        // A header, not a sticky bar: the body is its own scroll box, so nothing passes
+        // underneath the controls and there is no translucent corner to get wrong.
         <div className="flex shrink-0 items-center justify-end gap-1 px-4 py-3">
           {showSwitch ? (
             <Switch
@@ -684,73 +679,88 @@ export const SkillDetail = ({
         </div>
       ) : null}
 
-      <div
-        className={cn(
-          "min-h-0 flex-1 overflow-y-auto overscroll-contain",
-          // Two jobs, two columns: reading what the skill is (the rail) and reading what
-          // is inside it (the workspace). Stacked, the files sit below a screen of prose
-          // and the panel is a document you scroll instead of a surface you use.
-          workspace
-            ? "@4xl:grid @4xl:grid-cols-[20rem_minmax(0,1fr)] @4xl:overflow-hidden"
-            : "@4xl:overflow-y-auto"
-        )}
-      >
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <div
           className={cn(
-            "flex flex-col gap-5 px-5 pb-6",
-            workspace
-              ? "@4xl:min-h-0 @4xl:overflow-y-auto @4xl:overscroll-contain @4xl:border-r @4xl:border-border/60"
-              : "@4xl:mx-auto @4xl:w-full @4xl:max-w-2xl"
+            "flex flex-col gap-5 px-6 pb-6",
+            // The header carries its own padding, so the identity only needs air above
+            // it when there is no header to sit under.
+            toolbar ? "pt-1" : "pt-6"
           )}
         >
-          <div className="flex items-start gap-3">
-            {cover ? <Cover src={cover} /> : null}
-            <div className="flex min-w-0 flex-col gap-2">
-              {tags?.length ? (
-                <div className="flex flex-wrap gap-1.5">
-                  {tags.map((tag) => (
-                    <span
-                      className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground"
-                      key={tag}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
-              <h2 className="text-lg font-semibold tracking-tight text-balance">
-                {title}
-              </h2>
-              {author || updatedAt ? (
-                <MetaLine
-                  author={author}
-                  updatedAt={updatedAt}
-                  updatedLabel={updatedLabel}
-                />
-              ) : null}
+          {/* Two-up: the skill on the left, what it is for on the right. Below 48rem of
+              panel width the two stack, identity first, because a column of prose beside a
+              column of identity needs width that neither of them has on a phone. */}
+          <div className="flex flex-col gap-5 @3xl:flex-row @3xl:gap-10">
+            <div className="flex min-w-0 gap-4 @3xl:w-[24rem] @3xl:shrink-0">
+              {cover ? <Cover src={cover} /> : null}
+              {/* Name first, metadata after it. The tags used to open the column, which put
+                  a row of chips on the line where the name belongs — and it put the summary
+                  opposite the chips, so it read as their subtitle. With the name at the top,
+                  the paragraph beside it shares its first line and reads as the name's
+                  expansion, which is what it is. */}
+              <div className="flex min-w-0 flex-col items-start gap-2">
+                <h2 className="text-xl font-semibold tracking-tight text-balance">
+                  {title}
+                </h2>
+                {author || updatedAt ? (
+                  <MetaLine
+                    author={author}
+                    updatedAt={updatedAt}
+                    updatedLabel={updatedLabel}
+                  />
+                ) : null}
+                {tags?.length ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {tags.map((tag) => (
+                      <span
+                        className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                        key={tag}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
             </div>
+
+            {description || onTry ? (
+              // The summary column: the sentence and the one thing to do about it, in that
+              // order and 16px apart. The action is not pushed to the column's floor — a
+              // button with a paragraph of empty space above it belongs to nothing, and the
+              // eye reads proximity as ownership.
+              <div className="flex min-w-0 flex-1 flex-col items-start gap-4">
+                {description ? (
+                  <p className="max-w-2xl text-sm text-pretty text-muted-foreground">
+                    {description}
+                  </p>
+                ) : null}
+                {onTry ? (
+                  <Button className="self-end" onClick={onTry} type="button">
+                    {tryLabel}
+                  </Button>
+                ) : null}
+              </div>
+            ) : null}
           </div>
 
-          {onTry ? (
-            <Button className="w-fit" onClick={onTry} type="button">
-              {tryLabel}
-            </Button>
-          ) : null}
-
-          {description ? (
-            <p className="text-sm text-pretty text-muted-foreground">
-              {description}
-            </p>
-          ) : null}
-
           {prompts?.length ? (
-            <div className="flex flex-col gap-2">
-              <h3 className="text-xs font-medium text-muted-foreground">
+            <div className="flex flex-col gap-3">
+              <h3 className="text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
                 {promptsLabel}
               </h3>
-              <div className="flex flex-col gap-1">
-                {prompts.map((prompt) => (
-                  <PromptRow key={prompt} onSelect={onPrompt} prompt={prompt} />
+              {/* No vertical rules: a three-column strip cannot line up with a two-column
+                  head, and a rule that lines up with nothing is a grid the panel cannot
+                  keep. The gap is the head's own gap, so the two bands still read as one. */}
+              <div className="divide-border/60 border-border/60 grid grid-cols-1 divide-y border-t @3xl:grid-cols-3 @3xl:gap-x-10 @3xl:divide-y-0">
+                {prompts.map((prompt, index) => (
+                  <PromptCell
+                    index={index}
+                    key={prompt}
+                    onSelect={onPrompt}
+                    prompt={prompt}
+                  />
                 ))}
               </div>
             </div>
@@ -761,17 +771,17 @@ export const SkillDetail = ({
           <div
             className={cn(
               "border-t border-border/60",
-              hasPreview && "@4xl:grid @4xl:grid-cols-[12rem_minmax(0,1fr)]",
-              "@4xl:min-h-0 @4xl:overflow-hidden @4xl:border-t-0"
+              hasPreview && "@3xl:grid @3xl:grid-cols-[14rem_minmax(0,1fr)]",
+              "@3xl:min-h-0 @3xl:overflow-hidden"
             )}
           >
             <div
               aria-label={folder ?? "Skill files"}
               className={cn(
-                "flex flex-col gap-0.5 p-3",
+                "flex flex-col gap-0.5 p-4",
                 hasPreview &&
-                  "border-border/60 border-b @4xl:border-r @4xl:border-b-0",
-                "@4xl:min-h-0 @4xl:overflow-y-auto @4xl:overscroll-contain"
+                  "border-border/60 border-b @3xl:border-r @3xl:border-b-0",
+                "@3xl:min-h-0 @3xl:overflow-y-auto @3xl:overscroll-contain"
               )}
               onKeyDown={handleKeyDown}
               role="tree"
@@ -830,7 +840,7 @@ export const SkillDetail = ({
             </div>
 
             {hasPreview && renderPreview && currentFile ? (
-              <div className="min-w-0 p-5 @4xl:min-h-0 @4xl:overflow-y-auto @4xl:overscroll-contain">
+              <div className="min-w-0 p-6 @3xl:min-h-0 @3xl:overflow-y-auto @3xl:overscroll-contain">
                 {reduceMotion ? (
                   <div>{renderPreview(currentFile)}</div>
                 ) : (

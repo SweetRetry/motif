@@ -7,14 +7,14 @@ import { toast } from "sonner";
 import {
   SkillCard,
   SkillCode,
-  SkillDetail,
   SkillDetailDialog,
 } from "@/registry/new-york/agents/skill-detail";
 import type { SkillFile } from "@/registry/new-york/agents/skill-detail";
 
 /** Shipped with the docs so the demo needs no external host — swap in your own covers.
- *  One wide poster: the card draws it at 16:9 and the panel as a small flat thumbnail. */
+ *  Two crops of one poster: the card draws 16:9, the panel fills the height of its head. */
 const COVER = "/skill-detail/invoice-reconciler.svg";
+const COVER_PORTRAIT = "/skill-detail/invoice-reconciler-portrait.svg";
 
 /** What the card has room for. */
 const SUMMARY =
@@ -59,7 +59,9 @@ const PREVIEWS: Record<string, ReactNode> = {
   "SKILL.md": (
     <div className="flex flex-col gap-6">
       <SkillCode code={FRONT_MATTER} language="YAML" />
-      <h2 className="text-2xl font-semibold tracking-tight">
+      {/* One step under the panel's own heading: a document inside a surface never outranks
+          the surface. */}
+      <h2 className="text-lg font-semibold tracking-tight">
         Invoice Reconciler
       </h2>
       <Prose title="About matching">
@@ -109,27 +111,9 @@ export const SkillDetailDemo = () => {
         Press the card to open the panel.
       </p>
 
-      <SkillDetail
-        author={{ name: "Tidepool" }}
-        className="h-[46rem]"
-        cover={COVER}
-        defaultEnabled
-        description={DESCRIPTION}
-        files={FILES}
-        folder="invoice-reconciler"
-        onClose={() => setOpen(false)}
-        onPrompt={(prompt) => toast(`Queued “${prompt}”`)}
-        onTry={() => toast("Opening a session")}
-        prompts={["one", "two", "three"]}
-        renderPreview={(file) => PREVIEWS[file.path] ?? null}
-        tags={["Finance", "Automation"]}
-        title="Invoice Reconciler"
-        updatedAt="March 4, 2026"
-      />
-
       <SkillDetailDialog
         author={{ name: "Tidepool" }}
-        cover={COVER}
+        cover={COVER_PORTRAIT}
         defaultEnabled
         description={DESCRIPTION}
         files={FILES}
@@ -142,9 +126,9 @@ export const SkillDetailDemo = () => {
         onTry={() => toast("Opening a session")}
         open={open}
         prompts={[
-          "Reconcile last month's invoices against the bank export and list what is still unmatched.",
-          "Invoice 4821 did not match — explain why, and name the closest candidate.",
-          "Write the quarterly variance report, grouped by vendor, with the three biggest movers.",
+          "Reconcile last month and list what is unmatched.",
+          "Why didn't invoice 4821 match? Name the closest.",
+          "Write the quarterly variance report, grouped by vendor.",
         ]}
         renderPreview={(file) => PREVIEWS[file.path] ?? null}
         tags={["Finance", "Automation"]}

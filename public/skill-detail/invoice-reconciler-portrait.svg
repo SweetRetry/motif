@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800" role="img" aria-label="Invoice Reconciler blueprint poster">
+  <defs>
+    <linearGradient id="plate" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#123a72" />
+      <stop offset="0.55" stop-color="#0c2a55" />
+      <stop offset="1" stop-color="#071b39" />
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#8fc4ff" stroke-opacity="0.14" stroke-width="1" />
+    </pattern>
+    <pattern id="fine" width="8" height="8" patternUnits="userSpaceOnUse">
+      <path d="M8 0H0V8" fill="none" stroke="#8fc4ff" stroke-opacity="0.06" stroke-width="1" />
+    </pattern>
+  </defs>
+
+  <rect width="600" height="800" fill="url(#plate)" />
+  <rect width="600" height="800" fill="url(#fine)" />
+  <rect width="600" height="800" fill="url(#grid)" />
+
+  <g fill="none" stroke="#dbeafe" stroke-opacity="0.75" stroke-width="2">
+    <rect x="72" y="300" width="176" height="226" rx="12" />
+    <path d="M72 348h176M72 386h176M72 424h176M72 462h176" stroke-opacity="0.35" />
+    <path d="M312 322h216M312 360h150M312 398h216M312 436h120" stroke-opacity="0.5" />
+    <path d="M312 492l30 30 62-66" stroke-width="3" />
+    <path d="M72 572h456M72 616h300M72 660h380" stroke-opacity="0.3" />
+  </g>
+
+  <g fill="#dbeafe" fill-opacity="0.85">
+    <rect x="92" y="322" width="70" height="8" rx="4" />
+    <rect x="92" y="360" width="112" height="8" rx="4" />
+    <rect x="92" y="398" width="84" height="8" rx="4" />
+    <rect x="92" y="436" width="120" height="8" rx="4" />
+    <rect x="92" y="474" width="56" height="8" rx="4" />
+  </g>
+
+  <g fill="#dbeafe" fill-opacity="0.55" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13" letter-spacing="2">
+    <text x="72" y="604">matching rules</text>
+    <text x="72" y="648">vendor aliases</text>
+    <text x="72" y="692">reconcile.py</text>
+  </g>
+
+  <g font-family="ui-sans-serif, -apple-system, Segoe UI, Helvetica, sans-serif" font-weight="700" fill="#f8fbff">
+    <text x="72" y="130" font-size="72" letter-spacing="-2">Invoice</text>
+    <text x="72" y="206" font-size="72" letter-spacing="-2">Reconciler</text>
+  </g>
+
+  <g fill="#bfdbfe" fill-opacity="0.7" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" letter-spacing="3">
+    <text x="74" y="248">LEDGER / MONTHLY CLOSE</text>
+  </g>
+
+  <g stroke="#f8fbff" stroke-opacity="0.5" stroke-width="2" fill="none">
+    <path d="M72 740h76v40h-76zM168 740h76v40h-76zM264 740h76v40h-76zM360 740h76v40h-76zM456 740h72v40h-72z" />
+  </g>
+</svg>

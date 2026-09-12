@@ -12,7 +12,7 @@ export interface SkillFile {
 }
 
 export interface SkillAuthor {
-  /** Avatar URL. Without one the first letter of `name` stands in. */
+  /** Avatar URL. Drawn only when given. */
   avatar?: string;
   href?: string;
   name: string;
@@ -20,7 +20,7 @@ export interface SkillAuthor {
 
 export interface SkillCardProps {
   className?: string;
-  /** Cover art. Omit it and the card is title and description alone. */
+  /** Cover art, drawn at 16:9 whatever the art is. */
   cover?: string;
   /** One or two lines under the title; the rest is clamped. */
   description?: ReactNode;
@@ -41,13 +41,13 @@ export interface SkillDetailProps {
   /** Drawn beside the updated line. */
   author?: SkillAuthor;
   className?: string;
-  /** Cover art, drawn flat and small beside the heading. */
+  /** Cover art, drawn as a banner at the top of the rail. */
   cover?: string;
   /** Starts the enable switch on; ignored when `enabled` is passed. */
   defaultEnabled?: boolean;
   /** Selected on first render; defaults to the first file. */
   defaultSelectedPath?: string;
-  /** What the skill is for, read directly under the heading. */
+  /** What the skill is for, read under the heading. */
   description?: ReactNode;
   /** The enable switch. Passing this or `defaultEnabled` draws it. */
   enabled?: boolean;
@@ -60,8 +60,6 @@ export interface SkillDetailProps {
   /** Drops the close button when omitted. */
   onClose?: () => void;
   onEnabledChange?: (enabled: boolean) => void;
-  /** Drops the expand button when omitted. */
-  onExpand?: () => void;
   onFileSelect?: (path: string) => void;
   /** Turns the example prompts into buttons. */
   onPrompt?: (prompt: string) => void;
@@ -88,7 +86,7 @@ export interface SkillDetailProps {
 
 export interface SkillDetailDialogProps extends Omit<
   SkillDetailProps,
-  "onClose" | "onExpand"
+  "onClose"
 > {
   /** Extra classes for the dialog's own box, not the panel inside it. */
   contentClassName?: string;
