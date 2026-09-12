@@ -47,7 +47,12 @@ export function AgentDisclosure({
           ease: EASE_OUT,
         }
       }
-      className={cn("overflow-hidden", className)}
+      // The reveal clips, and a clip has no room around it for a ring: a full-bleed child
+      // that draws 3px outside itself - a focused input, the platform one especially -
+      // loses the two runs of its ring that lie along the sides of this box. So the box
+      // is grown 4px and padded straight back: the children sit exactly where they did,
+      // and only the clip moves out.
+      className={cn("-mx-1 overflow-hidden px-1", className)}
       style={{
         ...style,
         height: open ? openHeight : 0,
