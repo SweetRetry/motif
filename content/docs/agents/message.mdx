@@ -1,0 +1,90 @@
+---
+title: Message
+description: "One turn of a transcript, assembled from parts: who it is from, the body, and the actions that appear once you are done reading."
+---
+
+import { MessageDemo } from "@/examples/message";
+
+<ComponentPreview name="message">
+  <MessageDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/message.json
+```
+
+## Usage
+
+The root's one opinion is the arrangement; the parts inside it are the caller's to
+compose. A reader's turn sits against the trailing edge in a filled bubble, a turn to them
+runs full width, and a system note sits centred and quiet.
+
+```tsx
+import {
+  Message,
+  MessageActions,
+  MessageContent,
+} from "@/components/ui/message";
+
+export function Turn({ turn }: { turn: Turn }) {
+  return (
+    <Message from={turn.from}>
+      <MessageContent>
+        {turn.text}
+        <MessageActions>
+          <CopyButton value={turn.text} />
+        </MessageActions>
+      </MessageContent>
+    </Message>
+  );
+}
+```
+
+| Part             | What it is                                                                |
+| ---------------- | ------------------------------------------------------------------------- |
+| `Message`        | The row: `from` picks the arrangement, `data-from` carries it outward     |
+| `MessageContent` | The body column, whose shape follows the role                             |
+| `MessageActions` | A row under the body, revealed on hover or focus, empty while it is empty |
+
+`from` is `"user"`, `"assistant"` or `"system"` today. It is not a closed set the parts
+police — the root writes it to `data-from`, so a role this registry has not met yet can be
+styled from the outside without a second prop.
+
+## The arrangement
+
+The root's job is two rules: a reader's turn reverses the row and a system note centres
+it. Everything else about the body — how wide it is, whether it draws a fill — belongs to
+`MessageContent`, which reads the role from context.
+
+| Role          | Root           | Body                                            |
+| ------------- | -------------- | ----------------------------------------------- |
+| `"user"`      | Row reversed   | Bubble against the trailing edge, `max-w-[85%]` |
+| `"assistant"` | Row as written | Full width, no fill                             |
+| `"system"`    | Centred        | Muted, centred                                  |
+
+A reader's bubble is a fill _inside_ the thread — `bg-muted`, not a surface of its own —
+so it lands the same way on a page-level thread in either theme. It keeps whitespace,
+because what a person typed is what they typed.
+
+## The actions
+
+A reader is reading until they are not, and four controls under every answer is four
+controls of noise, so `MessageActions` stays out of the way until the turn is hovered or
+something inside it is focused. It is an ordinary flex row: the controls that go in it are
+whatever the surface already uses, and a control with no handler behind it is not drawn.
+
+The reveal is deliberately CSS. A tap that sticks a `:hover` open is the right touch
+gesture for a row of actions, which is the opposite of the magnetic pulls and hover lifts
+elsewhere in this registry — that is why `useHoverCapable` is not involved. Nothing is
+tabbable while it is invisible either: `focus-within` brings the row back the moment a
+keyboard reaches it.
+
+## Component source
+
+<ComponentSource
+  name="message"
+  src="registry/new-york/message.tsx"
+  title="message.tsx"
+/>

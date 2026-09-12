@@ -1,0 +1,145 @@
+---
+title: Voice Input
+description: "A composer's mic. A press asks for the microphone and the composer becomes a recording bar: cancel on the left, the live level across the middle, stop on the right. The level is written straight to the DOM, so a sixty-frame meter never re-renders anything."
+---
+
+import {
+  VoiceInputDemo,
+  VoiceInputStandaloneDemo,
+  VoiceRecordingDemo,
+} from "@/examples/voice-input";
+
+<ComponentPreview name="voice-input">
+  <VoiceInputDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/voice-input.json
+```
+
+## Usage
+
+```tsx
+import { VoiceInput } from "@/components/ui/voice-input";
+
+export function Composer() {
+  return (
+    <VoiceInput
+      maxSeconds={120}
+      onCancel={() => toast("Recording discarded.")}
+      onRecord={(blob) => transcribe(blob)}
+    />
+  );
+}
+```
+
+Without `onRecord` nothing is drawn: a mic with nowhere to send a recording is a control
+that lies about what it can do.
+
+## The bar replaces the field
+
+A recording is not a thing you type into, so the composer does not sit under it — the
+composer _becomes_ it. The bar is laid out inside the frame that is already there, with
+the field and the submit swapped out, so the frame's own edges do the work and the
+control never draws a surface of its own. That also means it can be dropped into any
+frame: a composer, a sheet, a floating pill.
+
+Both ends are buttons rather than gestures. A sliding cancel has to be taught with a hint
+and re-taught to every new user, and it cannot be performed with a keyboard or a screen
+reader; a round button is understood the first time and reachable by every input. Escape
+cancels as well, from anywhere on the page, because the mic has unmounted by the time the
+bar is on screen and nothing in the bar holds focus yet.
+
+The square is the one glyph that cannot be mistaken for play or pause. It ends this
+recording and sends it; it does not resume anything later.
+
+## The level is read, not rendered
+
+The meter is sixty readings a second and neither the bar nor the field is a reason to
+re-render a tree. So `VoiceBars` reads its source through a ref and writes `scaleY` onto
+its own cells, and React hears about the states a person can be in — idle, asking,
+recording — and nothing about the level at all.
+
+Heights go on through `scaleY`, so the only thing the compositor is asked for is a
+transform; nothing in the meter lays out and nothing re-renders. The window holds more
+bars than a 2xl composer can show, right-aligned, so the oldest readings run off the left
+edge and the meter reads as _moving_ rather than as filling up. A quiet room closes each
+3px bar into a dot, which is the shape the bar rests in.
+
+That is also what keeps the meter honest: a level is information, not decoration, so it
+keeps moving under `prefers-reduced-motion`. A level meter that holds still is a meter
+that has stopped listening.
+
+The level is RMS of the time-domain data, gained up by five. Speech sits far below full
+scale — an ordinary sentence lands around 0.05 — so the gain is what turns a flat line
+into a meter. The analyser is never connected to the destination, which is the difference
+between a meter and a feedback loop.
+
+## The engine ships apart
+
+`VoiceInput` is one arrangement of three pieces, and the other two are exported, because
+where the bar is drawn is a layout decision and not the recorder's.
+
+```tsx
+import {
+  useVoiceRecorder,
+  VoiceBars,
+  VoiceRecording,
+} from "@/components/ui/voice-input";
+
+const { status, start, stop, cancel, readLevel, startedAt } = useVoiceRecorder({
+  onRecord: (blob) => upload(blob),
+});
+```
+
+`useVoiceRecorder` owns permission, the analyser and the `MediaRecorder`; it hands back
+the blob, the status, and — for a caller who wants a clock — the epoch the recording
+began. `VoiceBars` is the meter. `VoiceRecording` takes a level reader and two handlers
+rather than a recorder, which is what lets it be drawn on a page with no microphone
+behind it:
+
+<ComponentPreview name="voice-input" align="start">
+  <VoiceRecordingDemo />
+</ComponentPreview>
+
+Pass a recorder back in — `<VoiceInput recorder={recorder} />` — and the mic shares the
+caller's recording instead of starting its own. That is how the demo at the top of this
+page draws the bar in the composer body while the mic stays in the footer.
+
+<ComponentPreview name="voice-input">
+  <VoiceInputStandaloneDemo />
+</ComponentPreview>
+
+## Props
+
+### VoiceInput
+
+| Prop         | Default | Meaning                                                                  |
+| ------------ | ------- | ------------------------------------------------------------------------ |
+| `onRecord`   | —       | Called with the finished recording; omit it and nothing is drawn         |
+| `onCancel`   | —       | The recording was thrown away                                            |
+| `maxSeconds` | `120`   | Auto-send at this many seconds                                           |
+| `disabled`   | `false` | Takes the control out of the tab order and the pointer's reach           |
+| `recorder`   | —       | A recorder from `useVoiceRecorder`, when the bar is drawn somewhere else |
+| `className`  | —       | Extra classes for the control's box                                      |
+
+### Parts
+
+| Part               | Props                                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `useVoiceRecorder` | `onRecord`, `onCancel`, `maxSeconds` → `status`, `error`, `startedAt`, `start`, `stop`, `cancel`, `readLevel` |
+| `VoiceRecording`   | `source`, `onCancel`, `onStop`, `className`                                                                   |
+| `VoiceBars`        | `source`, `bars`, `className`                                                                                 |
+
+`status` is `idle`, `requesting`, `recording`, `denied` or `error`; `error` is the
+message behind the last two, and it clears when the next recording starts.
+
+## Component source
+
+<ComponentSource
+  name="voice-input"
+  src="registry/new-york/voice-input.tsx"
+  title="voice-input.tsx"
+/>

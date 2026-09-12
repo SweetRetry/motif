@@ -1,6 +1,6 @@
 ---
 title: Thinking Block
-description: "A collapsible window onto a reasoning stream — fixed height, a mask that says the thought runs on below the fold, and a follow that lets the newest line rise into place instead of jumping the scroll."
+description: "A collapsible window onto a reasoning stream — a capped height, a mask that says the thought runs on below the fold, and a follow that lets the newest line rise into place instead of jumping the scroll."
 ---
 
 import {
@@ -47,10 +47,12 @@ export function Reasoning({ thought }: { thought: Thought }) {
 
 Reasoning is written longer than anyone wants to read and slower than the answer it is
 reasoning towards, so the block is a window onto it rather than a transcript of it: a
-fixed height (`208px` by default, `height` to change it) over a scroll container whose
-scrollbar is hidden. The height is the block's one hard promise — a thought that runs to
-forty paragraphs takes the same room as one that runs to two, and the answer underneath
-never gets pushed down the page while the model is still thinking.
+capped height (`208px` by default, `height` to change it) over a scroll container whose
+scrollbar is hidden. The cap is the block's one hard promise — a thought that runs to
+forty paragraphs takes no more room than that, and the answer underneath is never pushed
+past it while the model is still thinking. A thought shorter than the cap takes only its
+own room, so a finished two-line thought does not leave a windowful of empty space under
+it.
 
 What the missing scrollbar would have said, the mask says instead. Two ramps off one
 constant: the bottom edge fades in over the last `FADE` (28px) of hidden content, the top

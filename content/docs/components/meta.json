@@ -4,13 +4,11 @@
     "index",
     "activity-heatmap",
     "aspect-ratio-picker",
-    "attachment",
     "cover-fan",
     "duration-slider",
     "flow-edge",
     "generation-overlay",
     "resolution-segmented",
-    "scroll-rail",
     "settings-dialog",
     "toolbar"
   ]

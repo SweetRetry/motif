@@ -1,0 +1,130 @@
+---
+title: Chat App
+description: "A whole chat surface for a page. A thread that follows its own tail, a rail that mirrors it, turns that carry their reasoning and their actions, and a composer that holds files and a model — assembled, not rebuilt, from the pieces this registry already publishes."
+---
+
+import { ChatAppDemo, ChatAppEmptyDemo } from "@/examples/chat-app";
+
+<ComponentPreview align="start" name="chat-app" previewClassName="p-4 sm:p-6">
+  <ChatAppDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/chat-app.json
+```
+
+## What it is made of
+
+The block adds no surfaces of its own. Every part of it is a component this registry
+already publishes, and `shadcn add` brings them along through the registry dependencies:
+
+| Surface          | What it does here                                                   |
+| ---------------- | ------------------------------------------------------------------- |
+| `conversation`   | The thread: the follow, and the way back to the newest turn         |
+| `message`        | A turn's anatomy — the body, and the actions under it               |
+| `thinking-block` | The reasoning behind an answer, streaming in its own window         |
+| `waiting-row`    | The gap before the first token, when there is no reasoning to show  |
+| `prompt-input`   | The composer, with its attach button and its model picker           |
+| `scroll-rail`    | The rail beside the thread: one tick per turn, the reading line lit |
+| `attachment`     | The chips riding with a reader's turn, before and after it is sent  |
+
+`chat-app.tsx` is the wiring: how they sit, and nothing else. Swap any one of them for
+your own and the rest does not move.
+
+## Usage
+
+The surface takes a thread and four doors out of it. It owns the draft's attachments and
+nothing else — the turns belong to whatever transport you point it at.
+
+```tsx
+import { ChatApp } from "@/components/chat/chat-app";
+import { useDemoChat } from "@/components/chat/use-demo-chat";
+
+export default function ChatPage() {
+  const chat = useDemoChat();
+
+  return (
+    <div className="h-dvh">
+      <ChatApp {...chat} title="Assistant" />
+    </div>
+  );
+}
+```
+
+| Prop        | What it is                                                               |
+| ----------- | ------------------------------------------------------------------------ |
+| `turns`     | The thread, as data — markdown content, optional reasoning, files        |
+| `onSend`    | A message and the files riding with it                                   |
+| `onStop`    | Stop the answer that is arriving                                         |
+| `onRetry`   | Re-run an answer. Omit it and the retry control is not drawn             |
+| `onReset`   | Clear the thread. Omit it and the header keeps only its title            |
+| `streaming` | Swaps the composer's send for stop, and blocks Enter                     |
+| `empty`     | First-run surface, drawn in place of the thread while there are no turns |
+| `models`    | The composer's model picker, passed straight through                     |
+
+## The transport is the seam
+
+`use-demo-chat` is the smallest thing that behaves like a real one: it appends the
+reader's turn, appends an empty answer, then drips reasoning and answer into it a couple
+of words at a time. It streams on a chain of timeouts rather than an interval, so it stops
+when the passage does and leaves nothing behind to clear.
+
+It is a stand-in, not a framework. Replace it with a fetch to a streaming endpoint, a
+socket, or an SDK and keep the shape: the turns, whether an answer is arriving, and the
+handful of things the composer can ask it to do. The surface does not know the difference.
+
+## The empty slot
+
+The block does not decide what a thread with no turns looks like. It hands you a slot in
+the middle of the viewport and takes whatever you put in it — a greeting, a list of
+starting points, a fan of covers.
+
+<ComponentPreview name="chat-app" previewClassName="p-4 sm:p-6" hideCode>
+  <ChatAppEmptyDemo />
+</ComponentPreview>
+
+With nothing passed, the slot draws nothing, and the thread is simply empty.
+
+## The rail
+
+The thread carries a [`scroll-rail`](/docs/agents/scroll-rail) in its right gutter —
+one tick per turn, the tick under the reading line lit, and a preview when one is held.
+`useMessageFocus` reads the viewport into a motion value, so the rail follows the scroll
+on the compositor while React stays out of the render path entirely.
+
+Taking a tick walks the thread to that turn. The jump is computed by hand rather than
+with `scrollIntoView`, which would drag every scrollable ancestor along with it —
+including the page the app happens to be embedded in — and under reduced motion it lands
+instantly. The reading line is the middle of the viewport, which is what makes the lit
+tick read as "where I am" rather than "what I last clicked".
+
+The rail leaves the layout when the thread is empty: with no turns there are no ticks,
+and `ScrollRail` renders nothing at all.
+
+## Height
+
+`ChatApp` fills its parent — `h-full`, `min-h-0` — and the page gives it the window with
+`h-dvh`, which is the whole of the layout. A preview gives it a fixed height instead. That
+is the entire difference between the demo above and a real app.
+
+## Component source
+
+<ComponentSource
+  name="chat-app"
+  src="registry/new-york/blocks/chat-app/chat-app.tsx"
+  title="chat-app.tsx"
+/>
+
+<ComponentSource
+  name="chat-app"
+  src="registry/new-york/blocks/chat-app/use-demo-chat.ts"
+  title="use-demo-chat.ts"
+/>
+
+<ComponentSource
+  name="chat-app"
+  src="registry/new-york/blocks/chat-app/page.tsx"
+  title="page.tsx"
+/>

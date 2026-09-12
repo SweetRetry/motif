@@ -72,6 +72,35 @@
       ]
     },
     {
+      "name": "conversation",
+      "type": "registry:ui",
+      "title": "Conversation",
+      "description": "The scroll region a transcript lives in: it follows its own tail while the reader is at the end, stops the moment they scroll up, and offers a way back when they have.",
+      "dependencies": ["clsx", "lucide-react", "tailwind-merge"],
+      "registryDependencies": ["button"],
+      "files": [
+        {
+          "path": "registry/new-york/conversation.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/conversation.tsx"
+        }
+      ]
+    },
+    {
+      "name": "message",
+      "type": "registry:ui",
+      "title": "Message",
+      "description": "One turn of a transcript, assembled from parts: who it is from, the body, and the actions that appear once you are done reading.",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "files": [
+        {
+          "path": "registry/new-york/message.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/message.tsx"
+        }
+      ]
+    },
+    {
       "name": "waiting-row",
       "type": "registry:ui",
       "title": "Waiting Row",
@@ -166,7 +195,7 @@
       "name": "thinking-block",
       "type": "registry:component",
       "title": "Thinking Block",
-      "description": "A collapsible window onto a reasoning stream: a fixed height, a mask that says there is more below, and a follow that lets the newest line rise into place instead of jumping the scroll.",
+      "description": "A collapsible window onto a reasoning stream: a capped height, a mask that says there is more below, and a follow that lets the newest line rise into place instead of jumping the scroll.",
       "dependencies": [
         "clsx",
         "lucide-react",
@@ -353,6 +382,56 @@
           "path": "lib/ease.ts",
           "type": "registry:lib",
           "target": "@lib/ease.ts"
+        }
+      ]
+    },
+    {
+      "name": "voice-input",
+      "type": "registry:ui",
+      "title": "Voice Input",
+      "description": "A composer's mic. A press asks for the microphone and the composer becomes a recording bar: cancel on the left, the live level across the middle, stop on the right. The level is written straight to the DOM, so a sixty-frame meter never re-renders anything.",
+      "dependencies": ["clsx", "lucide-react", "tailwind-merge"],
+      "registryDependencies": ["button"],
+      "files": [
+        {
+          "path": "registry/new-york/voice-input.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/voice-input.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chat-app",
+      "type": "registry:block",
+      "title": "Chat App",
+      "description": "A whole chat surface for a page: a thread that follows its own tail, turns that carry reasoning and actions, and a composer that holds files and a model. Assembled from conversation, message, thinking-block, waiting-row and prompt-input.",
+      "dependencies": ["clsx", "lucide-react", "streamdown", "tailwind-merge"],
+      "registryDependencies": [
+        "button",
+        "tooltip",
+        "https://startercn.vercel.app/r/attachment.json",
+        "https://startercn.vercel.app/r/conversation.json",
+        "https://startercn.vercel.app/r/message.json",
+        "https://startercn.vercel.app/r/prompt-input.json",
+        "https://startercn.vercel.app/r/scroll-rail.json",
+        "https://startercn.vercel.app/r/thinking-block.json",
+        "https://startercn.vercel.app/r/waiting-row.json"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/blocks/chat-app/chat-app.tsx",
+          "type": "registry:component",
+          "target": "@components/chat/chat-app.tsx"
+        },
+        {
+          "path": "registry/new-york/blocks/chat-app/use-demo-chat.ts",
+          "type": "registry:component",
+          "target": "@components/chat/use-demo-chat.ts"
+        },
+        {
+          "path": "registry/new-york/blocks/chat-app/page.tsx",
+          "type": "registry:page",
+          "target": "app/chat/page.tsx"
         }
       ]
     }

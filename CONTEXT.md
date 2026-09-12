@@ -31,3 +31,7 @@ _Avoid_: cover card、preview card（那是不带正文的封面卡）
 **Prompt card**（示例卡）：
 skill detail 里的一张示例 prompt，整句写全，点一下就送进 composer。
 _Avoid_: suggestion、chip、example row
+
+**Voice input**（语音输入）：
+composer 里的麦克风控件：按一下开始录音，整个 composer 变成录音条——左取消、中间电平、右结束。电平直写 DOM，不触发 React 重渲染。
+_Avoid_: recorder、mic button、dictation

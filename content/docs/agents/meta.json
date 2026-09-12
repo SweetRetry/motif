@@ -1,10 +1,15 @@
 {
   "title": "Agents",
   "pages": [
-    "approval-card",
-    "waiting-row",
+    "conversation",
+    "message",
     "thinking-block",
+    "waiting-row",
     "prompt-input",
+    "voice-input",
+    "attachment",
+    "scroll-rail",
+    "approval-card",
     "skill-detail"
   ]
 }

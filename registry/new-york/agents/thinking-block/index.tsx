@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 /* -- The window ---------------------------------------------------------------
  * Reasoning arrives longer than anyone wants to read it and slower than the answer
  * it is reasoning towards. So the block is a short window onto a long stream: a
- * fixed height, a mask that says there is more below, and a follow that keeps the
+ * capped height, a mask that says there is more below, and a follow that keeps the
  * newest line where the eye already is.
  *
  * The follow is the part worth being careful about. Appending a line and pinning
@@ -44,9 +44,10 @@ import { cn } from "@/lib/utils";
  *    believed it would be chasing the animation that is trying to hide the movement.
  * --------------------------------------------------------------------------- */
 
-/** The window's height when the caller has no opinion: nine lines of `text-sm`
+/** The window's height at most when the caller has no opinion: nine lines of `text-sm`
  *  reasoning and a wrap. Enough that a thought can be read in one go, short enough
- *  that the block never becomes the answer it is attached to. */
+ *  that the block never becomes the answer it is attached to. A thought shorter than
+ *  this sits at its own height instead of reserving the whole window. */
 const DEFAULT_HEIGHT = 208;
 
 /** How much of an edge the mask spends on its ramp, in px. Also the distance over
@@ -112,7 +113,9 @@ export interface ThinkingBlockProps {
   /** Seconds the pass took, when the caller owns the number. Otherwise the block
    *  measures its own — the same count the row was already showing. */
   duration?: number;
-  /** The window's height. A number is px. */
+  /** The window's height at most. A number is px. A thought shorter than this sits at
+   *  its own height, so a finished two-line thought does not leave a windowful of
+   *  empty space under it. */
   height?: number | string;
   /** What the row says while it waits. */
   label?: string;
@@ -367,15 +370,17 @@ export const ThinkingBlock = ({
           <div
             // Hidden scrollbar, deliberately: the ramp below is the affordance, and a
             // second one — one that appears and disappears with the content — is noise
-            // over the text. `overscroll-contain` keeps the page still when a reader
-            // scrolls the window to its end, and `overflow-anchor` is off because the
-            // position is ours to hold: the browser's own anchoring would adjust it
-            // again behind the pin, by a different amount, every time a line wraps.
-            className="no-scrollbar overflow-y-auto overscroll-contain [overflow-anchor:none]"
+            // over the text. `overflow-anchor` is off because the position is ours to
+            // hold: the browser's own anchoring would adjust it again behind the pin, by
+            // a different amount, every time a line wraps. Chaining is left to the
+            // browser and `overscroll-contain` is deliberately *not* set: a thought is
+            // read inside a transcript, and a reader who reaches the end of it has to
+            // keep the thread moving underneath rather than stop dead on the block.
+            className="no-scrollbar overflow-y-auto [overflow-anchor:none]"
             data-slot="thinking-window"
             onScroll={readScroll}
             ref={windowRef}
-            style={{ height }}
+            style={{ maxHeight: height }}
           >
             <div className="flow-root" ref={streamRef}>
               <Streamdown

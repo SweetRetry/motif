@@ -1,0 +1,120 @@
+---
+title: Conversation
+description: "The region a transcript scrolls in: it follows its own tail while the reader is at the end, lets go the moment they scroll up, and draws a way back when they have."
+---
+
+import { ConversationDemo } from "@/examples/conversation";
+
+<ComponentPreview name="conversation">
+  <ConversationDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://startercn.vercel.app/r/conversation.json
+```
+
+The way back is the platform [`button`](https://ui.shadcn.com/docs/components/button) at
+its icon size.
+
+## Usage
+
+The root is the frame and owns one piece of state; `ConversationContent` is the viewport
+everything else measures against. What goes in the viewport — messages, an empty state, a
+waiting row — is yours.
+
+```tsx
+import {
+  Conversation,
+  ConversationContent,
+  ConversationScrollButton,
+} from "@/components/ui/conversation";
+import { Message, MessageContent } from "@/components/ui/message";
+
+export function Thread({ turns }: { turns: Turn[] }) {
+  return (
+    <Conversation>
+      <ConversationContent className="gap-6 px-4 py-6">
+        {turns.map((turn) => (
+          <Message from={turn.from} key={turn.id}>
+            <MessageContent>{turn.text}</MessageContent>
+          </Message>
+        ))}
+      </ConversationContent>
+
+      <ConversationScrollButton />
+    </Conversation>
+  );
+}
+```
+
+| Part                       | What it is                                                         |
+| -------------------------- | ------------------------------------------------------------------ |
+| `Conversation`             | The root: the frame, the follow, and the door back to the end      |
+| `ConversationContent`      | The scrolling viewport, and the element the follow measures        |
+| `ConversationScrollButton` | Drawn only while the reader is away from the end                   |
+| `useConversation`          | The root's state — `atEnd`, `scrollToEnd` — for a part of your own |
+
+Render exactly one `ConversationContent`, directly inside the root: it is the element the
+viewport ref lands on, and a thread with no viewport has nothing to follow.
+
+## The follow
+
+A transcript is a scroll region with a mind of its own. Turns land at the bottom and the
+reader is usually already there, so the region has to follow its own tail; the moment they
+scroll up to re-read something, it has to stop, or the passage they were reading walks
+away underneath them.
+
+The follow is written straight into the DOM. Pinning is a `scrollTop` assignment on the
+frame after a mutation, never a React update: a thread that re-rendered on every streamed
+token would diff a tree to move one number, and the commit would land in the middle of the
+scroll it is trying to produce. Two observers feed it — a `MutationObserver` for the
+tokens, a `ResizeObserver` and the window's `resize` for the box that wraps them — and
+both land on the same animation frame, read from the live element rather than from state
+that is a frame behind them.
+
+The position is re-read on every scroll: within 24px of the bottom still counts as
+"at the end", because sub-pixel layout means "at the bottom" is rarely exactly zero.
+
+## Letting go, and the way back
+
+Scrolling up is a statement of intent, so the region takes it. `following` is a ref, not
+state, and it flips the moment the reader crosses the slack — after that, new turns land
+without moving the viewport, and the scroll button appears.
+
+The button is drawn only while the reader is away from the end and unmounts when they
+return. A control that is always there is one more thing to read on a surface whose whole
+point is the text, and its absence is the signal that the thread is following along. It
+glides back with a smooth scroll, or jumps under `prefers-reduced-motion`, where the
+position is the information and the journey is not worth the wait.
+
+## Height
+
+The frame is `flex-1` with a `min-h-0`, so it fills a flex column and every part inside it
+can still shrink. A thread inside a non-flex parent needs an explicit height — the demo
+above gives it `h-96`, the [chat app](/docs/blocks/chat-app) gives it the window:
+
+```tsx
+<div className="flex h-dvh flex-col">
+  <Conversation>…</Conversation>
+</div>
+```
+
+The frame opens pinned to the newest turn, before the first paint, so a long thread does
+not flash its opening line and then jump a thousand pixels down.
+
+## Accessibility
+
+The scroll button is a real button with an `aria-label`, and it only enters the
+accessibility tree while it can take the reader somewhere. Nothing else is announced on
+its own: turns arrive as ordinary content, and whatever surface is writing them should
+own its own live region.
+
+## Component source
+
+<ComponentSource
+  name="conversation"
+  src="registry/new-york/conversation.tsx"
+  title="conversation.tsx"
+/>
