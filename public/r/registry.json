@@ -22,18 +22,15 @@
       "title": "Approval Card",
       "description": "A human-in-the-loop decision surface for approvals, single-choice questions, custom responses, and multi-step review flows.",
       "dependencies": ["clsx", "lucide-react", "motion", "tailwind-merge"],
-      "registryDependencies": ["tooltip"],
+      "registryDependencies": ["button", "input", "radio-group", "tooltip"],
       "cssVars": {
         "theme": {
-          "color-success": "var(--success)",
           "color-warning": "var(--warning)"
         },
         "light": {
-          "success": "oklch(0.596 0.145 163.225)",
           "warning": "oklch(0.666 0.179 58.318)"
         },
         "dark": {
-          "success": "oklch(0.765 0.177 163.223)",
           "warning": "oklch(0.828 0.189 84.429)"
         }
       },
@@ -54,34 +51,9 @@
           "target": "@components/agents/agent-disclosure.tsx"
         },
         {
-          "path": "components/motion/button/index.tsx",
-          "type": "registry:component",
-          "target": "@components/motion/button/index.tsx"
-        },
-        {
-          "path": "components/motion/button/base.tsx",
-          "type": "registry:component",
-          "target": "@components/motion/button/base.tsx"
-        },
-        {
-          "path": "components/motion/input.tsx",
-          "type": "registry:component",
-          "target": "@components/motion/input.tsx"
-        },
-        {
-          "path": "components/motion/radio.tsx",
-          "type": "registry:component",
-          "target": "@components/motion/radio.tsx"
-        },
-        {
           "path": "lib/ease.ts",
           "type": "registry:lib",
           "target": "@lib/ease.ts"
-        },
-        {
-          "path": "lib/hooks/use-hover-capable.ts",
-          "type": "registry:hook",
-          "target": "@lib/hooks/use-hover-capable.ts"
         }
       ]
     },

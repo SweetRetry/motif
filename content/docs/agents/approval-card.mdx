@@ -15,10 +15,15 @@ import { ApprovalCardDemo } from "@/examples/approval-card";
 npx shadcn@latest add https://startercn.vercel.app/r/approval-card.json
 ```
 
-The card reads its states in two tokens the base theme does not have: `warning` for a step
-walked past, `success` for a checkmark. The registry item carries both, so `shadcn add`
-adds them to your CSS — `:root`, `.dark` and `@theme`, the same three places
-`styles/globals.css` keeps them here.
+Pulls in the platform [`button`](https://ui.shadcn.com/docs/components/button),
+[`input`](https://ui.shadcn.com/docs/components/input) and
+[`radio-group`](https://ui.shadcn.com/docs/components/radio-group) — the same bases Prompt
+Input and Skill Detail build on, not copies of their own — plus `tooltip` for the
+step-bar previews.
+
+The card reads a step walked past in `warning`, a token the base theme does not have. The
+registry item carries it, so `shadcn add` adds it to your CSS — `:root`, `.dark` and
+`@theme`, the same three places `styles/globals.css` keeps it here.
 
 ## Usage
 
@@ -62,6 +67,11 @@ question in a tooltip), and every bar names itself to assistive tech
 ("Question 2 of 3: Who signs off… (answered)"). Navigation is free — `Skip` and `Continue`
 both move on without an answer — and only `Submit` on the last question enforces that
 every question is answered.
+
+The root is a `bg-card` container with a border, so it reads as raised on the page or
+inside a `bg-muted` panel. The free-text field is the platform input, so its border and
+focus ring are the same as everywhere else in the app; the card only pins the field's
+`h-10 rounded-xl` geometry.
 
 | Status                           | Meaning                                         |
 | -------------------------------- | ----------------------------------------------- |

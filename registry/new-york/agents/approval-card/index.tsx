@@ -5,9 +5,9 @@ import { motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { AgentDisclosure } from "@/components/agents/agent-disclosure";
-import { Button } from "@/components/motion/button";
-import { Input } from "@/components/motion/input";
-import { RadioGroup, RadioGroupItem } from "@/components/motion/radio";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Tooltip,
   TooltipContent,
@@ -76,15 +76,29 @@ function QuestionOptions({
           }}
           className="gap-0.5"
         >
-          {question.options.map((option) => (
-            <RadioGroupItem
-              key={option.value}
-              value={option.value}
-              label={option.label}
-              disabled={disabled || option.disabled}
-              className="min-h-9 rounded-lg px-1.5 py-1"
-            />
-          ))}
+          {question.options.map((option) => {
+            const optionDisabled = disabled || option.disabled;
+
+            return (
+              <label
+                key={option.value}
+                className={cn(
+                  "flex min-h-9 items-center gap-3 rounded-lg px-1.5 py-1 text-sm",
+                  optionDisabled ? "cursor-not-allowed" : "cursor-pointer"
+                )}
+              >
+                <RadioGroupItem
+                  value={option.value}
+                  disabled={optionDisabled}
+                />
+                <span
+                  className={cn("select-none", optionDisabled && "opacity-60")}
+                >
+                  {option.label}
+                </span>
+              </label>
+            );
+          })}
         </RadioGroup>
       ) : null}
 
@@ -92,13 +106,10 @@ function QuestionOptions({
         value={custom}
         disabled={disabled}
         placeholder={question.customPlaceholder ?? "Add another response…"}
-        onChange={(value) => onChange({ custom: value, selected: [] })}
-        className={cn("p-0.5", question.options?.length && "mt-1.5")}
-        classNames={{
-          field:
-            "h-10 rounded-xl border-0 bg-background/70 focus-within:bg-background",
-          input: "px-3 text-sm",
-        }}
+        onChange={(event) =>
+          onChange({ custom: event.target.value, selected: [] })
+        }
+        className={cn("h-10 rounded-xl", question.options?.length && "mt-1.5")}
       />
     </div>
   );
@@ -338,7 +349,7 @@ export function ApprovalCard({
       data-state={status}
       aria-busy={busy}
       className={cn(
-        "w-full overflow-hidden rounded-2xl bg-muted p-4 text-sm",
+        "w-full overflow-hidden rounded-2xl border border-border bg-card p-4 text-sm",
         className
       )}
     >
@@ -406,6 +417,7 @@ export function ApprovalCard({
                     size="sm"
                     disabled={busy}
                     onClick={() => setStep(currentStep + 1)}
+                    className="rounded-full"
                   >
                     {skipLabel}
                   </Button>
@@ -414,6 +426,7 @@ export function ApprovalCard({
                   size="sm"
                   disabled={busy || (lastStep && !allAnswered)}
                   onClick={continueQuestion}
+                  className="rounded-full"
                 >
                   {busy ? (
                     <LoaderCircle
