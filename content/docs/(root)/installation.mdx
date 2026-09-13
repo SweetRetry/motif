@@ -1,104 +1,76 @@
 ---
 title: Installation
-description: How to use this template to build your own shadcn component.
+description: How to install a component from the Motif registry into your app.
 ---
 
-## Building Your Component
+## Prerequisites
 
-### 1. Fork the Template
-
-Click "Use this template" on [GitHub](https://github.com/shadcn-labs/startercn).
-
-### 2. Install Dependencies
+Motif ships plain React, so any framework works — Next.js, Remix, Astro, Vite, Gatsby.
+You need [Tailwind CSS](https://tailwindcss.com/) and a shadcn project already set up:
 
 ```bash
-pnpm install
+npx shadcn@latest init
 ```
 
-### 3. Create Your Component
+## Install a component
 
-Components live under `registry/new-york/` — the reference one is
-`registry/new-york/agents/approval-card/index.tsx`:
+Every component installs from its URL. `shadcn add` pulls the source into your repo at
+the path the registry item names, and brings the base components it is built on along
+with it:
+
+```bash
+npx shadcn@latest add https://motif-sweetretrys-projects.vercel.app/r/approval-card.json
+```
+
+Then import it from `@/components/…`:
 
 ```tsx
-import { forwardRef, HTMLAttributes } from "react";
-import { cn } from "@/lib/utils";
+import { ApprovalCard } from "@/components/agents/approval-card";
 
-export interface MyButtonProps extends HTMLAttributes<HTMLButtonElement> {
-  variant?: "default" | "outline";
-}
-
-const MyButton = forwardRef<HTMLButtonElement, MyButtonProps>(
-  ({ className, variant = "default", ...props }, ref) => {
-    return (
-      <button
-        ref={ref}
-        className={cn(
-          "rounded-md px-4 py-2 font-medium",
-          variant === "default" && "bg-primary text-primary-foreground",
-          variant === "outline" && "border border-input",
-          className
-        )}
-        {...props}
-      />
-    );
-  }
-);
-
-MyButton.displayName = "MyButton";
-
-export { MyButton };
-```
-
-### 4. Update registry.json
-
-```json
-{
-  "name": "your-name/your-registry",
-  "homepage": "https://your-site.com",
-  "items": [
-    {
-      "name": "my-button",
-      "type": "registry:ui",
-      "title": "My Button",
-      "description": "A custom button component.",
-      "files": [
+export function Review() {
+  return (
+    <ApprovalCard
+      questions={[
         {
-          "path": "registry/new-york/my-button.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/my-button.tsx"
-        }
-      ]
-    }
-  ]
+          id: "scope",
+          title: "How focused should the first release be?",
+          options: [
+            { value: "focused", label: "A focused starter set" },
+            { value: "broad", label: "A broader collection" },
+          ],
+        },
+      ]}
+      onSubmit={(answers) => console.log("submitted", answers)}
+    />
+  );
 }
 ```
 
-### 5. Build & Deploy
+## Install a block
+
+A block is a whole surface assembled from parts the registry already publishes — the
+`chat-app` block is `conversation`, `message`, `thinking-block`, `waiting-row`,
+`prompt-input`, `scroll-rail` and `attachment` wired together:
 
 ```bash
-pnpm registry:build
-pnpm build
+npx shadcn@latest add https://motif-sweetretrys-projects.vercel.app/r/chat-app.json
 ```
 
-Deploy your app and your component is live!
+Because the dependencies travel with it, you get every part in one command — and you can
+swap any one of them for your own without touching the rest.
 
----
+## Theme tokens
 
-## Installing Components
+A component that needs a state the base theme does not name brings it along. A step
+walked past, for instance, is drawn in `warning`, and the registry item declares it in
+`:root`, `.dark` and `@theme` — the same three places `styles/globals.css` keeps it, so
+`shadcn add` adds it to your CSS.
 
-To install a component from any registry built with this template:
+If you already have the token, nothing is overwritten. If you would rather it read
+differently, change the variable — every surface that uses it follows.
 
-```bash
-npx shadcn@latest add https://example.com/r/my-button.json
-```
+## Browse the registry
 
-Then use it:
-
-```tsx
-import { MyButton } from "@/components/ui/my-button";
-
-export function Demo() {
-  return <MyButton variant="outline">Click me</MyButton>;
-}
-```
+- [Components](/docs/components) — the media and chrome pieces
+- [Agents](/docs/agents) — the conversation surfaces
+- [Blocks](/docs/blocks/chat-app) — assembled surfaces

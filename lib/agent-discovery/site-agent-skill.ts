@@ -8,7 +8,7 @@ export const SITE_AGENT_SKILL_MD = `# ${SITE.NAME}
 
 ## Summary
 
-Help users discover, inspect, and install components from this public shadcn registry starter and its documentation site.
+Help users discover, inspect, and install components from this public shadcn registry of interface parts for AI agents and generative media, and its documentation site.
 
 ## Registry
 

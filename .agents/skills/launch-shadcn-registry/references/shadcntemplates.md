@@ -11,7 +11,7 @@ Create: `content/{author}-{templatename}.md`
 - `author` ← `profile.githubUsername` (lowercase, no spaces)
 - `templatename` ← short slug from `profile.name` (lowercase, hyphens)
 
-Example: `aniket-508-ogimagecn.md`
+Example: `sweetretry-motif.md`
 
 ## Open-source listing template
 

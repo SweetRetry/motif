@@ -1,4 +1,5 @@
-export const FALLBACK_SITE_ORIGIN = "https://startercn.vercel.app" as const;
+export const FALLBACK_SITE_ORIGIN =
+  "https://motif-sweetretrys-projects.vercel.app" as const;
 
 const getBaseUrl = () => {
   if (process.env.NODE_ENV !== "production") {
@@ -16,23 +17,29 @@ const baseUrl = getBaseUrl();
 
 export const SITE = {
   AUTHOR: {
-    NAME: "Aniket Pawar",
-    TWITTER: "@alaymanguy",
+    NAME: "SweetRetry",
+    TWITTER: "@SweetRetry",
   },
   DESCRIPTION: {
-    LONG: "A starter kit for building and publishing your own shadcn registry components.",
-    SHORT: "Build your own shadcn registry",
+    LONG: "An open shadcn registry of interface parts for AI agents and generative media — conversation, reasoning, approvals, and the controls that frame them. Install with npx shadcn add, own the source, restyle it with your theme.",
+    SHORT: "Interface parts for AI agents",
   },
   KEYWORDS: [
     "shadcn",
     "shadcn registry",
     "component registry",
     "shadcn components",
+    "ai agent ui",
+    "agent interface",
+    "ai chat interface",
+    "chat ui components",
+    "generative media ui",
+    "react components",
     "next.js",
     "tailwindcss",
     "npx shadcn add",
   ] as const,
-  NAME: "startercn",
+  NAME: "Motif",
   OG_IMAGE: `${baseUrl}/og`,
   REGISTRY: baseUrl,
   URL: baseUrl,

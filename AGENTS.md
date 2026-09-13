@@ -2,7 +2,7 @@
 
 ## The inherited template is not ours to edit
 
-`startercn` came with a whole site: page chrome, docs infrastructure, the `components/ui`
+The scaffold came with a whole site: page chrome, docs infrastructure, the `components/ui`
 primitives, `styles/`, and a placeholder registry entry. Those files are the upstream's and
 stay as they came. Our work lands in files we add — registry items under
 `registry/new-york/`, their docs pages and their examples — and in the entries we add to

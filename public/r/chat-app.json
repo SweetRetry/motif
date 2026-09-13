@@ -12,13 +12,13 @@
   "registryDependencies": [
     "button",
     "tooltip",
-    "https://startercn.vercel.app/r/attachment.json",
-    "https://startercn.vercel.app/r/conversation.json",
-    "https://startercn.vercel.app/r/message.json",
-    "https://startercn.vercel.app/r/prompt-input.json",
-    "https://startercn.vercel.app/r/scroll-rail.json",
-    "https://startercn.vercel.app/r/thinking-block.json",
-    "https://startercn.vercel.app/r/waiting-row.json"
+    "https://motif-sweetretrys-projects.vercel.app/r/attachment.json",
+    "https://motif-sweetretrys-projects.vercel.app/r/conversation.json",
+    "https://motif-sweetretrys-projects.vercel.app/r/message.json",
+    "https://motif-sweetretrys-projects.vercel.app/r/prompt-input.json",
+    "https://motif-sweetretrys-projects.vercel.app/r/scroll-rail.json",
+    "https://motif-sweetretrys-projects.vercel.app/r/thinking-block.json",
+    "https://motif-sweetretrys-projects.vercel.app/r/waiting-row.json"
   ],
   "files": [
     {

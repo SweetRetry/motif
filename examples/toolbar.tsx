@@ -45,7 +45,7 @@ export const ToolbarDemo = () => {
       <ToolbarItem
         pinnedLabel="Source"
         external
-        href="https://github.com/shadcn-labs/startercn"
+        href="https://github.com/SweetRetry/motif"
         icon={<GithubIcon />}
         label="Source code on GitHub"
       />

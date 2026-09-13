@@ -1,27 +1,29 @@
 {
-  "scope": "@ogimagecn",
-  "name": "OG Image CN",
-  "homepage": "https://ogimagecn.vercel.app",
-  "registryBaseUrl": "https://ogimagecn.vercel.app/r",
+  "scope": "@motif",
+  "name": "Motif",
+  "homepage": "https://motif-sweetretrys-projects.vercel.app",
+  "registryBaseUrl": "https://motif-sweetretrys-projects.vercel.app/r",
   "registryIndexPath": "/registry.json",
-  "componentUrlPattern": "https://ogimagecn.vercel.app/r/{name}.json",
-  "description": "Beautiful OG images, made simple. Ready to use, customizable Open Graph image components for React.",
-  "descriptionLong": "OG Image CN is a shadcn-compatible registry of Open Graph image components for React. Install via the CLI, customize templates in your codebase, and ship social preview images without a separate design tool.",
-  "githubUrl": "https://github.com/Aniket-508/ogimagecn",
-  "githubUsername": "Aniket-508",
+  "componentUrlPattern": "https://motif-sweetretrys-projects.vercel.app/r/{name}.json",
+  "description": "Interface parts for AI agents and generative media. Ready to use, themeable shadcn components for React.",
+  "descriptionLong": "Motif is a shadcn-compatible registry of interface parts for AI agents and generative media — conversation, reasoning, approvals, and the controls that frame them. Install via the CLI, own the source, and restyle it with your theme tokens.",
+  "githubUrl": "https://github.com/SweetRetry/motif",
+  "githubUsername": "SweetRetry",
   "distribution": "open-source",
   "categories": [
     "react",
     "nextjs",
     "tailwind",
     "shadcn-registry",
-    "component-library"
+    "component-library",
+    "ai-agent"
   ],
-  "installExample": "npx shadcn@latest add @ogimagecn/simple",
-  "sampleComponents": ["simple"],
+  "installExample": "npx shadcn@latest add @motif/approval-card",
+  "sampleComponents": ["approval-card", "prompt-input", "message"],
   "features": [
     "shadcn CLI install — components live in your repo",
-    "Customizable OG image templates",
-    "Built for React and Next.js metadata APIs"
+    "Compound parts you can rearrange per surface",
+    "Every colour is a theme token, so dark mode is free",
+    "Built for React and Next.js"
   ]
 }

@@ -69,7 +69,7 @@ export const OrganizationJsonLd = () => (
       },
       logo: SITE.OG_IMAGE,
       name: SITE.NAME,
-      sameAs: [LINK.GITHUB, LINK.PORTFOLIO, LINK.X],
+      sameAs: [LINK.GITHUB, LINK.X],
       url: SITE.URL,
     }}
   />

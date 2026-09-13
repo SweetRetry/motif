@@ -1,4 +1,4 @@
-# startercn
+# Motif
 
 一个 shadcn registry：收录 agent 界面用的组件。同一份源码同时供给文档站和 `npx shadcn add`。这份文件只放词汇——同一个概念在代码、文档和对话里用哪个词说。
 

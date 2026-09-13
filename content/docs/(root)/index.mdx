@@ -1,44 +1,47 @@
 ---
 title: Introduction
-description: A template for building and publishing your own shadcn registry components.
+description: An open shadcn registry of interface parts for AI agents and generative media.
 ---
 
-A **ready-to-use template** for creating and publishing custom components to the [shadcn registry](https://ui.shadcn.com/docs/registry).
+**Motif** is a [shadcn registry](https://ui.shadcn.com/docs/registry) of interface parts
+for AI agents and generative media. Every piece ships as source you install with
+`npx shadcn add` and then own — there is no package to fight and no runtime to keep in
+step.
 
-## What You Get
+## What's in it
 
-- 📦 **Simple structure** - One component file + one config file
-- 📚 **Documentation site** - Powered by Fumadocs
-- 🎨 **Registry compatible** - Works with `npx shadcn add`
-- 🤖 **[Agent ready](https://www.mintlify.com/score/startercn)** - Ships with `llms.txt`, `llms-full.txt`, API catalog routes, and agent skill discovery endpoints
-- 🔊 **[Web audio feedback](https://audio.raphaelsalaja.com/)** - Built-in interaction sounds powered by `@web-kits/audio`
-- 📳 **[Web haptics](https://haptics.lochie.me/)** - Optional haptic feedback for supported devices via `web-haptics`
-- ✨ **[Motion animations](https://motion.dev/)** - Uses `motion` for animated UI states and transitions
-- 🎯 **[Animated icons](https://lucide-animated.com/)** - Includes reusable animated icons for buttons, sharing, and navigation
-- 🔄 **[View transitions](https://nextjs.org/docs/app/api-reference/config/next-config-js/viewTransition)** - Uses Next.js view transitions for smoother page changes
-- 🚀 **Deploy ready** - Deploy anywhere
+- **Agents** — the surfaces a conversation is made of: `conversation`, `message`,
+  `thinking-block`, `waiting-row`, `prompt-input`, `voice-input`, `attachment`,
+  `scroll-rail`, `approval-card` and `skill-detail`.
+- **Components** — the controls that frame a media surface: `aspect-ratio-picker`,
+  `resolution-segmented`, `duration-slider`, `generation-overlay`, `cover-fan`,
+  `flow-edge`, `toolbar`, `settings-dialog` and `activity-heatmap`.
+- **Blocks** — whole surfaces assembled from the parts, starting with `chat-app`.
 
-## Tech Stack
+## How the parts are built
 
-- `Next.js 16` + App Router
-- `React 19`
-- `Tailwind CSS 4`
-- `Fumadocs`
-- `motion`
-- `@web-kits/audio`
-- `web-haptics`
-- `shiki` + `rehype-pretty-code`
+- 🧩 **Compound components** — a root owns the state and named parts compose it. A caller
+  rearranges the parts, drops one into another frame, or leaves one out. A slot with
+  nothing in it draws nothing; a part with no handler behind it is not drawn at all.
+- 🎨 **Theme tokens** — every colour is a shadcn token (`bg-card`,
+  `text-muted-foreground`, `text-success`), so dark mode and a theme swap restyle a
+  component for free. Registry items carry the tokens they need in `cssVars`.
+- ✨ **[Motion](https://motion.dev/)** — animation is used where it explains the surface:
+  a follow that keeps a thread at its tail, a wave that says a turn is still coming, a
+  lift that names the card under the pointer.
+- 🤖 **Agent ready** — the site publishes `llms.txt`, `llms-full.txt`, an API catalog and
+  agent-skill discovery routes, so an assistant can read the registry without a browser.
 
-## How It Works
-
-1. Edit your component at `registry/new-york/agents/approval-card/index.tsx`
-2. Update `registry.json` with your component name and details
-3. Run `pnpm registry:build`
-
-That's it. Deploy your app and users can install your component:
+## Install
 
 ```bash
-npx shadcn@latest add https://your-site.com/r/approval-card.json
+npx shadcn@latest add https://motif-sweetretrys-projects.vercel.app/r/approval-card.json
+```
+
+Then import it from the path `shadcn add` wrote it to:
+
+```tsx
+import { ApprovalCard } from "@/components/agents/approval-card";
 ```
 
 ## FAQ
@@ -69,11 +72,12 @@ Any React framework: Next.js, Remix, Astro, Gatsby, Vite, etc.
 
 <AccordionItem value="faq-3">
 <AccordionTrigger>
-Can I publish multiple components?
+Do I have to take a whole surface?
 </AccordionTrigger>
 <AccordionContent>
 
-Yes! Add more files to `registry/new-york/` and list them in `registry.json`.
+No. Every part installs on its own, and `shadcn add` brings its base components with it
+through the registry dependencies. Take the piece you need and compose the rest yourself.
 
 </AccordionContent>
 </AccordionItem>

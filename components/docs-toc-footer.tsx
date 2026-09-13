@@ -2,7 +2,7 @@
 
 import { SquarePenIcon } from "lucide-react";
 
-import { DiscordIcon, XIcon } from "@/components/icons";
+import { XIcon } from "@/components/icons";
 import { GITHUB, LINK } from "@/constants/links";
 import { DOCS_DIR } from "@/lib/docs";
 import { trackEvent } from "@/lib/events";
@@ -34,22 +34,13 @@ export const DocsTocFooter = ({
       </a>
     )}
     <a
-      href={LINK.X_SHADCN_LABS}
+      href={LINK.X}
       target="_blank"
       rel="noopener noreferrer"
       className="transition-colors text-[0.8rem] hover:text-foreground text-muted-foreground [&_svg]:size-3 flex gap-1.5 items-center"
     >
       <XIcon />
-      Follow @shadcnlabs
-    </a>
-    <a
-      href={LINK.DISCORD}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="transition-colors text-[0.8rem] hover:text-foreground text-muted-foreground [&_svg]:size-3 flex gap-1.5 items-center"
-    >
-      <DiscordIcon />
-      Join community
+      Follow on X
     </a>
   </div>
 );
