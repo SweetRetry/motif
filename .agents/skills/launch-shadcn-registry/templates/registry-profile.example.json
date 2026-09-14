@@ -1,10 +1,10 @@
 {
   "scope": "@motif",
   "name": "Motif",
-  "homepage": "https://motif-sweetretrys-projects.vercel.app",
-  "registryBaseUrl": "https://motif-sweetretrys-projects.vercel.app/r",
+  "homepage": "https://motif-ui.vercel.app",
+  "registryBaseUrl": "https://motif-ui.vercel.app/r",
   "registryIndexPath": "/registry.json",
-  "componentUrlPattern": "https://motif-sweetretrys-projects.vercel.app/r/{name}.json",
+  "componentUrlPattern": "https://motif-ui.vercel.app/r/{name}.json",
   "description": "Interface parts for AI agents and generative media. Ready to use, themeable shadcn components for React.",
   "descriptionLong": "Motif is a shadcn-compatible registry of interface parts for AI agents and generative media — conversation, reasoning, approvals, and the controls that frame them. Install via the CLI, own the source, and restyle it with your theme tokens.",
   "githubUrl": "https://github.com/SweetRetry/motif",

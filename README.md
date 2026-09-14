@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://motif-sweetretrys-projects.vercel.app/og" alt="Motif banner" />
+  <img src="https://motif-ui.vercel.app/og" alt="Motif banner" />
 </p>
 
 <h1 align="center">Motif</h1>
@@ -53,7 +53,7 @@
 ## Use a component
 
 ```bash
-npx shadcn@latest add https://motif-sweetretrys-projects.vercel.app/r/approval-card.json
+npx shadcn@latest add https://motif-ui.vercel.app/r/approval-card.json
 ```
 
 `shadcn add` writes the source into your repo at the path the registry item names and

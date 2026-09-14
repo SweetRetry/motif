@@ -9,10 +9,10 @@
     "tailwind-merge"
   ],
   "registryDependencies": [
-    "https://motif-sweetretrys-projects.vercel.app/r/provider-mark.json",
+    "https://motif-ui.vercel.app/r/provider-mark.json",
     "button",
     "dropdown-menu",
-    "https://motif-sweetretrys-projects.vercel.app/r/attachment.json"
+    "https://motif-ui.vercel.app/r/attachment.json"
   ],
   "files": [
     {
