@@ -19,7 +19,9 @@ export {
   PromptInputTextarea,
 } from "./parts";
 export { ModelPicker } from "./model-picker";
-export { PROVIDER_NAMES, ProviderMark } from "./provider-icons";
+// Re-exported so a composer that hands its own model list over does not have to reach
+// for a second import path to draw the marks on it.
+export { PROVIDER_NAMES, ProviderMark } from "@/components/ui/provider-mark";
 export type {
   ModelPickerProps,
   PromptAttachment,
@@ -29,7 +31,10 @@ export type {
   PromptInputTextareaProps,
   PromptModel,
 } from "./types";
-export type { ProviderId, ProviderMarkProps } from "./provider-icons";
+export type {
+  ProviderId,
+  ProviderMarkProps,
+} from "@/components/ui/provider-mark";
 
 /* -- The composer --------------------------------------------------------------
  * Everything an agent surface asks for passes through one box, so the box is mostly the

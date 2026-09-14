@@ -1,0 +1,200 @@
+---
+title: Model Select
+description: "A catalogue you can walk: what is recommended first, then every maker in one scroll, with a rail that indexes the list and follows you down it."
+---
+
+import { ModelSelectDemo, ModelSelectShortDemo } from "@/examples/model-select";
+
+<ComponentPreview name="model-select">
+  <ModelSelectDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif-sweetretrys-projects.vercel.app/r/model-select.json
+```
+
+## Usage
+
+```tsx
+import {
+  ModelSelect,
+  ModelSelectContent,
+  ModelSelectIndex,
+  ModelSelectList,
+  ModelSelectSearch,
+  ModelSelectTrigger,
+} from "@/components/ui/model-select";
+
+export function Generation() {
+  const [model, setModel] = useState("seedance-2-5");
+
+  return (
+    <ModelSelect
+      models={MODELS}
+      onValueChange={setModel}
+      providers={PROVIDERS}
+      value={model}
+    >
+      <ModelSelectTrigger />
+      <ModelSelectContent>
+        <ModelSelectSearch />
+        <div className="flex min-h-0 flex-1">
+          <ModelSelectIndex />
+          <ModelSelectList />
+        </div>
+      </ModelSelectContent>
+    </ModelSelect>
+  );
+}
+```
+
+## One list, not two
+
+A catalogue is long and mostly unread: someone wants the two or three models that fit what
+they are making, and wants to know the rest are there. So the panel holds **one** scroll —
+the recommended models first, then every maker in turn — and puts an index beside it
+instead of splitting the catalogue into a maker view and a model view.
+
+The recommended section is not a second list either. A model marked `recommended` is lifted
+to the top of the same scroll and left where it is, so the row is in both places at once and
+the maker's section still holds its full set.
+
+```tsx
+{ id: "seedance-2-5", name: "Seedance 2.5", provider: "bytedance", recommended: true }
+```
+
+`recommendedLabel` names that section, `recommendedHint` explains it where the heading
+carries an info glyph — "fits this run: 30s, native audio, a reference image" is what the
+demo says, and the caller is the only one who can know it. `recommendedIcon` replaces the
+glyph that heads it, which defaults to a target: these are the models that fit.
+
+## The rail is an index, not a filter
+
+This is the part worth being careful about. Clicking a maker in the rail does not narrow the
+list; it scrolls the list you already have to that maker's section. That is what makes the
+index trustworthy: it can never disagree with what is on screen, because it is not choosing
+what is on screen.
+
+Both are derived from the same two props — `models` and `providers` — so they cannot drift:
+`providers` gives the sections their order and their names, and a model whose maker is not
+in that array still gets a section under its own id rather than disappearing from the list.
+
+`providers` takes `{ id, name, icon }`. `icon` is the mark — see
+[Provider Mark](/docs/components/provider-mark), which is what the demo passes — and a
+provider without one falls back to its initial, because an empty tile is a button with
+nothing to aim at.
+
+While a search owns the list the rail marks nothing. The results are not the browse list,
+and lighting a maker up would claim a position the list does not have; clicking a maker
+anyway is how you leave the search.
+
+```tsx
+<ModelSelectIndex />
+```
+
+## Two sets of columns
+
+The panel has a rail and a list, and the field above them is laid out on the same two
+columns the rail and the list are: the magnifier sits centred in the rail's column, on the
+same line as every mark in the rail, and the text you type starts exactly on the rail's
+edge — the line the list starts at.
+
+Inside the list it is two more lines: marks at 76px (the rail's 56 plus the list's padding
+and a row's) and text at 106px, so a maker's mark, a row's mark and the heading's mark are
+one column, and a section's label, a model's name, its `meta` and the line under it are
+another.
+
+## The scroll is what marks the section
+
+The heading of the section at the top of the box is the one the rail lights up, so the two
+answers to "where am I" are the same answer. At the end of the list the last section is
+marked even if it never reaches the top, because the bottom of a short section is still the
+bottom of the list.
+
+The headings scroll with their models rather than sticking under the top edge. A heading
+that sticks parks itself over the row that came before it — half a row, hanging out above
+the one thing meant to explain it — and a list whose whole point is that it lines up cannot
+afford that.
+
+Walking to a section is deferred by one render on purpose: leaving a search means the
+sections that were hidden have to be laid out again before there is anywhere to scroll to.
+Reduced motion gets an instant jump instead of a glide.
+
+## A row
+
+`ModelSelectItem` draws the mark, the name, whatever the caller hangs off it, the line under
+it, and the check that says this is the one in use.
+
+| prop          |                                                                          |
+| ------------- | ------------------------------------------------------------------------ |
+| `description` | The line under the name. Leave it out and the row is one line tall.      |
+| `meta`        | Anything drawn beside the name — a duration, capability glyphs, a price. |
+| `keywords`    | Words the search may match that are not on screen, e.g. `"audio"`.       |
+
+Filtering, arrow keys, Enter and the listbox/option semantics are
+[`cmdk`](https://cmdk.paco.me)'s, which is what the list is built on: a searchable list is a
+solved problem, and none of it is this component's idea. What is this component's idea is the
+rail, the recommended section, and the fact that both come from the same data.
+
+Matching is `command-score`, which reads the query as a **subsequence** of a row's text — so
+`sd25` finds `Seedance 2.5`, `hail` finds `Hailuo`, and a typo still lands — and then scores
+how good the match is, which is what floats the closest row to the top of its section. What
+it scores is the model's `name`, its maker, its `description` and whatever the caller added to
+`keywords`, so a word that is not on screen can still be searchable: a duration, a capability,
+a price.
+
+## Parts
+
+The root owns the state and draws nothing, so everything you see is a part you placed:
+
+| part                 |                                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------- |
+| `ModelSelectTrigger` | One mark, one name, one chevron. `children` replaces the face.                               |
+| `ModelSelectContent` | The panel. It draws the surface and the field's chrome.                                      |
+| `ModelSelectSearch`  | The field, holding the query in the root so the rail can clear it.                           |
+| `ModelSelectIndex`   | The rail. Leave it out and the picker is a searchable list, which is all a short list needs. |
+| `ModelSelectList`    | The scroll, the section headings, and the spy.                                               |
+| `ModelSelectSection` | One section: heading plus rows. `children` replaces the rows.                                |
+| `ModelSelectItem`    | One model. `children` replaces the row's content.                                            |
+
+Leaving the rail out is the whole difference between a browsable catalogue and a searchable
+one, and it is an omission rather than a prop:
+
+<ModelSelectShortDemo />
+
+## Accessibility
+
+The list is `role="listbox"` with `role="option"` rows, the field is a combobox wired to it,
+and `cmdk` keeps `aria-activedescendant` on the row under the arrow keys — so the arrow keys
+move the selection and the rail follows it, without a second keyboard model. The rail is a
+set of buttons with `aria-current="true"` on the section you are in.
+
+Every mark is decorative: the name sits next to it in every place it is drawn.
+
+## Component source
+
+<ComponentSource
+  name="model-select"
+  src="registry/new-york/model-select/index.tsx"
+  title="index.tsx"
+/>
+
+<ComponentSource
+  name="model-select"
+  src="registry/new-york/model-select/parts.tsx"
+  title="parts.tsx"
+/>
+
+<ComponentSource
+  name="model-select"
+  src="registry/new-york/model-select/context.ts"
+  title="context.ts"
+/>
+
+<ComponentSource
+  name="model-select"
+  src="registry/new-york/model-select/types.ts"
+  title="types.ts"
+/>

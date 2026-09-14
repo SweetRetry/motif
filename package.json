@@ -8,6 +8,7 @@
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit",
     "registry:build": "shadcn build registry.json --output ./public/r",
+    "registry:marks": "node scripts/generate-provider-marks.mts && ultracite fix registry/new-york/provider-mark.tsx",
     "postinstall": "fumadocs-mdx",
     "check": "ultracite check",
     "fix": "ultracite fix",
@@ -45,6 +46,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@lobehub/icons-static-svg": "1.95.0",
     "@tailwindcss/postcss": "^4.2.4",
     "@types/mdx": "^2.0.13",
     "@types/node": "^25.6.0",

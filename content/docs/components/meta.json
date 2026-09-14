@@ -8,6 +8,8 @@
     "duration-slider",
     "flow-edge",
     "generation-overlay",
+    "model-select",
+    "provider-mark",
     "resolution-segmented",
     "settings-dialog",
     "toolbar"

@@ -10,9 +10,9 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PROVIDER_NAMES, ProviderMark } from "@/components/ui/provider-mark";
 import { cn } from "@/lib/utils";
 
-import { PROVIDER_NAMES, ProviderMark } from "./provider-icons";
 import type { ModelPickerProps } from "./types";
 
 /* -- Which model answers -------------------------------------------------------

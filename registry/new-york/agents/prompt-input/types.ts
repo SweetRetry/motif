@@ -2,8 +2,7 @@ import type { ComponentProps } from "react";
 
 import type { AttachmentProps } from "@/components/ui/attachment";
 import type { ButtonProps } from "@/components/ui/button";
-
-import type { ProviderId } from "./provider-icons";
+import type { ProviderId } from "@/components/ui/provider-mark";
 
 /**
  * A file riding along with the draft, the way a composer usually holds them: the chip's

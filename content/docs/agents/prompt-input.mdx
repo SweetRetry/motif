@@ -46,6 +46,7 @@ import {
 const MODELS: PromptModel[] = [
   { id: "gpt-5.2", name: "GPT-5.2", provider: "openai" },
   { id: "claude-sonnet-4.5", name: "Claude Sonnet 4.5", provider: "anthropic" },
+  { id: "gemini-3-pro", name: "Gemini 3 Pro", provider: "gemini" },
 ];
 
 export function Composer() {
@@ -171,20 +172,20 @@ menu covering the thing you are deciding about.
 `models` takes `{ id, name, provider }`. `value` and `onValueChange` make the pick
 controlled; on its own the picker holds it, starting at `defaultValue` or the first model.
 
-`ProviderMark` is a 20px mono mark in `currentColor`, taken verbatim from
-[LobeHub's icon set](https://github.com/lobehub/lobe-icons) (MIT) and inlined as path
-data. The package itself is not a dependency: it ships every icon it has ever drawn —
-around nine megabytes — behind an `antd` peer, which is not a price a composer should put
-on an app. Fifteen providers ship here: `anthropic`, `deepseek`, `gemini`, `google`,
-`groq`, `meta`, `mistral`, `moonshot`, `ollama`, `openai`, `openrouter`, `perplexity`,
-`qwen`, `xai` and `zhipu`. A provider that is missing is one path in
-`provider-icons.tsx`; colour marks and avatar framing are what the real package is for.
+`ProviderMark` draws [LobeHub's icon set](https://github.com/lobehub/lobe-icons) (MIT) in
+its coloured cut, and it lives in [Provider Mark](/docs/components/provider-mark) rather
+than here — the marks are the same artwork a browsing picker needs, so they ship once and
+both components depend on them. This item re-exports `ProviderMark` and `PROVIDER_NAMES`
+for convenience, and `shadcn add` brings the marks along with it.
 
 ```tsx
-import { ProviderMark } from "@/components/agents/prompt-input";
+import { ProviderMark } from "@/components/ui/provider-mark";
 
 <ProviderMark className="size-5 text-foreground" provider="anthropic" />;
 ```
+
+The classes still matter for the marks whose brand is monochrome — OpenAI, Anthropic, xAI,
+Groq and the rest take the tone of the text they sit in; the coloured ones ignore it.
 
 `PROVIDER_NAMES` is exported beside it for the times the mark is not enough — a menu
 that has to say "Anthropic" somewhere.
@@ -254,12 +255,6 @@ Anything else goes to the underlying `form`.
   name="prompt-input"
   src="registry/new-york/agents/prompt-input/context.ts"
   title="context.ts"
-/>
-
-<ComponentSource
-  name="prompt-input"
-  src="registry/new-york/agents/prompt-input/provider-icons.tsx"
-  title="provider-icons.tsx"
 />
 
 <ComponentSource

@@ -1,0 +1,60 @@
+---
+title: Provider Mark
+description: "One maker's logo at 20px, in the colour the brand draws it: twenty-three marks, inlined so a picker never pays for an icon package."
+---
+
+import { ProviderMarkDemo } from "@/examples/provider-mark";
+
+<ComponentPreview name="provider-mark">
+  <ProviderMarkDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif-sweetretrys-projects.vercel.app/r/provider-mark.json
+```
+
+## Usage
+
+```tsx
+import { ProviderMark } from "@/components/ui/provider-mark";
+
+<ProviderMark className="size-5" provider="bytedance" />;
+```
+
+## Where the artwork comes from
+
+The marks are [LobeHub's icon set](https://github.com/lobehub/lobe-icons) (MIT), in its
+coloured cut, taken verbatim: same viewBox, same path data, same gradients. A model list is
+a shelf of brands, and the brand is the fastest thing to recognise on it — a colour mark
+answers "whose model is this" before the name has been read.
+
+They are inlined rather than installed. `@lobehub/icons` is the obvious dependency and it
+is nine megabytes behind `antd` and `@lobehub/ui` peer dependencies, which is not a price a
+picker gets to put on an app it is dropped into. `@lobehub/icons-static-svg` ships the same
+artwork as loose files, and `provider-mark.tsx` is generated from it:
+
+```bash
+pnpm registry:marks
+```
+
+The generator is a dev dependency, not a runtime one: nothing about the marks at runtime
+goes through it. Bump the package, run the script, and the diff is the icons.
+
+Marks whose brand is monochrome — OpenAI, Anthropic, xAI, Groq, Ollama, Moonshot, Pika,
+Runway, Black Forest Labs — keep `currentColor` and take the tone of whatever they are planted in, so
+`className` still works on them. The coloured cuts ignore it.
+
+## The marks are decorative
+
+Every mark renders `aria-hidden`, because the name sits next to it in every place it is
+used and a screen reader reading both would say the same thing twice.
+
+## Component source
+
+<ComponentSource
+  name="provider-mark"
+  src="registry/new-york/provider-mark.tsx"
+  title="provider-mark.tsx"
+/>

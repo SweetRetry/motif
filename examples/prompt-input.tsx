@@ -21,20 +21,12 @@ import type {
 /** Shipped with the docs so the demo needs no external host. */
 const THUMB = "/attachment-demo.jpg";
 
-/** One model per mark the picker draws, so the menu shows the whole set at once. */
+/** Three vendors, which is as many as a menu of models needs to show what it
+ *  does: a mark, a name, and the maker on the far side to tell two `Pro`s apart. */
 const MODELS: PromptModel[] = [
   { id: "gpt-5.2", name: "GPT-5.2", provider: "openai" },
   { id: "claude-sonnet-4.5", name: "Claude Sonnet 4.5", provider: "anthropic" },
   { id: "gemini-3-pro", name: "Gemini 3 Pro", provider: "gemini" },
-  { id: "grok-4", name: "Grok 4", provider: "xai" },
-  { id: "deepseek-v3.2", name: "DeepSeek V3.2", provider: "deepseek" },
-  { id: "qwen3-max", name: "Qwen3 Max", provider: "qwen" },
-  { id: "kimi-k2", name: "Kimi K2", provider: "moonshot" },
-  { id: "glm-4.6", name: "GLM-4.6", provider: "zhipu" },
-  { id: "llama-4-maverick", name: "Llama 4 Maverick", provider: "meta" },
-  { id: "mistral-large-3", name: "Mistral Large 3", provider: "mistral" },
-  { id: "sonar-pro", name: "Sonar Pro", provider: "perplexity" },
-  { id: "llama-3.3-70b", name: "Llama 3.3 70B", provider: "ollama" },
 ];
 
 /** A finished image and one upload still in flight, so the header shows both states. */
