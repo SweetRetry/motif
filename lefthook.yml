@@ -1,7 +1,23 @@
 pre-commit:
   jobs:
-    - run: pnpm fix {staged_files}
+    # `ultracite fix` is two tools in a trench coat: oxfmt formats the files it is given,
+    # oxlint lints them. Both exit non-zero when the staged set leaves them nothing to do,
+    # so a commit that staged nothing but build output was blocked with "every path was
+    # excluded" and a commit that staged only JSON with "No files found to lint". The flag
+    # is understood by both and only silences the empty-input case: a real warning or error
+    # still fails the hook.
+    - run: pnpm fix --no-error-on-unmatched-pattern {staged_files}
+      # Root-level files are listed again rather than left to `**/`: that pattern needs at
+      # least one directory, so `registry.json` — the file we edit on every new component —
+      # was never formatted before a push, and CI was the first to see it.
       glob:
+        - "*.js"
+        - "*.jsx"
+        - "*.ts"
+        - "*.tsx"
+        - "*.json"
+        - "*.jsonc"
+        - "*.css"
         - "**/*.js"
         - "**/*.jsx"
         - "**/*.ts"
@@ -9,4 +25,7 @@ pre-commit:
         - "**/*.json"
         - "**/*.jsonc"
         - "**/*.css"
+      # Written by `pnpm registry:build`, and in the formatter's own `ignorePatterns`.
+      exclude:
+        - "public/r/**"
       stage_fixed: true
