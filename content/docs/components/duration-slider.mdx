@@ -64,16 +64,37 @@ operable without a pointer.
 
 ## The track
 
-The chosen span is drawn as a clip with the playhead pinned to its leading edge — the
-amount of time is a length, so it is shown as a length. A fixed `CLIP_MIN_WIDTH` keeps the
-handle a real target at the very start of the range, and the pointer is mapped over the
-same travel the clip uses, so the handle always sits under the cursor.
+The chosen span is drawn as a clip whose leading edge is the value — the amount of time is
+a length, so it is shown as a length. The **track itself is the ruler**: `min` sits on its
+left edge and `max` on its right, which is where the `1s` and `15s` labels under the ends
+sit too, so every interval between two dots is the same width.
+
+The playhead's bar is the one thing held back from an edge, by half a bar at each end
+(`PLAYHEAD_INSET`), because a handle cut in half by the track's rounded corner reads as a
+rendering bug. Clamping the bar rather than insetting the ruler is the point. An earlier
+version reserved a fixed width at the left of the track and made the clip, the dots and the
+pointer all share that shortened travel: the first interval came out half again as wide as
+the rest, the `1s` label sat eleven pixels away from the zero it named, and the ruler never
+looked even. The pointer now maps over the track's whole width, so the handle still lands
+under the cursor — and at `min` the clip has no length at all, which is exactly what that
+end of the range says.
+
+The clip's leading edge is **straight**, not rounded. That edge is a number — the point on
+the track you have chosen — and a corner drawn there reads as a value rounded off in the
+drawing as well. It is also the edge the strength select draws, so the two controls that
+share a column of a form say the same thing about the same kind of boundary.
 
 The step is drawn as well: one dot per snapping interval, thinned to a stride when the
 span holds more steps than the track can space out. The dots sit over the clip, so the
 intervals you have already passed stay legible on it — the track reads as a length and a
-ruler at the same time. The playhead is a layer of its own above them, held just inside
-the clip's leading edge, so a dot it moves across never nicks the handle.
+ruler at the same time. Being an alpha of the foreground, they land a shade lighter on the
+clip than on the empty track; an opaque token was tried for that and dropped, because one
+mark half a shade off is not worth a variable in everyone's theme.
+
+The playhead stands **on** the dot of the value it marks rather than beside it: the bar is
+centred on the value's own position, so it covers that interval's dot and leaves the rest of
+the ruler in step. It used to sit a few pixels inside the clip's leading edge, which left
+two marks a few pixels apart wherever the handle happened to be.
 
 The number itself lives in a HUD above the track, clamped off the edges so it never gets
 cut off. It is shown while hovering or dragging and hidden otherwise: the read-out is for

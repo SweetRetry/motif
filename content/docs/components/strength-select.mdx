@@ -1,0 +1,147 @@
+---
+title: Strength Select
+description: "Strength as a stepped track: one seat per level, the seats up to the chosen one filled, and a slow drift of motes across the fill of the top level."
+---
+
+import {
+  StrengthSelectDemo,
+  StrengthSelectEffortDemo,
+} from "@/examples/strength-select";
+
+<ComponentPreview name="strength-select">
+  <StrengthSelectDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif-ui.vercel.app/r/strength-select.json
+```
+
+The item ships one keyframe, `strength-mote`, in its `css` — `shadcn add` writes it into
+your stylesheet along with the component. There is no animation library in the chain: a
+translate across a box is a CSS animation, and the component has no reason to carry a
+runtime for it.
+
+## Usage
+
+```tsx
+import { StrengthSelect } from "@/components/ui/strength-select";
+
+export function Defaults() {
+  const [strength, setStrength] = useState("Medium");
+
+  return (
+    <div className="space-y-2">
+      <div className="font-medium text-muted-foreground text-xs">Strength</div>
+      <StrengthSelect
+        aria-label="Strength"
+        onChange={setStrength}
+        value={strength}
+      />
+    </div>
+  );
+}
+```
+
+## The heading is yours
+
+The control draws no label. A field's label belongs to the form around it — above, beside,
+in a `<legend>` — and that is layout the caller owns, not something a select should decide
+for the page it lands in. So the component renders the track and nothing else.
+
+That leaves one line of wiring: a heading you write is plain text, so pass `aria-label`
+with the same words and the name reaches a screen reader too.
+
+## A track, not a slider
+
+The duration slider is dragged because a duration is a length: every point on its track is
+a number of seconds. Strength is not that. Its levels have names, and there is nothing
+between `High` and `Extra high` — no value sits at 70% of the way there. So this control is
+a track you land on: a click settles a level, the arrow keys walk the stops one at a time,
+and nothing is committed in flight. The track is the same shape as duration's because the
+two sit in the same column of the same form; what differs is what a press means.
+
+## The fill is the amount
+
+Each level owns a seat of the track, so `Low` fills one fifth of it and `Ultra` fills all
+five. The amount is drawn as an amount, which is what makes the levels comparable at a
+glance: two levels apart is twice the fill, and the empty remainder of the track is what a
+higher level would buy.
+
+The fill's leading edge is the boundary of the chosen seat, so the level is told twice over
+and neither half has to be decoded: the length says how much, and the bold name under the
+track says which. `motion-reduce:transition-none` parks the fill for anyone who has asked
+for less movement.
+
+## Only the ceiling moves
+
+The top level — wherever the list ends, three levels or nine — carries a slow drift of
+motes across its fill. Every level below it is still. Five levels do not need five
+animations: motion in a form is noise, and a control that is always moving stops being
+read as a control. Giving it to the one level that costs the most buys the ceiling a
+character the other four do not have, and it costs the levels below nothing.
+
+It is slow on purpose. A mote crosses the fill in 3.4–5 seconds, which reads as drift; the
+first version crossed in under a second and read as a flicker you had to look away from.
+Each mote starts partway through its own crossing — a negative `animation-delay`, which is
+how CSS says an animation has already been running — so the row is spread across the fill
+at every instant. Their crossing times differ as well, so the spread keeps shifting instead
+of settling into a pattern.
+
+The first version got this wrong, and the bug is worth keeping written down: it staggered
+the motes by a _positive_ delay from a shared start, so all twelve crossed as one clump and
+the bar sat empty between passes — half a minute of watching could show no mote at all.
+Phasing is the whole point of a drift; a stagger is not a phase.
+
+The placement is worked out from each mote's index by a hash rather than from
+`Math.random`, so the server and the client draw the same row and none of it has to be
+generated in an effect. Each mote's carrier spans the fill, so `100%` of its travel is the
+fill's own width: nothing is measured in pixels, and the drift works the same whatever the
+level's fill is worth.
+
+Under `motion-reduce` the drift is not drawn at all — not paused, not stilled: `Low`
+through the top level are the one control they always were.
+
+## Every label is a target
+
+The names sit under the track, one per seat, and each is the button that chooses its level.
+The heading above the control is a label, so it does nothing when pressed; these are not
+labels, so they do — the level you read is the level you press, and the whole seat above
+the name is part of the same target.
+
+The seat is what answers the pointer and the keyboard: hovering a name or tabbing onto it
+lights its own seat and brings its own name forward, so the two halves of the control agree
+about which level is about to be chosen. The light is the foreground token at 5% rather
+than `muted` or `accent` — in light mode those two are the same lightness as the fill, so a
+`muted` hover would disappear on the part of the track the selection already covers. An
+outline was the other candidate and lost: a ring the height of the track reads as a box
+floating in it rather than as a seat being chosen. The highlight's own corners follow the
+same reasoning — it carries the track's radius on the outside of the row and is square on
+every edge that meets another seat, because a rounded corner there would poke past the
+straight boundary the fill is drawn with.
+
+## Any ordered list
+
+`options` is any list of level names, weakest first; the count sets the segments, and the
+component never parses what the names mean. Keep them ascending — the first entry is the
+one the track treats as the smallest, and the **last** is the one that drifts.
+
+<StrengthSelectEffortDemo />
+
+## Accessibility
+
+The row is a `role="radiogroup"` named by `aria-label`, over a `role="radio"` button per
+stop with `aria-checked`. It is one tab stop with a roving focus, and the arrows move the
+selection and the focus together — `↑`/`←` one stop weaker, `↓`/`→` one stronger, `Home`
+and `End` to the ends — so a level is never focused without being chosen. The fill and the
+motes are `aria-hidden`: the chosen name is already in the markup, the state is on the
+radio, and a drifting dot is not something to read out.
+
+## Component source
+
+<ComponentSource
+  name="strength-select"
+  src="registry/new-york/strength-select.tsx"
+  title="strength-select.tsx"
+/>

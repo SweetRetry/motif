@@ -369,6 +369,19 @@
   }
 }
 
+/* The strength select's motes, drifting across the fill of its top level. The carrier is
+   the fill's own box, so 100% of the travel is the fill's width whatever level is in
+   effect; the component carries the duration. Shipped to installs by the registry item's
+   `css`, so the two blocks are the same block. */
+@keyframes strength-mote {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
 @keyframes slide {
   from {
     translate: var(--slide-offset);

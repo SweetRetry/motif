@@ -12,6 +12,7 @@
     "provider-mark",
     "resolution-segmented",
     "settings-dialog",
+    "strength-select",
     "toolbar"
   ]
 }

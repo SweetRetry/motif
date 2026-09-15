@@ -292,6 +292,33 @@
       ]
     },
     {
+      "name": "strength-select",
+      "type": "registry:ui",
+      "title": "Strength Select",
+      "description": "Strength as a stepped track: one seat per level, the seats up to the chosen one filled, and a slow drift of motes across the fill of the top level.",
+      "dependencies": [
+        "clsx",
+        "tailwind-merge"
+      ],
+      "css": {
+        "@keyframes strength-mote": {
+          "from": {
+            "transform": "translateX(-100%)"
+          },
+          "to": {
+            "transform": "translateX(100%)"
+          }
+        }
+      },
+      "files": [
+        {
+          "path": "registry/new-york/strength-select.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/strength-select.tsx"
+        }
+      ]
+    },
+    {
       "name": "thinking-block",
       "type": "registry:component",
       "title": "Thinking Block",

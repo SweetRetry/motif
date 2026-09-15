@@ -11,22 +11,29 @@ import { cn } from "@/lib/utils";
  * are, and the HUD carries the number so the track does not have to be measured in
  * pixels. Dragging keeps the in-flight number in local state and a ref, so the track
  * paints on every move while the committed value lands once, on release.
+ *
+ * The track **is** the ruler: `min` sits on its left edge and `max` on its right, so the
+ * step dots fall on equal intervals and the labels under the ends agree with them. The
+ * only thing held back from an edge is the playhead's own bar, by half a bar at either
+ * end — a handle cut in half by a rounded corner reads as a rendering bug.
  * --------------------------------------------------------------------------- */
 
-/** The playhead reserves a fixed width at the left of the track, and the clip and the
- *  pointer share the same travel so the handle always sits under the cursor. */
-const CLIP_MIN_WIDTH = 12;
+/** How far the playhead's bar is kept inside the track, so a bar at either end of the
+ *  range is a whole bar rather than half of one. */
+const PLAYHEAD_INSET = 2;
 
 /** The most step dots a track will draw. A `1s` step across a minute would otherwise
  *  read as one solid line rather than as intervals. */
 const MAX_DOTS = 24;
 
 /**
- * Where a percentage of the range lands on the track — the travel the clip's leading
- * edge and the pointer both use, so a dot and the handle agree on where a step is.
+ * Where the playhead stands for a percentage of the range, clamped a whole bar inside the
+ * track. The clip's width and the dots use the percentage itself: they are the ruler, and
+ * a ruler that stopped short of its own ends would put the first interval out of step with
+ * every interval after it.
  */
-const travelLeft = (pct: number) =>
-  `calc(${pct}% + ${CLIP_MIN_WIDTH * (1 - pct / 100)}px)`;
+const playheadLeft = (pct: number) =>
+  `clamp(${PLAYHEAD_INSET}px, ${pct}%, calc(100% - ${PLAYHEAD_INSET}px))`;
 
 /**
  * The steps, as values to dot along the track. Both ends are left out: the ends are the
@@ -126,18 +133,14 @@ export const DurationSlider = ({
         return;
       }
       // `offsetWidth`/`clientLeft` account for the track's own border, so the pointer
-      // maps to the same travel the clip uses.
+      // maps to the same travel the clip and the dots use.
       const relativeX =
         ((clientX - rect.left) / rect.width) * target.offsetWidth -
         target.clientLeft;
-      const travelWidth = target.clientWidth - CLIP_MIN_WIDTH;
-      if (travelWidth <= 0) {
+      if (target.clientWidth <= 0) {
         return;
       }
-      const rawPct = Math.min(
-        1,
-        Math.max(0, (relativeX - CLIP_MIN_WIDTH) / travelWidth)
-      );
+      const rawPct = Math.min(1, Math.max(0, relativeX / target.clientWidth));
       const rawVal = min + rawPct * (max - min);
       const stepped = Math.round((rawVal - min) / step) * step + min;
       const clamped = Math.min(max, Math.max(min, stepped));
@@ -224,15 +227,18 @@ export const DurationSlider = ({
         role="slider"
         tabIndex={0}
       >
-        {/* The chosen clip. */}
+        {/* The chosen clip. Its leading edge is straight rather than rounded: the clip is
+            a length being measured, and a corner there reads as a rounded-off value — the
+            same edge the strength select draws, so the two controls in one column are
+            speaking about the same kind of thing. */}
         <div
           className={cn(
-            "absolute inset-y-0 left-0 rounded-r-lg border border-border/80 bg-accent shadow-xs",
+            "absolute inset-y-0 left-0 border border-border/80 bg-accent shadow-xs",
             isDragging
               ? "transition-none"
               : "transition-[width] duration-150 ease-out"
           )}
-          style={{ width: travelLeft(pct) }}
+          style={{ width: `${pct}%` }}
         />
 
         {/* The intervals the value is measured in, dotted along the track. They are
@@ -247,13 +253,13 @@ export const DurationSlider = ({
             <span
               className="absolute top-1/2 size-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground/30"
               key={dot}
-              style={{ left: travelLeft(((dot - min) / (max - min)) * 100) }}
+              style={{ left: `${((dot - min) / (max - min)) * 100}%` }}
             />
           ))}
         </div>
 
-        {/* The playhead, pinned just inside the clip's leading edge and kept above the
-              dots so a step it passes over never nicks the handle. */}
+        {/* The playhead, standing on the dot of the value it marks rather than beside it,
+              so the ruler's rhythm is unbroken where you are standing. */}
         <div
           className={cn(
             "absolute inset-y-0",
@@ -261,9 +267,9 @@ export const DurationSlider = ({
               ? "transition-none"
               : "transition-[left] duration-150 ease-out"
           )}
-          style={{ left: travelLeft(pct) }}
+          style={{ left: playheadLeft(pct) }}
         >
-          <div className="absolute top-1/2 right-1 h-6 w-1 -translate-y-1/2 rounded-full bg-foreground shadow-sm" />
+          <div className="absolute top-1/2 left-1/2 h-6 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground shadow-sm" />
         </div>
         <span className="pointer-events-none relative mx-auto font-medium text-foreground text-sm tabular-nums">
           {draftValue}
