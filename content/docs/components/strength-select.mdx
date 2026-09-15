@@ -96,9 +96,22 @@ Phasing is the whole point of a drift; a stagger is not a phase.
 
 The placement is worked out from each mote's index by a hash rather than from
 `Math.random`, so the server and the client draw the same row and none of it has to be
-generated in an effect. Each mote's carrier spans the fill, so `100%` of its travel is the
-fill's own width: nothing is measured in pixels, and the drift works the same whatever the
-level's fill is worth.
+generated in an effect. The hash is integer arithmetic on purpose. `Math.sin` looks like a
+harmless way to spread points — it is what the first version used — but it is not specified
+to the last bit, and the browser's engine disagrees with the server's a few ulps out. Those
+digits went straight into the `style` attribute: the server wrote
+`animation:strength-mote 3.491549070959445s` where the browser computed
+`3.4915490709710864s`, and React compares that attribute as text, so it called the two
+different rows a hydration mismatch. `Math.imul` is exact integer multiplication, so an
+index gives the same number in every engine.
+
+Each crossing and each height is then rounded — a hundredth of a second, a tenth of a
+percent — which is finer than the drift can show and keeps a float's full expansion out of
+the markup.
+
+Each mote's carrier spans the fill, so `100%` of its travel is the fill's own width:
+nothing is measured in pixels, and the drift works the same whatever the level's fill is
+worth.
 
 Under `motion-reduce` the drift is not drawn at all — not paused, not stilled: `Low`
 through the top level are the one control they always were.

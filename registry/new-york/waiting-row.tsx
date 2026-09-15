@@ -70,17 +70,35 @@ const CELL_CREST = 0.6;
 
 const CELL_KEYFRAMES = waveKeyframes(CELL_TROUGH, CELL_CREST);
 
-/** How far into the cycle a cell starts, read off the anti-diagonal it sits on. */
-const phase = (index: number) =>
-  (Math.floor(index / GRID) + (index % GRID)) / WAVE_SPREAD;
+/** The anti-diagonal a cell sits on — row plus column. It is what the wave travels along,
+ *  and the anti-diagonals run 0…4 across a three-by-three lattice. */
+const antiDiagonal = (index: number) =>
+  Math.floor(index / GRID) + (index % GRID);
 
-/** The resting opacity of a cell: the wave at `t = 0`. Drawn under the animation, and
- *  the only thing left when motion is turned down. */
-const restingOpacity = (index: number) => {
-  const turn = phase(index) % 1;
-  const cosine = 0.5 - 0.5 * Math.cos(turn * Math.PI * 2);
-  return CELL_TROUGH + (CELL_CREST - CELL_TROUGH) * cosine;
-};
+/** How far into the cycle a cell starts, read off the anti-diagonal it sits on. */
+const phase = (index: number) => antiDiagonal(index) / WAVE_SPREAD;
+
+/**
+ * The resting opacity of each anti-diagonal: the wave at `t = 0`, which is what is drawn
+ * under the animation and all that is left when motion is turned down. Nine cells sit on
+ * five anti-diagonals, so the wave is five numbers rather than a cosine evaluated while
+ * rendering.
+ *
+ * Written out rather than computed, for the reason the strength select's motes are:
+ * `Math.cos` is not specified to the last bit, the browser's value and the server's
+ * disagree a few ulps out, and React compares the `style` attribute as text — so a cell's
+ * full-precision opacity is a hydration mismatch waiting for the right browser, and it is
+ * seventeen characters where five would do. The keyframes below still sample the cosine in
+ * full: they are handed to `element.animate` in the browser and never written into HTML,
+ * where the last digits cost nothing.
+ *
+ * `CELL_TROUGH + (CELL_CREST - CELL_TROUGH) * (0.5 - 0.5 * Math.cos(turn * Math.PI * 2))`
+ * at `turn = 0, 1, 2, 3, 4` over `WAVE_SPREAD`.
+ */
+const CELL_REST_OPACITY = [0.2, 0.3169, 0.531, 0.5919, 0.4285];
+
+const restingOpacity = (index: number) =>
+  CELL_REST_OPACITY[antiDiagonal(index) % CELL_REST_OPACITY.length];
 
 /* -- The label ---------------------------------------------------------------- */
 

@@ -52,13 +52,40 @@ const seatRadius = (index: number, count: number) => {
   return "";
 };
 
-/** A stable pseudo-random in `[0, 1)`. Placement comes from a mote's index rather than
- *  from `Math.random`, so the server and the client draw the same row and nothing has to
- *  be generated in an effect. */
+/** A signed 32-bit product as its unsigned value, so the halves below can be taken by
+ *  dividing rather than by a bitwise shift — this project's lint forbids those. */
+const unsigned = (value: number) => (value < 0 ? value + 4_294_967_296 : value);
+
+/** The top half of a 32-bit value, as a whole number in `[0, 65_536)`. */
+const upperHalf = (value: number) => Math.floor(unsigned(value) / 65_536);
+
+/**
+ * A stable pseudo-random in `[0, 1)`, from a mote's index rather than from `Math.random`,
+ * so the server and the client draw the same row and nothing has to be generated in an
+ * effect.
+ *
+ * Integers only, and that is the whole point. `Math.sin` is not specified to the last bit:
+ * the browser's engine and the one rendering on the server disagree a few ulps out, and a
+ * hash built on it wrote that disagreement straight into the `style` attribute —
+ * `animation:strength-mote 3.491549070959445s` on the server against
+ * `3.4915490709710864s` in the browser — which React reads as a hydration mismatch, since
+ * it compares that attribute as text. `Math.imul` is exact, so this is the same number in
+ * every engine.
+ *
+ * Multiply, keep the top half, multiply again: discarding the low half between rounds is
+ * what breaks the constant step two neighbouring indices would otherwise share, so the
+ * twelve motes read as scattered rather than as a run of near-identical values.
+ */
 const noise = (seed: number) => {
-  const x = Math.sin(seed * 12.9898) * 43_758.5453;
-  return x - Math.floor(x);
+  const first = upperHalf(Math.imul(seed + 1, 2_654_435_761));
+  return upperHalf(Math.imul(first + 1, 2_246_822_519)) / 65_536;
 };
+
+/** A number at a fixed precision. Two places is a hundredth of a second on a crossing and
+ *  a tenth of a percent on a height — finer than the drift can show, and short enough that
+ *  the `style` attribute carries a string rather than a float's full expansion. */
+const rounded = (value: number, places: number) =>
+  Number(value.toFixed(places));
 
 /**
  * The motes' places, worked out once. Each starts partway through its own crossing — a
@@ -68,12 +95,12 @@ const noise = (seed: number) => {
  * settling into a pattern.
  */
 const MOTES = Array.from({ length: MOTE_COUNT }, (_, index) => {
-  const duration = 3.4 + noise(index + 1) * 1.6;
+  const duration = rounded(3.4 + noise(index + 1) * 1.6, 2);
   return {
-    delay: -(duration * ((index + 0.5) / MOTE_COUNT)),
+    delay: -rounded(duration * ((index + 0.5) / MOTE_COUNT), 2),
     duration,
     id: `mote-${index}`,
-    top: 12 + noise(index + 21) * 76,
+    top: rounded(12 + noise(index + 21) * 76, 1),
   };
 });
 
