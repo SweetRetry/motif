@@ -5,16 +5,16 @@
 
 ## 当前值
 
-| 项              | 值                                              | 唯一来源                         |
-| --------------- | ----------------------------------------------- | -------------------------------- |
-| 名称            | `Motif`                                         | `SITE.NAME`                      |
-| 发行标识 scope  | `@motif`                                        | `registry.json:name`             |
-| 包名            | `motif`                                         | `package.json:name`              |
-| 站点 / registry | `https://motif-ui.vercel.app` | `constants/site.ts` fallback     |
-| 仓库            | `https://github.com/SweetRetry/motif`           | `constants/links.ts` `GITHUB`    |
-| 作者            | `SweetRetry`（GitHub handle，不用真名）         | `SITE.AUTHOR.NAME`               |
-| X               | `@SweetRetry`                                   | `SITE.AUTHOR.TWITTER` / `LINK.X` |
-| 版权            | `Copyright (c) 2026 Motif`                      | `LICENSE`                        |
+| 项              | 值                                      | 唯一来源                         |
+| --------------- | --------------------------------------- | -------------------------------- |
+| 名称            | `Motif`                                 | `SITE.NAME`                      |
+| 发行标识 scope  | `@motif`                                | `registry.json:name`             |
+| 包名            | `motif`                                 | `package.json:name`              |
+| 站点 / registry | `https://motif-ui.vercel.app`           | `constants/site.ts` fallback     |
+| 仓库            | `https://github.com/SweetRetry/motif`   | `constants/links.ts` `GITHUB`    |
+| 作者            | `SweetRetry`（GitHub handle，不用真名） | `SITE.AUTHOR.NAME`               |
+| X               | `@SweetRetry`                           | `SITE.AUTHOR.TWITTER` / `LINK.X` |
+| 版权            | `Copyright (c) 2026 Motif`              | `LICENSE`                        |
 
 短描述：en `Interface parts for AI agents`；长描述见 `SITE.DESCRIPTION`。关键词见
 `SITE.KEYWORDS`（面向 agent UI / chat UI / 生成式媒体，而非"模板"）。
@@ -50,7 +50,7 @@
 | 项                    | 值                                                                                                                                       |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | Project               | `motif`（原 `startercn`，已改名）                                                                                                        |
-| 生产域                | `https://motif-ui.vercel.app`                                                                                          |
+| 生产域                | `https://motif-ui.vercel.app`                                                                                                            |
 | Deployment Protection | 已关闭（`ssoProtection: null`）——registry 必须公开可取；preview 也一并公开了，只想护 preview 就到 dashboard 设成 preview-only            |
 | 旧域                  | `startercn-livid.vercel.app` 已从 project domains 删除（`DELETE /v10/projects/{id}/domains/...`），否则每次 deploy 会把它重新 alias 出来 |
 
