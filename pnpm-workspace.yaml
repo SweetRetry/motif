@@ -1,0 +1,13 @@
+# Which dependencies may run their install scripts. pnpm 10 moved this setting here from
+# `pnpm.onlyBuiltDependencies` in package.json, which pnpm 12 now ignores and warns about, so
+# this file is the one home for the answer.
+#
+# esbuild, lefthook and msw are the three the project has always approved. sharp is listed as
+# a refusal rather than left out: it is only ever asked to build itself when the prebuilt
+# binary for the platform is missing, and nothing here has needed that, so approving it would
+# be a new decision rather than the one in force.
+allowBuilds:
+  esbuild: true
+  lefthook: true
+  msw: true
+  sharp: false
