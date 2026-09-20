@@ -45,3 +45,9 @@ next-env.d.ts
 .contentlayer
 .content-collections
 .source
+
+# `pnpm registry:build` output, rebuilt by both `dev` and `build`. Committing it
+# only ever added a copy that could drift from `registry/` without anything
+# noticing: the deploy regenerates it, and CI never compared it. Linters and the
+# formatter already skip it for the same reason.
+/public/r

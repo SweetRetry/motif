@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "pnpm registry:build && next dev",
     "build": "pnpm registry:build && next build",
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit",
