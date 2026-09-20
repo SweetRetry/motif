@@ -1,6 +1,6 @@
 ---
 title: Strength Select
-description: "Strength as a stepped track: one seat per level, the seats up to the chosen one filled, and a slow drift of motes across the fill of the top level."
+description: "Strength as a track you drag: one seat per level, the playhead riding the fill's leading edge, and a slow drift of motes across the fill of the top level."
 ---
 
 import {
@@ -48,19 +48,30 @@ export function Defaults() {
 
 The control draws no label. A field's label belongs to the form around it — above, beside,
 in a `<legend>` — and that is layout the caller owns, not something a select should decide
-for the page it lands in. So the component renders the track and nothing else.
+for the page it lands in. So the component renders the track and its own level names, and
+no heading above them.
 
 That leaves one line of wiring: a heading you write is plain text, so pass `aria-label`
 with the same words and the name reaches a screen reader too.
 
-## A track, not a slider
+## A slider that snaps to names
 
 The duration slider is dragged because a duration is a length: every point on its track is
-a number of seconds. Strength is not that. Its levels have names, and there is nothing
-between `High` and `Extra high` — no value sits at 70% of the way there. So this control is
-a track you land on: a click settles a level, the arrow keys walk the stops one at a time,
-and nothing is committed in flight. The track is the same shape as duration's because the
-two sit in the same column of the same form; what differs is what a press means.
+a number of seconds, and the number is the value. Strength is not that. Its levels have
+names, and there is nothing between `High` and `Extra high` — no value sits at 70% of the
+way there.
+
+So the gesture is a slider's and the value is a list's. The pointer runs freely along the
+track, and the seat it is standing in is the level it lands on. That is where the snap
+comes from: not from a continuous number being rounded to a step, but from the track being
+divided into seats that each already have a name. The two controls are the same shape
+because they sit in the same column of the same form; what differs is that the duration
+slider's number is the answer and this one's index is only the spelling of it.
+
+The seats are what make the drag honest, and they are the same partition the names below
+the track use: a fifth of the track is `Low` because the word `Low` sits under that fifth.
+Snapping to the nearest edge instead would put `Low` a fifth of the way across the track,
+which is where the word `Medium` is.
 
 ## The fill is the amount
 
@@ -69,10 +80,18 @@ five. The amount is drawn as an amount, which is what makes the levels comparabl
 glance: two levels apart is twice the fill, and the empty remainder of the track is what a
 higher level would buy.
 
-The fill's leading edge is the boundary of the chosen seat, so the level is told twice over
-and neither half has to be decoded: the length says how much, and the bold name under the
-track says which. `motion-reduce:transition-none` parks the fill for anyone who has asked
-for less movement.
+The fill's leading edge is the boundary of the chosen seat, and the playhead stands on it —
+the same bar the duration slider carries, in the same place. So the level is told twice
+over and neither half has to be decoded: the length says how much, and the bold name under
+the track says which.
+
+The edge is the seat's _far_ edge, which means the playhead ends up as much as one seat
+ahead of the pointer that put it there: press the first fifth and the fill runs to the end
+of the first fifth. That is the price of "the fill is the amount" — the seat is what you
+press, and the length is what you bought — and the seat tint following the pointer is what
+keeps the two readable while you drag.
+
+`motion-reduce:transition-none` parks the fill for anyone who has asked for less movement.
 
 ## Only the ceiling moves
 
@@ -116,18 +135,27 @@ worth.
 Under `motion-reduce` the drift is not drawn at all — not paused, not stilled: `Low`
 through the top level are the one control they always were.
 
-## Every label is a target
+## Every name is a target
 
-The names sit under the track, one per seat, and each is the button that chooses its level.
-The heading above the control is a label, so it does nothing when pressed; these are not
-labels, so they do — the level you read is the level you press, and the whole seat above
-the name is part of the same target.
+The names sit under the track, one per seat, and pressing one chooses its level. The
+heading above the control is a label, so it does nothing when pressed; these are not
+labels, so they do — the level you read is the level you press.
 
-The seat is what answers the pointer and the keyboard: hovering a name or tabbing onto it
-lights its own seat and brings its own name forward, so the two halves of the control agree
-about which level is about to be chosen. The light is the foreground token at 5% rather
-than `muted` or `accent` — in light mode those two are the same lightness as the fill, so a
-`muted` hover would disappear on the part of the track the selection already covers. An
+The whole control is the pointer's surface, so a press on a name is resolved the same way a
+drag is: the x lands in a seat, and that seat's level is the one you get. The word and the
+fifth of the track above it cannot disagree, because they are the same partition being
+asked.
+
+What they are not is a second set of tab stops. A drag, a press on a name, a press on the
+track and an arrow key all resolve to a seat, and five separately focusable names would ask
+a keyboard user to walk six stops to describe one value. The focus belongs to the track and
+the arrows move the selection — so a level is never focused without being chosen.
+
+The tint is what keeps the pointer and the names in step while you drag: the seat under the
+pointer lights and its name comes forward, before anything is chosen. The light is the
+foreground token at 5% rather than `muted` or `accent` — in light mode those two are the
+same lightness as the fill, so a `muted` hover would disappear on the part of the track the
+selection already covers. An
 outline was the other candidate and lost: a ring the height of the track reads as a box
 floating in it rather than as a seat being chosen. The highlight's own corners follow the
 same reasoning — it carries the track's radius on the outside of the row and is square on
@@ -144,12 +172,22 @@ one the track treats as the smallest, and the **last** is the one that drifts.
 
 ## Accessibility
 
-The row is a `role="radiogroup"` named by `aria-label`, over a `role="radio"` button per
-stop with `aria-checked`. It is one tab stop with a roving focus, and the arrows move the
-selection and the focus together — `↑`/`←` one stop weaker, `↓`/`→` one stronger, `Home`
-and `End` to the ends — so a level is never focused without being chosen. The fill and the
-motes are `aria-hidden`: the chosen name is already in the markup, the state is on the
-radio, and a drifting dot is not something to read out.
+The track is a `role="slider"` named by `aria-label`, with `aria-valuemin`, `aria-valuemax`
+and `aria-valuenow` taken over the _index_ of the level, and `aria-valuetext` carrying the
+name. The index is what a slider is required to expose; the name is what the level actually
+is, and it is what gets announced — this is the case `aria-valuetext` exists for, a value
+that is chosen from a range and read as a word.
+
+It is one tab stop. `↑`/`→` move one level stronger and `↓`/`←` one weaker, `Home` and
+`End` go to the ends, and the focus stays on the track while the selection moves. The seat
+names are `aria-hidden` — the level they spell is already in `aria-valuetext`, and reading
+five names out around the slider would say the same thing twice. So are the fill and the
+motes, which carry nothing the value does not.
+
+`touch-none` stops the browser from claiming the horizontal drag as a scroll. Unlike the
+duration slider, nothing is held back for a release: a drag commits each level as it
+crosses it, because each crossing is already a whole named level rather than an
+intermediate number.
 
 ## Component source
 
