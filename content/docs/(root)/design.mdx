@@ -8,14 +8,16 @@ why a play icon feels off-center even when mathematically centered, why a nested
 
 These are **Design Cases**. Every case documented here targets a recurring visual bug or anti-pattern, paired with a live side-by-side comparison, the underlying perception principle, and the exact code formula to solve it.
 
-## How each case is structured
+## How a topic is structured
 
-Every topic follows a standardized **Error vs. Right** evaluation framework:
+The unit is a **Wrong vs. Right** pair:
 
-- ❌ **The Anti-Pattern (Wrong)** — The common intuitive implementation that produces subtle visual bugs, layout shifts, or perceptual flaws. Live examples place this on the left.
-- ✅ **The Best Practice (Right)** — The refined, production-grade solution. Live examples place this on the right with full interactive validation.
-- 💡 **The Principle & Formula** — The math, browser rendering mechanism, or human visual perception heuristic behind the correction (e.g. geometric centroid vs. visual mass, concentric radius subtraction, compositing layers).
-- 📐 **Rules & Boundaries** — Explicit scoping rules so a local micro-correction does not accidentally turn into an over-engineered global abstraction.
+- ❌ **The Anti-Pattern (Wrong)** — The implementation reached for first, and the specific flaw it produces: a layout shift, a 1–2px perceptual imbalance, a surface that inverts when the theme changes. Live examples place it on the left.
+- ✅ **The Best Practice (Right)** — The correction together with the mechanism, measurement or formula behind it — geometric centroid against visual mass, `R_inner = max(0, R_outer - gap)`, `min-width: auto` — so the fix is understood rather than copied. Live examples place it on the right.
+
+Where the topic is measured against a scale, the scale follows as a table: the type ladder, the radius ladder, the z-index ladder. A case is written against it rather than inventing its own numbers.
+
+The rule about how far a correction reaches belongs to the topic, not to each case, and closes the page where the topic has one — how local an optical adjustment must stay, which layers application code may occupy, what survives `prefers-reduced-motion`. A boundary that belongs to a single case (`tabular-nums` is for counters, not prose) sits beside that case as a callout instead.
 
 ## Design Topics
 
