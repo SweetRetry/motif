@@ -129,7 +129,7 @@ const WorkspacePanel = () => (
 
     {/* A card is a `divide-y` container, so a plain block inside one becomes a summary
         block rather than a row. */}
-    <SettingsCard className="flex flex-col gap-3 p-5">
+    <SettingsCard className="flex flex-col gap-3 py-5">
       <div className="flex items-baseline justify-between gap-4">
         <p className="text-sm font-medium">Run history</p>
         <p className="text-muted-foreground text-sm tabular-nums">

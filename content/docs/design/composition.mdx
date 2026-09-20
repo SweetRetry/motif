@@ -3,6 +3,7 @@ title: Composition
 description: Thoughtful composition establishes clear reading order before components are chosen. Learn how alignment, whitespace, and typographic proportion outperform heavy decorative chrome.
 ---
 
+import { DividerExtentDemo } from "@/examples/design/composition/divider-extent";
 import { EqualMetricsDemo } from "@/examples/design/composition/equal-metrics";
 import { GroupingDemo } from "@/examples/design/composition/grouping";
 import { ListChromeDemo } from "@/examples/design/composition/list-chrome";
@@ -62,6 +63,23 @@ When grouping complex settings or permissions, it is easy to accumulate nested b
 <ComponentPreview name="design/composition/nested-surfaces">
   <NestedSurfacesDemo />
 </ComponentPreview>
+
+---
+
+## 5. Divider Extent: Inset It to the Content
+
+A divider is the same 1px `border-border` the card around it was drawn with, so its **length** is the part that carries meaning: a line that spans the row is claiming the container's edge, and a line that stops where the text stops stays a mark inside one block.
+
+- ❌ **The Error**: Letting the line run the row's full width. The card is already one block — a plan, its seats, its renewal date — and the line severs it into three stacked slabs. At that length the divider matches the card's own edge in colour, weight and extent, so the eye reads three boundaries where there is one card and the outer border loses the authority it was drawn to carry. Both ends also run into the corner arc, where the line and the curvature meet with nothing between them.
+- ✅ **The Fix**: Give the divider the same left and right padding the content has, so it shares the text's axis. The ends keep their breathing room, the block stays whole, and the line reads as a pause between two facts rather than a border between two surfaces. Mechanically it comes down to which level holds the `px-4`: on the card, every `divide-y` line insets with the content for free; on the rows, the line runs to the card's edge and has to be pulled back with an `mx-4` hairline or a pseudo-element.
+
+  The two cards are one `px-4` moved a level, and they read as different objects rather than different measurements — 32px off each end of a 1400px card is 4% of the line, and all of what it says.
+
+<ComponentPreview name="design/composition/divider-extent">
+  <DividerExtentDemo />
+</ComponentPreview>
+
+> **⚠️ Boundary**: The line follows the content column, so a surface with no surrounding card — a list at the page level, a table whose header rule is the table's own top edge — has nothing to inset from, and there the line is a boundary rather than a pause.
 
 ---
 

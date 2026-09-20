@@ -51,6 +51,13 @@ const PREVIOUS_KEYS = new Set(["ArrowUp", "ArrowLeft"]);
  *  the click and the answer. */
 const PANEL_FADE = { duration: 0.14, ease: EASE_OUT } as const;
 
+/** The one column the panel's text is set on. Inside the panel's own gutter this padding
+ *  lands a heading on the same axis as the rows it introduces: the card draws it for its
+ *  rows, the section label above a card draws it, and so does the panel's title. The cards
+ *  keep their edges — a heading names what is under it rather than the surface it sits on,
+ *  so it belongs with the words, and a panel of text on two axes reads as two panels. */
+const CONTENT_COLUMN = "px-5";
+
 interface SettingsTabProps {
   item: SettingsNavItem;
   selected: boolean;
@@ -209,7 +216,11 @@ export const SettingsDialog = ({
         {...(description ? {} : { "aria-describedby": undefined })}
       >
         <aside className="border-border/60 flex shrink-0 flex-col border-b md:h-full md:min-h-0 md:border-r md:border-b-0">
-          <DialogTitle className="max-md:sr-only shrink-0 px-4 pt-6 pb-1 text-base font-semibold">
+          {/* The dialog's name is also the opening group's heading, so it wears what
+              every other group heading in the rail wears: same muted line, same left
+              edge. A title over a list of labelled groups reads as a fourth kind of
+              thing in a rail that already has two. */}
+          <DialogTitle className="max-md:sr-only text-muted-foreground shrink-0 px-3 pt-6 pb-1 text-xs font-medium">
             {title}
           </DialogTitle>
           <div
@@ -253,7 +264,11 @@ export const SettingsDialog = ({
           tabIndex={-1}
         >
           <header className="flex shrink-0 items-center justify-between gap-4 px-5 pt-5 pb-3 sm:px-6 md:pt-6 md:pb-5">
-            <h2 className="truncate text-lg font-semibold">{current?.label}</h2>
+            <h2
+              className={cn("truncate text-lg font-semibold", CONTENT_COLUMN)}
+            >
+              {current?.label}
+            </h2>
             <DialogClose className="bg-muted text-muted-foreground hover:bg-muted/70 hover:text-foreground focus-visible:ring-ring/50 -mr-1 inline-flex size-8 shrink-0 items-center justify-center rounded-full outline-none transition-colors focus-visible:ring-[3px]">
               <XIcon className="size-4" />
               <span className="sr-only">Close {title}</span>
@@ -293,11 +308,17 @@ export const SettingsDialog = ({
   );
 };
 
-/** The surface a run of rows sits on. */
+/**
+ * The surface a run of rows sits on. The horizontal padding belongs to the card rather
+ * than to the row: a `divide-y` line is drawn at the box of the element it separates, so
+ * padding on the row runs every separator to the card's edge and cuts one card into a
+ * slab per row. Held here, the lines stop where the text does and the card stays whole.
+ */
 export const SettingsCard = ({ className, children }: SettingsCardProps) => (
   <div
     className={cn(
       "divide-border/60 bg-muted/50 divide-y rounded-2xl",
+      CONTENT_COLUMN,
       className
     )}
   >
@@ -305,7 +326,7 @@ export const SettingsCard = ({ className, children }: SettingsCardProps) => (
   </div>
 );
 
-/** A card with the section's name above it. */
+/** A card with the section's name above it, on the card's content column. */
 export const SettingsSection = ({
   children,
   className,
@@ -314,7 +335,12 @@ export const SettingsSection = ({
 }: SettingsSectionProps) => (
   <section className={cn("flex flex-col gap-2", className)}>
     {label ? (
-      <h3 className="text-muted-foreground px-1 text-sm font-medium">
+      <h3
+        className={cn(
+          "text-muted-foreground text-sm font-medium",
+          CONTENT_COLUMN
+        )}
+      >
         {label}
       </h3>
     ) : null}
@@ -325,7 +351,9 @@ export const SettingsSection = ({
 /**
  * One setting: what it is on the left, what changes it on the right. The title stays
  * legible on its own because the description is a second line, not a subtitle — a row
- * read at a glance should be the setting's name.
+ * read at a glance should be the setting's name. It draws no horizontal padding of its
+ * own, so its box is the card's content box and the separator above it lands on the same
+ * column; `SettingsCard` holds the padding for every child, row or not.
  */
 export const SettingsRow = ({
   title,
@@ -336,7 +364,7 @@ export const SettingsRow = ({
 }: SettingsRowProps) => (
   <div
     className={cn(
-      "flex justify-between gap-6 px-5 py-4",
+      "flex justify-between gap-6 py-4",
       align === "start" ? "items-start" : "items-center",
       className
     )}

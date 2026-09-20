@@ -72,6 +72,21 @@
       ]
     },
     {
+      "name": "audio-preview",
+      "type": "registry:ui",
+      "title": "Audio Preview",
+      "description": "A recording you can read before you play it: the whole waveform on screen, the part you have heard lit, and a press anywhere on it to seek there.",
+      "dependencies": ["clsx", "lucide-react", "tailwind-merge"],
+      "registryDependencies": ["button"],
+      "files": [
+        {
+          "path": "registry/new-york/audio-preview.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/audio-preview.tsx"
+        }
+      ]
+    },
+    {
       "name": "breakdown",
       "type": "registry:ui",
       "title": "Breakdown",

@@ -1,0 +1,169 @@
+---
+title: Audio Preview
+description: "A recording you can read before you play it: the whole waveform on screen, the part you have heard lit, and a press anywhere on it to seek there."
+---
+
+import {
+  AudioPreviewDemo,
+  AudioPreviewPlayerDemo,
+} from "@/examples/audio-preview";
+
+<ComponentPreview name="audio-preview">
+  <AudioPreviewDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif-ui.vercel.app/r/audio-preview.json
+```
+
+## Usage
+
+```tsx
+import {
+  AudioPreview,
+  AudioPreviewPlayButton,
+  AudioPreviewTime,
+  AudioPreviewWaveform,
+} from "@/components/ui/audio-preview";
+
+export function Take() {
+  return (
+    <AudioPreview src="/take-3.m4a">
+      <AudioPreviewPlayButton />
+      <AudioPreviewWaveform label="Seek take 3" />
+      <AudioPreviewTime />
+    </AudioPreview>
+  );
+}
+```
+
+The root owns the media element and the clock, and lays the parts out in a row. The
+parts read the clock and never speak to each other, so a caller can move one, or drop
+one, and the rest carry on.
+
+| Part                     | Draws                                         |
+| ------------------------ | --------------------------------------------- |
+| `AudioPreview`           | The `<audio>` element and the state behind it |
+| `AudioPreviewPlayButton` | Play, and pause                               |
+| `AudioPreviewWaveform`   | The bars, the playhead, and the seek surface  |
+| `AudioPreviewTime`       | `0:12 / 1:30`                                 |
+| `useAudioPreview`        | The same state, for a part of your own        |
+
+## The waveform is the progress bar
+
+It does not scroll. The whole track is on screen from the start, every bar left of the
+playhead lit and every bar right of it dimmed, and a press anywhere on the track seeks
+there.
+
+A window that scrolls past a playhead pinned to its left edge can say _something is
+happening_, but never _you are a third of the way in_ — which is the one question a
+preview is opened to answer. That is also why the scrolling version needs a slider beside
+it: in a scrolling waveform `x` is time relative to now, so the picture cannot also be
+the seek surface. Standing still, it can.
+
+Drawn as DOM bars rather than on a canvas, for the same reason. A canvas needs a
+`requestAnimationFrame` loop, a `ResizeObserver`, a device pixel ratio and a
+`getComputedStyle` read just to keep re-drawing itself, and every one of those exists
+only because the picture is moving. Static bars are elements: they inherit the theme's
+colour through `currentColor` and they cost nothing while nothing changes.
+
+The pitch scales with the track. Each gap is a sibling carrying the bar's own `flex-1`,
+so the two always come out the same width — the 3px-and-3px the source drew at, at any
+width and for any number of bars. A fixed `gap-px` cannot do that: the same 96 bars in a
+550px track leave 4.7px of bar against 1px of air, which reads as a barcode rather than
+as a waveform.
+
+## Where the bars come from
+
+Left alone, the component fetches `src`, decodes it with the Web Audio API and samples
+the result. Ninety-six buckets, each the RMS of its slice, read against the track's own
+10th and 90th percentiles rather than against full scale. That last part is the whole
+trick: a recording made quietly is still drawn full height, so a preview of a whisper is
+as legible as a preview of a shout. Against full scale, half of what anyone uploads would
+be a flat line.
+
+Pass `peaks` and none of that happens:
+
+```tsx
+<AudioPreview peaks={take.waveform} src={take.url}>
+```
+
+That is the caller whose server already analysed the file when it was uploaded — the bars
+are in the payload, and decoding them again in the browser is the same work done a second
+time. The values are 0–1, left to right, as a share of the track's loudest passage.
+
+Two things follow from decoding in the browser. The file has to be on the same origin as
+the page, or served with the header that lets its bytes be read across origins — a
+`<audio>` element will play a cross-origin file that `fetch` is not allowed to see, and
+the result is a track that plays with no waveform on it. And a file the browser can play
+but not decode is the same outcome. Neither is an error state: what is lost is a picture.
+
+## Nothing drawn yet
+
+Until the bars arrive — and forever, for a file that cannot be decoded — the track draws
+a flat line and still seeks. Silence decodes to a full-height row of dots, because the
+floor sees to it, so the flat line is unambiguously _not drawn yet_ rather than _nothing
+in here_.
+
+The waveform is a reading of a control that works without it. Turning a working transport
+into an error message because a decoration failed would be the tail wagging the dog.
+
+## Colour
+
+The bars are `bg-current`, so the whole colour story is the `className` on the waveform:
+
+```tsx
+<AudioPreviewWaveform className="text-primary" />
+```
+
+It defaults to `text-foreground`, and it is the one part that draws in the inherited
+colour — the button carries its own variant, and the clock is `muted-foreground` because
+it is a reading rather than the thing you are looking at.
+
+Played and unplayed bars differ by opacity, and by nothing else. The source of this
+component encoded amplitude in opacity as well as height, which meant a quiet passage and
+an unplayed passage looked the same. One channel each: height is how loud, opacity is
+whether you have heard it.
+
+## Clock
+
+`m:ss`, fixed. A duration is the one thing every locale writes the same way, and the two
+decisions inside it — seconds are padded, minutes are not — are what the `tabular-nums`
+on the part exists to hold still, so the readout does not twitch as the digits change.
+
+It is not a prop, because there is nothing to configure. A caller who wants `1m 30s`, or
+an hour column, or a countdown instead of a count-up, reads `currentTime` and `duration`
+from the hook and draws their own part:
+
+<ComponentPreview name="audio-preview" align="start">
+  <AudioPreviewPlayerDemo />
+</ComponentPreview>
+
+## Accessibility
+
+The track is a `role="slider"`, labelled by `label` and valued in seconds, so a screen
+reader hears where the playhead is rather than a description of a picture:
+
+```tsx
+<AudioPreviewWaveform label="Seek take 3" />
+```
+
+Arrow keys move it five seconds, Shift and an arrow move it thirty, Home and End go to
+either end. The fine step is a sentence and the coarse one is a paragraph — thirty
+seconds is the only way to cross a long take without holding a key down.
+
+Nothing is bound to Space or Enter. Play and pause belong to the play button, and a
+surface that grabs the space bar is a surface that steals it from the page.
+
+The parts take their labels as props rather than hard-coding them, so a caller working in
+another language passes their own — `playLabel`, `pauseLabel`, and the waveform's `label`.
+
+## Component source
+
+<ComponentSource
+  name="audio-preview"
+  src="registry/new-york/audio-preview.tsx"
+  title="audio-preview.tsx"
+/>

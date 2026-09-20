@@ -128,9 +128,22 @@ the description under it. A row with no control is a legitimate way to explain s
 without asking for anything, and a section with no `label` continues the section above
 it — use that when the heading would only repeat the destination you are already on.
 
-Cards are `divide-y` containers, so rows separate themselves; put a plain block in a
-`SettingsCard` and it becomes a summary block instead of a row, which is how the run
-history card in the demo is built.
+Cards are `divide-y` containers, so rows separate themselves, and the card owns the
+horizontal padding: separators stop at the text column instead of running to the card's
+edge and slicing the card into one slab per row. A plain block in a `SettingsCard` becomes
+a summary block instead of a row, on that same column — which is how the run history card
+in the demo is built.
+
+That column is the whole panel's, not the card's alone. The section label above a card and
+the panel's own title draw the same `px-5`, so every line of text in a panel — title,
+section name, row title, description — is set on one axis, and the cards are the only
+thing at the panel's gutter. A heading belongs with the words it introduces rather than
+with the surface it sits on; two axes inside one panel read as two panels.
+
+The rail's heading works the same way: the dialog's `title` is the opening group's
+heading, so it wears what every other group heading wears — the same muted line at the
+same left edge as `Agent` and `Files`. A rail is a list of labelled groups, and a title
+set apart from them is a third kind of thing in a column that has room for two.
 
 ## Narrow screens
 
