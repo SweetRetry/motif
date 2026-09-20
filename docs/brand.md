@@ -45,6 +45,9 @@
 `public/r/registry.json`、`public/r/*.json` 由 `pnpm registry:build` 生成；
 `.source/*` 由 `fumadocs-mdx` 在 `postinstall` 生成。
 
+两者都不纳入版本控制：`public/r` 由 `dev` 和 `build` 在各自启动前重建，`.source`
+由 `pnpm install` 的 `postinstall` 重建，所以仓库里没有需要同步的副本。
+
 ## 部署（Vercel）
 
 | 项                    | 值                                                                                                                                       |
