@@ -1,0 +1,253 @@
+---
+title: Breakdown
+description: "A whole cut into its parts: one bar, each cut as wide as its share, and a legend that names every part and its amount."
+---
+
+import { BreakdownDemo, BreakdownRowsDemo } from "@/examples/breakdown";
+
+<ComponentPreview name="breakdown">
+  <BreakdownDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif-ui.vercel.app/r/breakdown.json
+```
+
+## Usage
+
+```tsx
+import {
+  Breakdown,
+  BreakdownBar,
+  BreakdownLegend,
+  breakdownColors,
+} from "@/components/ui/breakdown";
+
+/** Every model the workspace can spend on — the catalogue, not the month. */
+const MODELS = [
+  { key: "seedance-2-5", label: "Seedance 2.5", value: 486_200 },
+  { key: "claude-sonnet-4-5", label: "Claude Sonnet 4.5", value: 312_450 },
+  { key: "veo-3-1", label: "Veo 3.1", value: 184_900 },
+];
+
+const COLORS = breakdownColors(MODELS.map((model) => model.key));
+
+export function ModelConsumption() {
+  return (
+    <Breakdown
+      colors={COLORS}
+      formatValue={(value) => `${value.toLocaleString()} pt`}
+      items={MODELS}
+    >
+      <div className="flex flex-col gap-4">
+        <BreakdownBar label="Consumption by model" />
+        <BreakdownLegend />
+      </div>
+    </Breakdown>
+  );
+}
+```
+
+The order of `items` is the caller's and the component never sorts. A breakdown is a
+ranking as often as it is a share, and a list that reorders itself under the reader is
+worse than one that is merely wrong.
+
+## Bar and legend
+
+They answer two different questions, which is why they are two parts rather than one
+picture. The bar answers **what shape is this** — read in one glance, before anything is
+named. The legend answers **which part is that** — the colour matched to a label and an
+amount.
+
+The root holds what both need and draws nothing itself: the shares, the colour of each
+part, and the two formatters. Neither part can see the other, and both have to agree on
+all four, so the root is the only place they can be worked out once.
+
+```tsx
+// The legend alone is a list.
+<Breakdown items={models}>
+  <BreakdownLegend />
+</Breakdown>
+
+// The bar alone is a strip inside somebody else's row.
+<Breakdown items={models}>
+  <BreakdownBar />
+</Breakdown>
+```
+
+A part with nothing in it is dropped rather than drawn at zero width — a cut you cannot
+see reads as a rendering fault, not as a part with no share. That goes for the legend too,
+so the two always name the same set.
+
+## The parts and the whole
+
+| Prop     | Default        | Does                                         |
+| -------- | -------------- | -------------------------------------------- |
+| `items`  | —              | The parts, in the order they should be drawn |
+| `colors` | —              | Each part's colour, keyed by `key`           |
+| `total`  | sum of `items` | The whole the shares are read against        |
+
+`total` is for the case where the parts on screen are a slice of something larger — a page
+of a longer list, a period that includes spend the caller has already filtered out. The
+bar does not fill its track when the parts do not add up to `total`; the track showing
+through at the end is the reading.
+
+## Colour
+
+`colors` is required, and the component draws no colour of its own. A palette is a statement
+about what the parts **mean** — which model is which — and that is not something the
+component can know: it sees this period's parts and nothing else. A colour it invented
+would be a guess at an identity it cannot see, and the guess would be wrong in the quietest
+way there is. Two months read side by side, and the same model is a different hue in each,
+because it moved up the ranking. A default that is wrong quietly is worse than no default,
+so there is none.
+
+`breakdownColors` is that guess, offered as a function instead of hidden as a default:
+
+```ts
+const COLORS = breakdownColors(CATALOGUE.map((model) => model.key));
+```
+
+It hands out `--chart-1` … `--chart-5` in order — the sequence the theme already publishes
+for exactly this, so dark mode and a theme swap come free — and past five it walks the hues
+again with a lightness step mixed toward `--foreground`. Toward the ink, never toward the
+surface: a step toward the surface moves a part _into_ whatever it is drawn on, which
+brightens it on a light theme and darkens it on a dark one, so the ramp would invert with
+the theme. Fifteen parts are distinguishable this way, past the point a stacked bar can be
+read at all.
+
+Hand it the catalogue, not the page:
+
+```ts
+// The model keeps its colour in a month it is small in, or absent from.
+const COLORS = breakdownColors(CATALOGUE.map((model) => model.key));
+
+// A colour per rank — the hues reshuffle whenever the ranking does.
+const COLORS = breakdownColors(SPEND.map((row) => row.key));
+```
+
+Hashing the key into a slot is the other tempting shortcut, and it is worse. Six parts over
+the fifteen slots collide about two times in three, and two parts in one colour is the one
+thing a stacked bar cannot survive: identical dots in the legend, and two cuts that read as
+one. The sequence cannot collide — consecutive positions are consecutive hues by
+construction.
+
+When the palette is yours to name — a brand colour per model, a status colour per member —
+write the map out. Anything CSS accepts works, and a token is the answer almost every time:
+the theme already names the roles, and a literal hex is a guess about the surface it will be
+drawn on.
+
+```ts
+const COLORS = {
+  "seedance-2-5": "var(--chart-1)",
+  "claude-sonnet-4-5": "var(--chart-2)",
+  "veo-3-1": "var(--chart-3)",
+};
+```
+
+A key with no colour in the map is drawn in `--muted-foreground` — a neutral belonging to
+no sequence, so a part nobody coloured reads as a part nobody coloured rather than as a
+member of the palette.
+
+That fallback is a report, not a repair. Falling back to `--chart-1` would claim a rank the
+part does not have; falling back to nothing would be quieter still, and a dot missing from
+the legend is exactly the kind of omission that survives a review. The cut is the wrong
+colour on purpose, where it can be seen. It also covers the caller whose parts arrive from
+a query and whose palette cannot name them in advance — an uncoloured part is a legitimate
+runtime state, not always a forgotten line.
+
+## Formatting
+
+| Prop          | Default        | Does                      |
+| ------------- | -------------- | ------------------------- |
+| `formatValue` | `12,400`       | The amount beside a label |
+| `formatShare` | `42% of total` | The line in the tooltip   |
+
+```tsx
+<Breakdown
+  formatShare={(share) => `${Math.round(share)}% of the workspace`}
+  formatValue={(value) => `${value.toLocaleString()} pt`}
+  items={models}
+/>
+```
+
+Both defaults are fixed to `en-US` rather than read from the browser, for the reason the
+heatmap's `locale` is fixed: the server and the client have to render the same string, and
+a number that gains a separator on hydration is a mismatch. Both are props for the caller
+who wants their own language.
+
+Shares are exact where they are drawn and rounded where they are printed. A bar cut to
+`Math.round` would collapse its smallest parts to nothing and leave a gap at the end of the
+track; a percentage printed to four decimals is noise.
+
+## Hover
+
+The share is not printed beside the amount. The bar already carries the comparison, and a
+column of percentages next to it is the same fact said twice — so the exact number waits in
+the tooltip, where it costs nothing until it is asked for.
+
+It is in the accessible text either way, because a tooltip is a pointer's affordance and a
+screen reader has none.
+
+## A frame of your own
+
+`useBreakdown` hands over what the parts read: the slices, with their colours and shares
+filled in, and the two formatters. A row per part, a second legend, a bar drawn inside a
+table cell — all of them are the same maths in a different frame.
+
+<ComponentPreview name="breakdown" align="start">
+  <BreakdownRowsDemo />
+</ComponentPreview>
+
+```tsx
+const Rows = () => {
+  const { formatValue, items } = useBreakdown();
+
+  return items.map((item) => (
+    <div key={item.key}>
+      {item.label}
+      <span style={{ background: item.color, width: `${item.share}%` }} />
+      {formatValue(item.value)}
+    </div>
+  ));
+};
+
+<Breakdown items={models}>
+  <Rows />
+</Breakdown>;
+```
+
+## Nothing to draw
+
+With no parts — or none with a value above zero — both parts render nothing at all. An
+empty state is the host's, because the host is the only one that knows which of the two it
+has: a period with no spend, or a request that has not come back yet. A surface that is
+still waiting is [Waiting Row](/docs/agents/waiting-row).
+
+## Accessibility
+
+The bar is a `role="img"` whose label names every part and its amount, so the whole picture
+is one announcement rather than a row of unlabelled spans. Pass `label` to put a sentence
+in front of it:
+
+```tsx
+<BreakdownBar label="Consumption by model" />
+```
+
+The legend is real text — a label and an amount, both readable — with the share in an
+`sr-only` span so nothing lives only in a hover. The colour dot is `aria-hidden`: it is the
+same information the label already carries, and a screen reader has no use for it.
+
+The legend is not focusable. It is a reading, not a control, and turning six rows into six
+tab stops to reach a tooltip that repeats what the text already says is a worse deal than
+leaving it out of the tab order.
+
+## Component source
+
+<ComponentSource
+  name="breakdown"
+  src="registry/new-york/breakdown.tsx"
+  title="breakdown.tsx"
+/>

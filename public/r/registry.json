@@ -72,6 +72,21 @@
       ]
     },
     {
+      "name": "breakdown",
+      "type": "registry:ui",
+      "title": "Breakdown",
+      "description": "A whole cut into its parts: one bar, each cut as wide as its share, and a legend that names every part and its amount.",
+      "dependencies": ["clsx", "tailwind-merge"],
+      "registryDependencies": ["tooltip"],
+      "files": [
+        {
+          "path": "registry/new-york/breakdown.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/breakdown.tsx"
+        }
+      ]
+    },
+    {
       "name": "conversation",
       "type": "registry:ui",
       "title": "Conversation",
