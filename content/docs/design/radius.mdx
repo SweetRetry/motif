@@ -1,0 +1,40 @@
+---
+title: Radius
+description: Border radius defines surface contour. Learn the concentric corner formula for nested boxes and how to apply the design system's radius scale consistently.
+---
+
+import { NestedCornersDemo } from "@/examples/design/radius/nested-corners";
+
+Border radius defines the curvature of UI surfaces. The radius scale is standardized across the design system—components pick a standard rung, and variants apply the shape.
+The primary geometric calculation a developer must make is deriving the inner corner radius of a box nested inside another rounded container.
+
+---
+
+## 1. Nested Corners: The Concentric Radius Rule
+
+When nesting a rounded card or panel inside another rounded container, developers often reuse the parent's radius class.
+
+- ❌ **The Error**: Reusing the outer radius for nested inner panels. Because the intervening padding separates the two shapes, identical radii cause the inner corner to run parallel along the straight edges but bulge outward at the corners, creating an awkward non-concentric distortion.
+- ✅ **The Fix**: Subtract the padding distance to maintain concentric arcs: `R_inner = max(0, R_outer - gap)`. For a 24px outer card with 16px of padding, the inner radius must be `24 - 16 = 8px` (`rounded-md`).
+
+<ComponentPreview name="design/radius/nested-corners">
+  <NestedCornersDemo />
+</ComponentPreview>
+
+---
+
+## 2. The Radius Scale Ladder
+
+| Role                                | Utility Class               | Approximate Value |
+| :---------------------------------- | :-------------------------- | :---------------- |
+| **Micro elements, badges, handles** | `rounded-xs`                | 2px               |
+| **Controls, inputs, menu panels**   | `rounded-sm` / `rounded-md` | 4px / 6–8px       |
+| **Modal dialogs, notifications**    | `rounded-lg`                | 10–12px           |
+| **Standard cards & containers**     | `rounded-xl`                | 14–16px           |
+| **Emphasized cards, viewports**     | `rounded-2xl`               | 20px              |
+| **Large hero frames, trays**        | `rounded-3xl`               | 24px              |
+| **Pill buttons, avatars, tags**     | `rounded-full`              | 9999px            |
+
+### The Control Height Rule
+
+A button or control with a fixed height `H` should either be a **rounded rectangle** (`R <= H / 4`) or a **full pill** (`R >= H / 2`). Values in the intermediate zone look like an accidental deformity rather than an intentional design choice.

@@ -1,0 +1,50 @@
+---
+title: Size Stability
+description: State changes should never move what the user was about to click. Learn how to prevent Cumulative Layout Shift (CLS) in buttons, validation errors, and flex containers.
+---
+
+import { FlexOverflowDemo } from "@/examples/design/stability/flex-overflow";
+import { SubmitButtonDemo } from "@/examples/design/stability/submit-button";
+import { ValidationSpaceDemo } from "@/examples/design/stability/validation-space";
+
+Loading, failing, and empty states are different conditions of a _single_ surface, not separate surfaces.
+The cardinal rule of UI stability: **a state change must never shift an interactive element while the user is actively reaching to click it**. Unpredictable layout jumps cause misclicks, degrade user trust, and trigger severe Cumulative Layout Shift (CLS) penalties.
+
+---
+
+## 1. Submit Buttons and Loading Spinners
+
+When an action button transitions to a loading state upon click, its physical footprint should remain immovable.
+
+- ❌ **The Error**: Replacing button text with a spinner upon submit. Unmounting the text collapses the button's width immediately, causing adjacent elements to jerk to the left and leaving the user's cursor hovering over empty space.
+- ✅ **The Fix**: Retain the label in the DOM layout using `invisible` to lock the button's exact physical width, and place the spinner absolutely centered over it. The button stays completely static during loading.
+
+<ComponentPreview name="design/stability/submit-button">
+  <SubmitButtonDemo />
+</ComponentPreview>
+
+---
+
+## 2. Form Validation Messages (Preventing Layout Push)
+
+Validation errors that appear asynchronously or on blur often shove form inputs downward.
+
+- ❌ **The Error**: Dynamically mounting error text into the DOM tree when validation fails. Injecting a new line of text suddenly shoves all following inputs and action buttons downward, often just as the user is about to click.
+- ✅ **The Fix**: Pre-allocate the error message line height in the initial layout. Hide it with `invisible` during normal states, and toggle visibility on error so only the ink appears without shifting layout.
+
+<ComponentPreview name="design/stability/validation-space">
+  <ValidationSpaceDemo />
+</ComponentPreview>
+
+---
+
+## 3. Flex Rows with Long Strings
+
+Flexbox rows containing user-generated strings (e.g., file names, email addresses, URLs) often break out of containers.
+
+- ❌ **The Error**: Unconstrained text in a flex container. Because flex items default to `min-width: auto`, a long unbroken string will not wrap or shrink, blowing past the parent container's borders.
+- ✅ **The Fix**: Apply `min-w-0 truncate` to the text flex child. This overrides the default `min-width` behavior, allowing the item to shrink smaller than its text and gracefully truncate with an ellipsis.
+
+<ComponentPreview name="design/stability/flex-overflow">
+  <FlexOverflowDemo />
+</ComponentPreview>

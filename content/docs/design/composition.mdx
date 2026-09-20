@@ -1,0 +1,73 @@
+---
+title: Composition
+description: Thoughtful composition establishes clear reading order before components are chosen. Learn how alignment, whitespace, and typographic proportion outperform heavy decorative chrome.
+---
+
+import { EqualMetricsDemo } from "@/examples/design/composition/equal-metrics";
+import { GroupingDemo } from "@/examples/design/composition/grouping";
+import { ListChromeDemo } from "@/examples/design/composition/list-chrome";
+import { NestedSurfacesDemo } from "@/examples/design/composition/nested-surfaces";
+
+Good UI composition is about understanding information hierarchy first. When you decide what information leads and what supports it, the layout naturally follows.
+When you reach for components first, you often end up wrapping content in unnecessary cards, borders, and badges that obscure the actual data.
+
+---
+
+## 1. List Chrome vs. Clean Alignment
+
+When presenting a list of items (such as recent activity, documents, or reports), developers frequently wrap each row in a separate bordered container.
+
+- ❌ **The Error**: Wrapping every row in its own bordered card and placing dates in pill badges. Repeating card boundaries and badges creates heavy visual noise that distracts from the actual content and inflates page height.
+- ✅ **The Fix**: Rely on shared alignment axes, subtle muted text, and vertical whitespace rhythm. Keep pill badges strictly for scan-critical dynamic states (e.g. _Failed_, _Running_, _Completed_), not static metadata like dates.
+
+<ComponentPreview name="design/composition/list-chrome">
+  <ListChromeDemo />
+</ComponentPreview>
+
+---
+
+## 2. Proximity and Spacing Scales
+
+The Gestalt **Law of Proximity** states that elements placed close together are instinctively perceived as belonging to the same group. A widespread composition error is using uniform spacing everywhere—between a heading and its text, an icon and its label, a key and its value, or an input and its caption.
+
+- ❌ **The Error**: Uniform spacing across all visual relationships (e.g. using `gap-4` uniformly between headers, descriptions, controls, and subsequent sections). When the distance between tightly bound sub-elements is identical to the distance between independent sections, grouping dissolves, forcing the eye to work to deduce which element belongs to which.
+- ✅ **The Fix**: Establish **two distinct spacing scales** (Internal Tightness vs. External Separation). Keep internal relationships tight (4–6px between an icon and text, a title and its paragraph, or a label and its field), and make the separation between distinct groups 3–4× looser (20–24px). A section heading should always sit noticeably closer to what it introduces than to what came before it.
+
+<ComponentPreview name="design/composition/grouping">
+  <GroupingDemo />
+</ComponentPreview>
+
+---
+
+## 3. Dashboard Metrics Hierarchy
+
+Metric summaries often default to a grid of equal-sized cards, regardless of how important each number actually is.
+
+- ❌ **The Error**: Presenting metrics as uniform 2x2 grid cards with identical font size and weight. Equal cards imply that all numbers share equal priority, diluting the impact of your primary KPI.
+- ✅ **The Fix**: Use **Lead-and-Support** composition. Give the hero metric commanding visual weight (`text-3xl font-semibold`), while tucking supporting telemetry underneath in clean, compact rows.
+
+<ComponentPreview name="design/composition/equal-metrics">
+  <EqualMetricsDemo />
+</ComponentPreview>
+
+---
+
+## 4. Nested Surfaces (Card Inception)
+
+When grouping complex settings or permissions, it is easy to accumulate nested bordered boxes.
+
+- ❌ **The Error**: Nesting cards inside cards inside cards. Every extra border adds visual weight without adding meaningful structure, creating a claustrophobic box-within-a-box layout.
+- ✅ **The Fix**: Keep related content on a single surface, separating sub-sections with clean whitespace or a subtle 1px divider (`border-t`). Only introduce a separate nested surface when an element can be independently dragged, selected, or dismissed.
+
+<ComponentPreview name="design/composition/nested-surfaces">
+  <NestedSurfacesDemo />
+</ComponentPreview>
+
+---
+
+## The Rule of Thumb: The Strip-Down Test
+
+If you strip away all decorative borders, background fills, and badge pills from your layout, does the visual hierarchy and logical flow of the page remain crystal clear?
+
+- If **yes**, your composition is structurally sound.
+- If **no**, decorative chrome is masking weak information hierarchy.

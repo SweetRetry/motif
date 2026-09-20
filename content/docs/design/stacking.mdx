@@ -1,0 +1,42 @@
+---
+title: Stacking
+description: The z-index property manages overlapping layers. Learn how CSS isolate prevents child elements from bleeding into global page layers and how to follow a strict z-index ladder.
+---
+
+import { IsolateDemo } from "@/examples/design/stacking/isolate";
+
+Most layout order on a web page is naturally resolved by standard DOM tree order without needing manual `z-index` numbers.
+The `z-index` property is specifically for elements that physically overlap. When used, the essential architectural question is: **which container owns that layer overlap?**
+
+---
+
+## 1. Escaping the Container: Stacking Context Isolation
+
+When an element inside Card A (such as an absolute notification badge) hangs over its container edge, it often unexpectedly covers neighboring Card B.
+
+- ❌ **The Error**: Assuming `position: relative` isolates child z-indices. In CSS specifications, a positioned element with `z-index: auto` does _not_ establish a new stacking context. A child with `z-10` escapes to compete in the root page's stacking order, improperly floating over adjacent siblings.
+- ✅ **The Fix**: Add `isolate` (`isolation: isolate`) to the parent container. This explicitly bounds all child z-indices inside the parent, letting sibling cards stack naturally according to standard DOM flow.
+
+<ComponentPreview name="design/stacking/isolate">
+  <IsolateDemo />
+</ComponentPreview>
+
+---
+
+## 2. The Standard z-index Scale Ladder
+
+Never invent arbitrary numbers like `z-[9999]`. Confine all application layering to a standard ladder:
+
+| Layer Level              | Utility Class    | Intended Purpose                                                 |
+| :----------------------- | :--------------- | :--------------------------------------------------------------- |
+| **Below Flow**           | `-z-10`          | Subtle background accents, grid patterns                         |
+| **Default Flow**         | `z-auto` / `z-0` | Standard page content, text, media                               |
+| **Local Stacking**       | `z-10`           | Overlapping badges, local tooltips inside an `isolate` container |
+| **Local Sticky**         | `z-20`           | Sticky table headers, local canvas drag handles                  |
+| **Fixed Navigation**     | `z-30`           | Persistent sticky topbars, floating bottom action bars           |
+| **Overlays & Backdrops** | `z-40`           | Backdrop scrims, modal dimmers                                   |
+| **Portals & Dialogs**    | `z-50`           | Modals, full sheets, global toasts, popovers                     |
+
+### Portals vs. High z-indices
+
+Application code should never need to exceed `z-50`. Modals, dropdown menus, sheets, and tooltips should be mounted into a root portal. Because portals mount at the end of the `<body>` element, natural DOM ordering handles top-level layering cleanly without numeric arms races.

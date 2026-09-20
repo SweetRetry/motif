@@ -1,0 +1,24 @@
+---
+title: Design
+description: Micro-decisions that elevate interfaces from functional to refined — structured as standard Error vs. Right patterns with live interactive examples and concrete measurements.
+---
+
+A component library tells you _which_ primitive to pick, but it rarely explains the subtle visual decisions that make an interface feel either unpolished or exceptional:
+why a play icon feels off-center even when mathematically centered, why a nested panel bulges out of its frame, or why a submit button jerks the entire page when loading.
+
+These are **Design Cases**. Every case documented here targets a recurring visual bug or anti-pattern, paired with a live side-by-side comparison, the underlying perception principle, and the exact code formula to solve it.
+
+## How each case is structured
+
+Every topic follows a standardized **Error vs. Right** evaluation framework:
+
+- ❌ **The Anti-Pattern (Wrong)** — The common intuitive implementation that produces subtle visual bugs, layout shifts, or perceptual flaws. Live examples place this on the left.
+- ✅ **The Best Practice (Right)** — The refined, production-grade solution. Live examples place this on the right with full interactive validation.
+- 💡 **The Principle & Formula** — The math, browser rendering mechanism, or human visual perception heuristic behind the correction (e.g. geometric centroid vs. visual mass, concentric radius subtraction, compositing layers).
+- 📐 **Rules & Boundaries** — Explicit scoping rules so a local micro-correction does not accidentally turn into an over-engineered global abstraction.
+
+## Design Topics
+
+Explore the micro-craft principles across 8 core design domains:
+
+<ComponentsList folderName="Design" />

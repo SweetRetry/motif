@@ -1,0 +1,62 @@
+---
+title: Optical Alignment
+description: Layout engines align geometric bounding boxes, but human eyes align visual mass. Learn how micro-adjustments correct subtle 1–2px perceptual imbalances across icons, buttons, and quotes.
+---
+
+import { HangingPunctuationDemo } from "@/examples/design/optical-alignment/hanging-punctuation";
+import { IconCenteringDemo } from "@/examples/design/optical-alignment/icon-centering";
+import { IconLabelButtonDemo } from "@/examples/design/optical-alignment/icon-label-button";
+
+Layout engines align geometric bounding boxes. But human vision perceives the **center of visual mass**.
+Whenever a shape does not fill its bounding box symmetrically (such as a triangle, a directional arrow, or an opening quotation mark), geometric centering and visual centering disagree by 1–3 pixels.
+While small, this discrepancy makes controls look subtly lopsided or unpolished.
+
+---
+
+## 1. Asymmetric Glyphs: The Play Icon
+
+A classic challenge in UI design: centering a Play triangle inside a circular button.
+
+- ❌ **The Error**: Centering strictly by the bounding box (`items-center justify-center`). Because a triangle's mass is concentrated on its flat left side, its geometric center is far to the right of its center of mass. To the human eye, the triangle looks visibly pushed to the left.
+- ✅ **The Fix**: Apply a slight horizontal offset toward the tip by ~5% of glyph width (e.g. `translate-x-1` on an 80px glyph, or `translate-x-px` on a 16px icon). This aligns the center of visual mass with the container's center.
+
+<ComponentPreview name="design/optical-alignment/icon-centering">
+  <IconCenteringDemo />
+</ComponentPreview>
+
+> **💡 The Blur Test**: Click "Blur the shapes" in the demo above. By blurring out the sharp edges, you can see pure blobs of visual mass. In the blurred view, the geometric version clearly drifts left of center, while the optically compensated version sits squarely in the middle.
+
+---
+
+## 2. Icon-Label Button Padding
+
+Buttons that pair a text label with a leading or trailing arrow often feel unevenly spaced.
+
+- ❌ **The Error**: Applying symmetrical horizontal padding (`px-3`) to both sides. Stroke icons don't touch the extreme bounds of their SVG canvas—they carry roughly 1.5–2px of built-in transparent margin, making the icon side look looser.
+- ✅ **The Fix**: Trim 2px of padding off the icon side (`pr-2.5 pl-3` for a trailing icon; `pl-2.5 pr-3` for a leading icon). This reclaims the built-in transparent margin of the icon, giving both sides an identical perceived distance to the edge.
+
+<ComponentPreview name="design/optical-alignment/icon-label-button">
+  <IconLabelButtonDemo />
+</ComponentPreview>
+
+---
+
+## 3. Hanging Punctuation on Blockquotes
+
+Opening a blockquote with a large quotation mark often creates an awkward indent.
+
+- ❌ **The Error**: Placing opening quotation marks in the normal text flow. Quotation marks have substantial empty space underneath their glyphs, causing the first line of text to look unintentionally indented compared to subsequent lines.
+- ✅ **The Fix**: Hang the quote mark into the margin using a negative first-line indent (`indent-[-0.42em]`). This aligns the first actual word of line 1 with line 2 on the exact same vertical axis.
+
+<ComponentPreview name="design/optical-alignment/hanging-punctuation">
+  <HangingPunctuationDemo />
+</ComponentPreview>
+
+---
+
+## Scoping Rule: Keep Corrections Local
+
+Every optical correction must remain localized to the specific component drawing that glyph.
+
+- Do **not** apply blanket global padding rules to all buttons (buttons with symmetric icons or square badges are already centered).
+- Optical adjustments should always state what they are correcting: _"Lucide's Play centroid sits 5.5% left of center"_, never _"Buttons always get 1px"_.

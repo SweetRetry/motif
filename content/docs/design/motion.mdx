@@ -1,0 +1,56 @@
+---
+title: Motion
+description: Motion explains state changes and spatial origin. Learn how swift durations, subtle scale deltas, and GPU compositor-only properties keep interfaces snappy and layout-stable.
+---
+
+import { EnterMotionDemo } from "@/examples/design/motion/enter";
+import { TransitionScopeDemo } from "@/examples/design/motion/transition-scope";
+
+Motion in UI engineering is not decorative flair; it provides spatial continuity and clarifies what just happened.
+A solid litmus test for animation: if a motion does not convey a state change or an origin of entry, removing it will make the interface feel faster and cleaner.
+
+---
+
+## 1. Enter Transitions: Snappy vs. Sluggish
+
+Dropdown menus, tooltips, and dialogs often suffer from overly theatrical entrance animations.
+
+- ❌ **The Error**: Slow 700ms zoom from 0% with `ease-in`. The long wait feels like the system is struggling to compute, growing from a point looks like an artificial stunt, and `ease-in` starts slowly, creating the sensation of input lag.
+- ✅ **The Fix**: Keep durations brisk (150–200ms), scale subtly from 95% (`zoom-in-95`), and use `ease-out`. It feels like a slight responsive nudge that decelerates gracefully upon arrival.
+
+<ComponentPreview name="design/motion/enter">
+  <EnterMotionDemo />
+</ComponentPreview>
+
+### Recommended Timing Guidelines
+
+| Surface Type                 | Recommended Duration | Easing                           |
+| :--------------------------- | :------------------- | :------------------------------- |
+| **Press & Click Feedback**   | 100–150ms            | `ease-out`                       |
+| **Tooltips & Popovers**      | 125–200ms            | `ease-out`                       |
+| **Dropdowns & Select Menus** | 150–250ms            | `ease-out`                       |
+| **Modals, Sheets, Dialogs**  | 200–350ms            | `cubic-bezier(0.23, 1, 0.32, 1)` |
+
+Exit transitions should generally be 20–30% shorter than entrance transitions.
+
+---
+
+## 2. Transition Scoping: Compositor vs. Layout Reflow
+
+Hover states intended to change button colors often accidentally trigger document reflow.
+
+- ❌ **The Error**: Using `transition-all` with layout properties like `hover:px-6`. `transition-all` animates padding changes on every frame, forcing the browser to recalculate document layout (Reflow) and violently shoving adjacent text back and forth.
+- ✅ **The Fix**: Specifically scope transitions to intended properties (`transition-colors`). If size changes are needed, animate GPU compositor properties (`transform` and `opacity`) rather than layout box-model properties.
+
+<ComponentPreview name="design/motion/transition-scope">
+  <TransitionScopeDemo />
+</ComponentPreview>
+
+---
+
+## Accessibility: Respecting `prefers-reduced-motion`
+
+Always honor system accessibility settings. When `prefers-reduced-motion: reduce` is enabled:
+
+- Disable large position shifts, zoom scaling, and parallax sweeps.
+- Maintain subtle opacity crossfades so state transitions remain perceptible without triggering vestibular discomfort.

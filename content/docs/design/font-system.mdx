@@ -1,0 +1,42 @@
+---
+title: Font System
+description: Typography should strictly follow the design system's type ladder. Learn how tabular numerals prevent layout jitter and how to maintain consistent typographic hierarchy.
+---
+
+import { TabularNumbersDemo } from "@/examples/design/font-system/tabular-numbers";
+
+Typography is governed by system design tokens. Components consume standard sizes and font families defined by the design system; they should not define arbitrary pixel values or reach for monospace fonts to solve spacing problems.
+
+---
+
+## 1. Dynamic Numbers and Width Jitter
+
+When a number dynamically ticks—such as in a live counter, timer, download progress indicator, or financial ticker—the box around it frequently jitters.
+
+- ❌ **The Error**: Using default proportional figures or switching the whole font to `font-mono`. In proportional typefaces, each digit has a different width (e.g. `1` is much narrower than `8`), causing the container width to shake on every tick. Switching to `font-mono` stops the shaking, but changes the letterforms and breaks typographic consistency with surrounding text.
+- ✅ **The Fix**: Add `tabular-nums` (`font-variant-numeric: tabular-nums`). This activates the typeface's built-in tabular figures feature, giving every digit an identical width while preserving the font's aesthetic design.
+
+<ComponentPreview name="design/font-system/tabular-numbers">
+  <TabularNumbersDemo />
+</ComponentPreview>
+
+> **💡 Usage Boundary**: Do not apply `tabular-nums` globally to body paragraphs. Proportional figures are designed for reading rhythm in prose; reserve `tabular-nums` specifically for counters, timers, data tables, and metrics.
+
+---
+
+## 2. The Type Scale Ladder
+
+Stick strictly to the established typographic scale instead of arbitrary one-off pixel values:
+
+| Class       | Font Size / Line Height | Primary Role                                          |
+| :---------- | :---------------------- | :---------------------------------------------------- |
+| `text-xs`   | 12px / 16px             | Badges, timestamps, small annotations, helper text    |
+| `text-sm`   | 14px / 20px             | Secondary copy, form labels, table cells, button text |
+| `text-base` | 16px / 24px             | Default body copy, long-form paragraphs               |
+| `text-lg`   | 18px / 28px             | Emphasized body text, card headers                    |
+| `text-xl`   | 20px / 28px             | Section titles, modal headings                        |
+| `text-2xl`  | 24px / 32px             | Page titles, major category headers                   |
+| `text-3xl`  | 30px / 36px             | Hero metrics, key dashboard stats                     |
+| `text-4xl`+ | 36px+                   | Marketing display headlines                           |
+
+A higher level on the ladder should differ by size, font weight, and line-height simultaneously. A heading that only changes in font size without proportional weight often competes with the body text below it rather than commanding the hierarchy.
