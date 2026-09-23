@@ -3,6 +3,7 @@ title: Color & Surface
 description: Color communicates status and draws attention, while surfaces establish spatial depth. Learn how to maintain consistent visual hierarchy across both light and dark themes.
 ---
 
+import { ColorProportionDemo } from "@/examples/design/color-and-surface/color-proportion";
 import { EmphasisDemo } from "@/examples/design/color-and-surface/emphasis";
 import { SurfaceLevelsDemo } from "@/examples/design/color-and-surface/surface-levels";
 
@@ -50,6 +51,30 @@ A common temptation when styling action bars or modal footers is giving every bu
 </ComponentPreview>
 
 > **💡 Accessibility Note**: Never rely on color alone to convey state or danger. Always accompany color cues with descriptive text, icons, or standard ARIA roles so interfaces remain clear under grayscale, high-contrast, or forced-color modes.
+
+---
+
+## 3. Color Proportion: The 60-30-10 Rule
+
+A common temptation when styling promotion or feature cards is painting large structural areas with the primary brand color to make the block feel "important".
+
+- ❌ **The Error**: Flooding the header with a solid primary banner (`bg-primary`). A decorative banner consumes ~40% of the card's surface. Because saturated color is the strongest visual attractor, the non-interactive header overpowers the actual CTA button below. When accent color is everywhere, it ceases to function as a focal cue.
+- ✅ **The Fix**: Strictly apply the **60-30-10 Rule** (6-3-1 原则) to allocate visual real estate:
+  - **60% Dominant Base**: A clean, unified neutral canvas (`bg-card`) provides negative space and reading clarity.
+  - **30% Structural Secondary**: Content hierarchy is established purely through typography and subtle dividers (`text-muted-foreground`, `border-border`), keeping the body calm.
+  - **10% Targeted Accent**: The primary color is held strictly in reserve for the interactive CTA button (`bg-primary`), giving the user an instant, unmistakable focal anchor.
+
+<ComponentPreview name="design/color-and-surface/color-proportion">
+  <ColorProportionDemo />
+</ComponentPreview>
+
+### The 60-30-10 Allocation Table
+
+| Visual Role              | Target Area | Semantic Tokens                                      | Interface Responsibility                             |
+| :----------------------- | :---------- | :--------------------------------------------------- | :--------------------------------------------------- |
+| **Dominant Base**        | ~60%        | `bg-card`, `bg-background`                           | Negative space, reading canvas, visual calm          |
+| **Structural Secondary** | ~30%        | `border-border`, `text-muted-foreground`, `bg-muted` | Container boundaries, metadata labels, divider rules |
+| **Targeted Accent**      | ~10%        | `bg-primary`, `text-primary-foreground`              | Primary CTA button, interactive focal point          |
 
 ---
 

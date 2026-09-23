@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { WaitingRow } from "@/components/ui/waiting-row";
+import { AgentIndicator } from "@/components/agents/agent-indicator";
 import {
   ModelPicker,
   PromptInput,
@@ -150,7 +150,15 @@ export const PromptInputStreamingDemo = () => {
 
   return (
     <div className="flex w-full max-w-2xl flex-col gap-3">
-      {streaming ? <WaitingRow label="Thinking" /> : null}
+      {streaming ? (
+        <span
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground"
+          role="status"
+        >
+          <AgentIndicator state="thinking" />
+          <span>Thinking</span>
+        </span>
+      ) : null}
       <PromptInput
         onStop={() => setStreaming(false)}
         onSubmit={() => setStreaming(true)}

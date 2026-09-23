@@ -1,0 +1,56 @@
+---
+title: Agent Indicator
+description: "A 3×3 grid badge that shows what an agent is doing while it works — idle, thinking, calling a tool, or streaming — through colour, shape and an opacity wave."
+---
+
+import {
+  AgentIndicatorDemo,
+  AgentIndicatorSwitchDemo,
+} from "@/examples/agent-indicator";
+
+<ComponentPreview name="agent-indicator">
+  <AgentIndicatorDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif-ui.vercel.app/r/agent-indicator.json
+```
+
+## Usage
+
+```tsx
+import { AgentIndicator } from "@/components/agents/agent-indicator";
+
+<AgentIndicator state="thinking" />
+```
+
+## States
+
+Four states covering the wait, each with its own colour, shape and motion:
+
+| State | Colour | Shape | Motion |
+| --- | --- | --- | --- |
+| `idle` | Muted | Full grid | Static |
+| `thinking` | Info (blue) | Full grid | Diagonal wave |
+| `tool-call` | Foreground | Cross ↔ corners | Alternating shapes |
+| `streaming` | Success (green) | Full grid | Column wave left → right |
+
+<ComponentPreview name="agent-indicator-switch">
+  <AgentIndicatorSwitchDemo />
+</ComponentPreview>
+
+## The wave
+
+The thinking state uses a cosine wave across the anti-diagonal of the grid:
+nine cells, one sampled curve, the phase offset read off the anti-diagonal each cell sits on.
+The streaming state runs the same curve along columns instead of diagonals, at a faster tempo.
+
+Every animation is opacity only — nothing here repaints the page on a frame.
+
+## Reduced motion
+
+When `prefers-reduced-motion` is active, animations are skipped and cells display at their
+resting opacity — the frozen first frame of the wave. The four states are still visually
+distinct by colour and shape alone.

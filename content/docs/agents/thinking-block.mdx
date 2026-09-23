@@ -118,10 +118,9 @@ frame shows the thought as it is rather than sliding the whole passage into plac
 
 ## Streaming
 
-While the work is happening the header is a `WaitingRow` — the nine-square wave, the
-shimmering label, the seconds so far. That is the pairing the two components exist for:
-the shimmer is the only part of the block that says _now_, and it is replaced by a fact
-once the truth is available.
+While the work is happening the header is an `AgentIndicator` in the thinking state, a
+label, and the seconds so far. The indicator is the part of the block that says _now_, and
+it is replaced by a fact once the truth is available.
 
 | Prop        | Behaviour                                                                   |
 | ----------- | --------------------------------------------------------------------------- |
@@ -134,7 +133,8 @@ once the truth is available.
 Under way the header reads **Thinking 4s**; afterwards it reads **Thought for 9s**. The
 count is captured off the falling edge of `streaming` rather than ticked in state — a
 second-by-second re-render would land in the middle of the rise above, which is the one
-thing that must not stutter. It is the same `formatDuration` the loading row prints with,
+thing that must not stutter. The clock writes directly to the DOM and `formatDuration`
+formats whole seconds with an `s` suffix,
 so the two can never disagree about a second. With no pass measured and no `duration`
 passed, the label stands alone as **Thought** rather than claiming a zero.
 

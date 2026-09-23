@@ -58,6 +58,34 @@
       ]
     },
     {
+      "name": "agent-indicator",
+      "type": "registry:component",
+      "title": "Agent Indicator",
+      "description": "A 3×3 grid badge that shows agent state — idle, thinking, executing, streaming, done, failed — through color, shape, and an opacity wave.",
+      "dependencies": ["clsx", "motion", "tailwind-merge"],
+      "cssVars": {
+        "theme": {
+          "color-success": "var(--success)",
+          "color-info": "var(--info)"
+        },
+        "light": {
+          "success": "oklch(0.535 0.179 155.331)",
+          "info": "oklch(0.546 0.215 262.881)"
+        },
+        "dark": {
+          "success": "oklch(0.696 0.17 162.48)",
+          "info": "oklch(0.623 0.214 259.815)"
+        }
+      },
+      "files": [
+        {
+          "path": "registry/new-york/agents/agent-indicator.tsx",
+          "type": "registry:component",
+          "target": "@components/agents/agent-indicator.tsx"
+        }
+      ]
+    },
+    {
       "name": "attachment",
       "type": "registry:ui",
       "title": "Attachment",
@@ -127,20 +155,6 @@
           "path": "registry/new-york/message.tsx",
           "type": "registry:ui",
           "target": "@components/ui/message.tsx"
-        }
-      ]
-    },
-    {
-      "name": "waiting-row",
-      "type": "registry:ui",
-      "title": "Waiting Row",
-      "description": "A nine-square wave, a shimmering label and a live duration — the row a surface shows while it waits for work to come back.",
-      "dependencies": ["clsx", "motion", "tailwind-merge"],
-      "files": [
-        {
-          "path": "registry/new-york/waiting-row.tsx",
-          "type": "registry:ui",
-          "target": "@components/ui/waiting-row.tsx"
         }
       ]
     },
@@ -302,7 +316,7 @@
         "tailwind-merge"
       ],
       "registryDependencies": [
-        "https://motif-ui.vercel.app/r/waiting-row.json"
+        "https://motif-ui.vercel.app/r/agent-indicator.json"
       ],
       "files": [
         {
@@ -498,7 +512,7 @@
       "name": "chat-app",
       "type": "registry:block",
       "title": "Chat App",
-      "description": "A whole chat surface for a page: a thread that follows its own tail, turns that carry reasoning and actions, and a composer that holds files and a model. Assembled from conversation, message, thinking-block, waiting-row and prompt-input.",
+      "description": "A whole chat surface for a page: a thread that follows its own tail, turns that carry reasoning and actions, and a composer that holds files and a model. Assembled from conversation, message, thinking-block, agent-indicator and prompt-input.",
       "dependencies": ["clsx", "lucide-react", "streamdown", "tailwind-merge"],
       "registryDependencies": [
         "button",
@@ -509,7 +523,7 @@
         "https://motif-ui.vercel.app/r/prompt-input.json",
         "https://motif-ui.vercel.app/r/scroll-rail.json",
         "https://motif-ui.vercel.app/r/thinking-block.json",
-        "https://motif-ui.vercel.app/r/waiting-row.json"
+        "https://motif-ui.vercel.app/r/agent-indicator.json"
       ],
       "files": [
         {

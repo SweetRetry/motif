@@ -4,7 +4,7 @@
     "conversation",
     "message",
     "thinking-block",
-    "waiting-row",
+    "agent-indicator",
     "prompt-input",
     "voice-input",
     "attachment",
