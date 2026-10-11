@@ -7,7 +7,7 @@
       "type": "registry:ui",
       "title": "Activity Heatmap",
       "description": "A year of daily activity as a GitHub-style grid: a column per week, a row per weekday, one square per day, shaded by how much happened.",
-      "dependencies": ["clsx", "tailwind-merge"],
+      "dependencies": ["cn"],
       "files": [
         {
           "path": "registry/new-york/activity-heatmap.tsx",
@@ -21,7 +21,7 @@
       "type": "registry:component",
       "title": "Approval Card",
       "description": "A human-in-the-loop decision surface for approvals, single-choice questions, custom responses, and multi-step review flows.",
-      "dependencies": ["clsx", "lucide-react", "motion", "tailwind-merge"],
+      "dependencies": ["cn", "lucide-react", "motion"],
       "registryDependencies": ["button", "input", "radio-group", "tooltip"],
       "cssVars": {
         "theme": {
@@ -62,7 +62,7 @@
       "type": "registry:component",
       "title": "Agent Indicator",
       "description": "A 3×3 grid badge that shows agent state — idle, thinking, executing, streaming, done, failed — through color, shape, and an opacity wave.",
-      "dependencies": ["clsx", "motion", "tailwind-merge"],
+      "dependencies": ["cn", "motion"],
       "cssVars": {
         "theme": {
           "color-success": "var(--success)",
@@ -90,7 +90,7 @@
       "type": "registry:ui",
       "title": "Attachment",
       "description": "A square attachment chip for composer rows: image thumbnails, file glyphs and upload progress traced around the card border.",
-      "dependencies": ["clsx", "lucide-react", "tailwind-merge"],
+      "dependencies": ["cn", "lucide-react"],
       "files": [
         {
           "path": "registry/new-york/attachment.tsx",
@@ -104,7 +104,7 @@
       "type": "registry:ui",
       "title": "Audio Preview",
       "description": "A recording you can read before you play it: the whole waveform on screen, the part you have heard lit, and a press anywhere on it to seek there.",
-      "dependencies": ["clsx", "lucide-react", "tailwind-merge"],
+      "dependencies": ["cn", "lucide-react"],
       "registryDependencies": ["button"],
       "files": [
         {
@@ -119,7 +119,7 @@
       "type": "registry:ui",
       "title": "Breakdown",
       "description": "A whole cut into its parts: one bar, each cut as wide as its share, and a legend that names every part and its amount.",
-      "dependencies": ["clsx", "tailwind-merge"],
+      "dependencies": ["cn"],
       "registryDependencies": ["tooltip"],
       "files": [
         {
@@ -134,7 +134,7 @@
       "type": "registry:ui",
       "title": "Conversation",
       "description": "The scroll region a transcript lives in: it follows its own tail while the reader is at the end, stops the moment they scroll up, and offers a way back when they have.",
-      "dependencies": ["clsx", "lucide-react", "tailwind-merge"],
+      "dependencies": ["cn", "lucide-react"],
       "registryDependencies": ["button"],
       "files": [
         {
@@ -149,7 +149,7 @@
       "type": "registry:ui",
       "title": "Message",
       "description": "One turn of a transcript, assembled from parts: who it is from, the body, and the actions that appear once you are done reading.",
-      "dependencies": ["clsx", "tailwind-merge"],
+      "dependencies": ["cn"],
       "files": [
         {
           "path": "registry/new-york/message.tsx",
@@ -163,7 +163,7 @@
       "type": "registry:component",
       "title": "Scroll Rail",
       "description": "A tick rail that mirrors a long scroll region: width carries distance from the reading line, colour carries focus. Hover a tick to preview the turn, click to jump to it.",
-      "dependencies": ["clsx", "motion", "tailwind-merge"],
+      "dependencies": ["cn", "motion"],
       "registryDependencies": ["popover"],
       "files": [
         {
@@ -198,7 +198,7 @@
       "type": "registry:ui",
       "title": "Aspect Ratio Picker",
       "description": "Aspect ratio as a grid of to-scale glyphs, each drawn inside the same square window so the shapes line up and the ratio reads without the label.",
-      "dependencies": ["clsx", "lucide-react", "tailwind-merge"],
+      "dependencies": ["cn", "lucide-react"],
       "files": [
         {
           "path": "registry/new-york/aspect-ratio-picker.tsx",
@@ -212,7 +212,7 @@
       "type": "registry:ui",
       "title": "Resolution Segmented",
       "description": "A segmented resolution control with a sliding plate and a dot-matrix glyph that carries sampling density: two dots standard, three high, four retina.",
-      "dependencies": ["clsx", "tailwind-merge"],
+      "dependencies": ["cn"],
       "files": [
         {
           "path": "registry/new-york/resolution-segmented.tsx",
@@ -226,7 +226,7 @@
       "type": "registry:ui",
       "title": "Provider Mark",
       "description": "One maker's logo at 20px, in the colour the brand draws it: twenty-three marks, taken from LobeHub's icon set and inlined so a picker never pays for an icon package.",
-      "dependencies": ["clsx", "tailwind-merge"],
+      "dependencies": ["cn"],
       "files": [
         {
           "path": "registry/new-york/provider-mark.tsx",
@@ -240,7 +240,7 @@
       "type": "registry:ui",
       "title": "Model Select",
       "description": "A catalogue you can walk: what is recommended first, then every maker in one scroll, with a rail that indexes the list and follows you down it.",
-      "dependencies": ["clsx", "lucide-react", "tailwind-merge"],
+      "dependencies": ["cn", "lucide-react"],
       "registryDependencies": ["command", "popover"],
       "files": [
         {
@@ -270,7 +270,7 @@
       "type": "registry:ui",
       "title": "Duration Slider",
       "description": "Duration as a compact clip on a timeline: drag the playhead, read the live value in a HUD, commit one settled number on release.",
-      "dependencies": ["clsx", "tailwind-merge"],
+      "dependencies": ["cn"],
       "files": [
         {
           "path": "registry/new-york/duration-slider.tsx",
@@ -284,7 +284,7 @@
       "type": "registry:ui",
       "title": "Strength Select",
       "description": "Strength as a track you drag: one seat per level, the playhead riding the fill's leading edge, and a slow drift of motes across the fill of the top level.",
-      "dependencies": ["clsx", "tailwind-merge"],
+      "dependencies": ["cn"],
       "css": {
         "@keyframes strength-mote": {
           "from": {
@@ -308,13 +308,7 @@
       "type": "registry:component",
       "title": "Thinking Block",
       "description": "A collapsible window onto a reasoning stream: a capped height, a mask that says there is more below, and a follow that lets the newest line rise into place instead of jumping the scroll.",
-      "dependencies": [
-        "clsx",
-        "lucide-react",
-        "motion",
-        "streamdown",
-        "tailwind-merge"
-      ],
+      "dependencies": ["cn", "lucide-react", "motion", "streamdown"],
       "registryDependencies": [
         "https://motif-ui.vercel.app/r/agent-indicator.json"
       ],
@@ -341,7 +335,7 @@
       "type": "registry:ui",
       "title": "Generation Overlay",
       "description": "The overlay a media node wears while it generates: a two-tone flow drifting behind the result, a blur-to-focus reveal once the media decodes, and a failure line when it never arrives.",
-      "dependencies": ["clsx", "motion", "tailwind-merge"],
+      "dependencies": ["cn", "motion"],
       "files": [
         {
           "path": "registry/new-york/generation-overlay.tsx",
@@ -355,7 +349,7 @@
       "type": "registry:ui",
       "title": "Flow Edge",
       "description": "A bezier connector that carries a pulse of light from one end to the other while work is in flight — bright in the middle, faded at both ends — and rests as a plain line when it is not.",
-      "dependencies": ["clsx", "motion", "tailwind-merge"],
+      "dependencies": ["cn", "motion"],
       "files": [
         {
           "path": "registry/new-york/flow-edge.tsx",
@@ -369,7 +363,7 @@
       "type": "registry:ui",
       "title": "Toolbar",
       "description": "A floating dock of glyphs that names itself on approach: the icon under the pointer swells and its label arrives above it, while the bar itself never moves. Items that earn the width can pin their label into the row.",
-      "dependencies": ["clsx", "motion", "tailwind-merge"],
+      "dependencies": ["cn", "motion"],
       "registryDependencies": ["tooltip"],
       "files": [
         {
@@ -394,7 +388,7 @@
       "type": "registry:component",
       "title": "Settings Dialog",
       "description": "Destinations down the left, one panel on the right: a rail you can walk with the arrow keys, a panel that fades in, and the row, section and card the panel is built from.",
-      "dependencies": ["clsx", "lucide-react", "motion", "tailwind-merge"],
+      "dependencies": ["cn", "lucide-react", "motion"],
       "registryDependencies": ["dialog"],
       "files": [
         {
@@ -419,7 +413,7 @@
       "type": "registry:component",
       "title": "Prompt Input",
       "description": "The box a message is written in, assembled from parts: a field that grows and then scrolls, the files riding with the draft as chips above it, the model answering it, and the one button that ends the turn.",
-      "dependencies": ["clsx", "lucide-react", "tailwind-merge"],
+      "dependencies": ["cn", "lucide-react"],
       "registryDependencies": [
         "https://motif-ui.vercel.app/r/provider-mark.json",
         "button",
@@ -459,7 +453,7 @@
       "type": "registry:ui",
       "title": "Cover Fan",
       "description": "A fan of cover cards for an empty state: full-bleed art, the title sitting on it, and enough of every card left showing that the whole set reads in one look. Hover lifts a card out of the fan.",
-      "dependencies": ["clsx", "tailwind-merge"],
+      "dependencies": ["cn"],
       "files": [
         {
           "path": "registry/new-york/cover-fan.tsx",
@@ -473,7 +467,7 @@
       "type": "registry:component",
       "title": "Skill Detail",
       "description": "A skill's detail surface: a card that opens it, and a panel that says what it is, what it is for, and what is inside it. Tags, cover and example prompts up top, then a file tree whose preview is your renderer — with only the toolbar controls you wired up.",
-      "dependencies": ["clsx", "lucide-react", "motion", "tailwind-merge"],
+      "dependencies": ["cn", "lucide-react", "motion"],
       "registryDependencies": ["button", "dialog", "switch"],
       "files": [
         {
@@ -498,7 +492,7 @@
       "type": "registry:ui",
       "title": "Voice Input",
       "description": "A composer's mic. A press asks for the microphone and the composer becomes a recording bar: cancel on the left, the live level across the middle, stop on the right. The level is written straight to the DOM, so a sixty-frame meter never re-renders anything.",
-      "dependencies": ["clsx", "lucide-react", "tailwind-merge"],
+      "dependencies": ["cn", "lucide-react"],
       "registryDependencies": ["button"],
       "files": [
         {
@@ -513,7 +507,7 @@
       "type": "registry:block",
       "title": "Chat App",
       "description": "A whole chat surface for a page: a thread that follows its own tail, turns that carry reasoning and actions, and a composer that holds files and a model. Assembled from conversation, message, thinking-block, agent-indicator and prompt-input.",
-      "dependencies": ["clsx", "lucide-react", "streamdown", "tailwind-merge"],
+      "dependencies": ["cn", "lucide-react", "streamdown"],
       "registryDependencies": [
         "button",
         "tooltip",
