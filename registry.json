@@ -516,9 +516,14 @@
       "name": "skill-detail",
       "type": "registry:component",
       "title": "Skill Detail",
-      "description": "A skill's detail surface: a card that opens it, and a panel that says what it is, what it is for, and what is inside it. Tags, cover and example prompts up top, then a file tree whose preview is your renderer — with only the toolbar controls you wired up.",
+      "description": "A skill's detail surface: a card that opens it, and a panel that says what it is, what it is for, and what is inside it. A cover rail with the name and the one action over it, then a workspace of what the skill makes and a file tree whose preview is your renderer — with only the toolbar controls you wired up.",
       "dependencies": ["cn", "lucide-react", "motion"],
-      "registryDependencies": ["button", "dialog", "switch"],
+      "registryDependencies": [
+        "button",
+        "dialog",
+        "switch",
+        "https://motif-ui.vercel.app/r/line-tabs.json"
+      ],
       "files": [
         {
           "path": "registry/new-york/agents/skill-detail/index.tsx",
@@ -534,6 +539,20 @@
           "path": "lib/ease.ts",
           "type": "registry:lib",
           "target": "@lib/ease.ts"
+        }
+      ]
+    },
+    {
+      "name": "line-tabs",
+      "type": "registry:ui",
+      "title": "Line Tabs",
+      "description": "Tabs drawn as words with a line under the selected one. No pill and no plate: the strip sits on the rule of the header around it, and the line reads as that rule thickening under one word.",
+      "dependencies": ["cn", "radix-ui"],
+      "files": [
+        {
+          "path": "registry/new-york/line-tabs.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/line-tabs.tsx"
         }
       ]
     },

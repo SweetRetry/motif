@@ -12,7 +12,7 @@ import {
 import type { SkillFile } from "@/registry/new-york/agents/skill-detail";
 
 /** Shipped with the docs so the demo needs no external host — swap in your own covers.
- *  Two crops of one poster: the card draws 16:9, the panel fills the height of its head. */
+ *  Two crops of one poster: the card draws 16:9, the panel fills the height of its rail. */
 const COVER = "/skill-detail/invoice-reconciler.svg";
 const COVER_PORTRAIT = "/skill-detail/invoice-reconciler-portrait.svg";
 
@@ -23,6 +23,14 @@ const SUMMARY =
 /** What the panel has room for. */
 const DESCRIPTION =
   "Match a month's invoices against the bank feed and flag what a human still has to look at. Read this skill before touching the ledger: it owns the matching rules, the rounding tolerance and the wording of the report.";
+
+/** Four things the skill produced, shipped with the docs like the covers. */
+const RESULTS = [
+  { label: "Matched", src: "/skill-detail/result-matched.svg" },
+  { label: "Variance", src: "/skill-detail/result-variance.svg" },
+  { label: "Vendors", src: "/skill-detail/result-vendors.svg" },
+  { label: "Flagged", src: "/skill-detail/result-flagged.svg" },
+];
 
 const FILES: SkillFile[] = [
   { path: "SKILL.md" },
@@ -131,6 +139,8 @@ export const SkillDetailDemo = () => {
           "Write the quarterly variance report, grouped by vendor.",
         ]}
         renderPreview={(file) => PREVIEWS[file.path] ?? null}
+        results={RESULTS}
+        resultsNote="From the March close: 214 invoices, 6 flagged for a person."
         tags={["Finance", "Automation"]}
         title="Invoice Reconciler"
         updatedAt="March 4, 2026"

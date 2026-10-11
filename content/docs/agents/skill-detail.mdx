@@ -1,6 +1,6 @@
 ---
 title: Skill Detail
-description: "A skill's detail surface, in two columns: a rail that says what the skill is and a workspace that shows what is inside it. A card opens it, the dialog is optional."
+description: "A skill's detail surface, in two columns: a cover rail that says what the skill is and a workspace that shows what it makes and what is inside it. A card opens it, the dialog is optional."
 ---
 
 import { SkillDetailDemo } from "@/examples/skill-detail";
@@ -52,6 +52,7 @@ export function Library({ skills }: { skills: Skill[] }) {
           onOpenChange={(next) => setOpenId(next ? open.id : null)}
           open
           prompts={open.prompts}
+          results={open.results}
           renderPreview={(file) => (
             <Markdown source={read(open.id, file.path)} />
           )}
@@ -74,12 +75,11 @@ pieces, three jobs, and you can leave any of them out.
   where there is room to explain it. Pass `href` instead of `onOpen` and the card
   navigates to a page of its own rather than opening in place. Its cover is drawn at 16:9
   whatever the art is, so a portrait poster loses its top and its tail.
-- **`SkillDetail`** is the surface: a rail of identity, examples and description, next to
-  a workspace of files and their contents. It fills whatever box you give it — give it a
-  height and it behaves like a sheet, leave the height off and it grows with its contents.
-  The cover heads the identity column rather than spanning the panel: it is the only colour
-  in an otherwise monochrome surface, and keeping it a thumbnail spends 63px of height on it
-  instead of 300.
+- **`SkillDetail`** is the surface: a rail of identity down the left edge, next to a
+  workspace with two tabs, what the skill makes and what it is made of. It fills whatever
+  box you give it, so give it a height. The cover is the rail's background rather than a
+  thumbnail inside it: it is the only colour in an otherwise monochrome surface, and a skill
+  is a visual thing, so it gets 22rem by the full height of the dialog rather than 63px.
 - **`SkillDetailDialog`** is the handful of lines of plumbing: it sizes the panel at
   `min(46rem, 88dvh)` and `max-w-5xl`, names the dialog for assistive tech, and wires the
   panel's close control to closing. Leave it out and the panel sits in a page just as
@@ -90,75 +90,56 @@ The dialog leans on the panel rather than the other way around: `onClose` is dro
 and `open` works controlled or uncontrolled with `defaultOpen`, like the panel's own
 selection.
 
-## The head is two-up
+## A rail and a workspace
 
-The head is the only part of the panel that is read, and it is two columns: the skill on the
-left, what it is for on the right. The left column is the identity — cover, name, who made it,
-tags — and it holds nothing else, because an action wedged under a byline reads as one more
-line of metadata. The name opens that column rather than the tags: a row of chips is metadata,
-and metadata does not get the first line of the panel. It also decides where the summary sits —
-with the name at the top, the paragraph opposite shares its first line and reads as the name's
-expansion, where a paragraph opposite a row of chips reads as their caption. The paragraph opposite is the summary: the one place in the panel where
-somebody tells you what the skill does, instead of handing you a file that says it. The action
-follows that sentence — right-aligned, 16px under the last line — because proximity is how the
-eye decides what a button belongs to. Pushed to the foot of the column instead, it sat under a
-paragraph of empty space and belonged to nothing.
+The panel is two columns, and they answer different questions. The rail on the left says what
+the skill is: the cover, then on top of it the tags, the name, the sentence about what it does,
+who made it and when, and the one thing to do about it. The workspace on the right says what is
+in it. Neither needs the other's width, and the workspace gets the panel's whole height, which
+is where a file tree and a document need it.
 
-Two columns rather than one stack because the two halves answer different questions and
-neither of them needs the full width. Stacked, the paragraph sat under the identity, so the
-first screen was a cover, a name, a button and a wall of prose before anything else appeared,
-and the right half of a 64rem panel stayed empty the whole way down. Now the identity column
-is a fixed 24rem, the prose takes what is left and is held to a `max-w-2xl` measure — a
-paragraph is not more readable at 1000px — and the examples get the full width underneath
-both.
+The text sits on the cover, at its foot, over a scrim. The scrim is the one place the component
+draws literal black and white: it is measured against the artwork, not against the theme, so a
+token would be wrong the moment the art changed. It is heavy at the foot, where the words are,
+and gone by the top so the art keeps its colour. The action is the last thing in the rail and
+spans its width, because it is the rail's one verb. A skill with no `cover` gets the same
+rail without the art: the text starts at the top in ordinary foreground colours, so nothing is
+ever white on white.
+
+The art is cropped to the rail, not letterboxed, because a cover that keeps its own ratio cannot
+also fill a column whose height is the dialog's. Ship two crops of the art: 16:9 for the card,
+portrait for the panel.
 
 The split happens at 48rem of the panel's own width, with a container query rather than a
-viewport one, and below it the two stack identity-first, which is the only order that fits in
-a column. The same panel is a dialog here, a sheet there, a route of its own somewhere else;
-only its own box knows whether there is room.
+viewport one. Below it the rail becomes a 13rem banner across the top, carrying the tags, name,
+byline and action; the description moves under it, above the tabs, because a banner has no room
+for a paragraph and dropping it would lose the one sentence that says what the skill does. The
+same panel is a dialog here, a sheet there, a route of its own somewhere else; only its own box
+knows whether there is room.
 
-The cover is a block, not a thumbnail: it fills the height of the head, so the left edge of
-the panel is one flush rectangle instead of a picture floating in a corner with a byline
-running past it. That means the art is cropped to the block's height rather than letterboxed
-— a cover that keeps its own ratio cannot also line up with a block whose height comes from
-the text beside it. Ship two crops of the art: 16:9 for the card, portrait for the panel.
+## Results first
 
-Two more things keep the head short: the toolbar is a header rather than a sticky bar over the
-body, and the examples are one ruled strip of three cells rather than three stacked rows or
-three cards.
+The first tab is what the skill makes: `results` as a row of pictures, a `resultsNote` line under
+them for where they came from or what they cost, and the example prompts beneath. It opens on
+that tab because for a visual skill the output is the argument, and a file tree is the proof you
+reach for second. The second tab is the file tree and its preview. The strip itself is
+[Line Tabs](/docs/components/line-tabs), installed alongside as a base component rather than
+written into the panel.
 
-## One gutter, and no grid the panel cannot keep
+A skill with only one of the two draws only that one, without a tab strip to switch nothing: no
+`files` means the first tab alone, no `results` and no `prompts` means the files alone. The first
+tab's name is `resultsLabel`, `"Results"` by default.
 
-Every line in the panel starts on the same 24px gutter: the cover, the tags, the heading, the
-section label, the example cells, and the first level of the file tree — the tree's pane is
-inset 16px and its rows carry the last 8px, so a folder's chevron lands on the same edge as
-the heading above it. A panel whose left edge zigzags by four pixels reads as unfinished even
-when nobody can say why.
+An example prompt is a line you might have typed, so it is drawn as one rather than boxed like a
+card: a number to scan by, two clamped lines of text, and the whole row as the button, with the
+rows ruled apart rather than carded. The arrow is there at rest, dimmed, because a hit target
+that only admits it is one under a pointer does not admit it at all on a touch screen. Without
+`onPrompt` the rows are not buttons at all and render as plain text, because an example that
+cannot be sent anywhere is just documentation.
 
-The example strip has no vertical rules. It cannot: three columns and a two-column head have no
-common divisor, so a rule under one would never continue the rule above it — and a divider that
-lines up with nothing is a grid claim the layout cannot keep. The cells are separated by the
-head's own 40px gap instead, which still ties the two bands together without pretending they
-share columns.
-
-## Examples, not example cards
-
-An example prompt is a line you might have typed, so it is drawn as one rather than boxed
-like a card: a number to scan by, two clamped lines of text, and the whole cell as the
-button. Three of them sit across the panel under a single rule, which is the shape that
-matches the content — each example is a line, and a line does not need its own bordered panel
-to be understood. The arrow is there at rest, dimmed, because a hit target that only admits it
-is one under a pointer does not admit it at all on a touch screen.
-
-Side by side also spends the width instead of the height. Stacked, three examples are three
-rows of mostly empty space and 120px of the panel's first screen; across, they are 60px.
-Below 48rem of panel width the strip stacks back into rows, which is where a column of
-lines is the only thing that fits.
-
-The arrow only appears on the cell the pointer is on, and the text lifts to the foreground
-with it, so three examples read as things to try rather than three competing panels.
-Without `onPrompt` the cells are not buttons at all and render as plain text, because an
-example that cannot be sent anywhere is just documentation.
+Every block in the workspace starts on the same 24px gutter: the tabs, the results, the section
+label, the example rows and the preview. The first level of the file tree is inset 16px and its
+rows carry the last 8px, so a folder's chevron lands on the same edge.
 
 ## Files are paths
 
@@ -219,21 +200,23 @@ every row it owns at once instead of one nested block, and the levels are named 
 enable switch is a real switch with a label of its own (`Enable {title}`), not a
 decoration beside the heading.
 
-| Region   | Prop                            | Notes                                                        |
-| -------- | ------------------------------- | ------------------------------------------------------------ |
-| Card     | `cover`, `title`, `description` | The summary: one line, clamped to two, cover at 16:9         |
-| Card     | `onOpen` / `href`               | Opens in place, or navigates when the skill has a page       |
-| Identity | `tags`, `title`, `author`       | The heading is the only required prop                        |
-| Identity | `cover`                         | Fills the height of the head, cropped; portrait crop         |
-| Identity | `updatedAt`                     | Already formatted — the panel does not touch dates           |
-| Action   | `onTry` / `tryLabel`            | Closes the summary column, right-aligned; needs a handler    |
-| Prose    | `description`                   | The summary opposite the identity, held to a reading measure |
-| Prompts  | `prompts` / `promptsLabel`      | Rows become buttons once `onPrompt` is passed                |
-| Toolbar  | `enabled` / `defaultEnabled`    | Passing either draws the switch, controlled or not           |
-| Toolbar  | `menu`                          | Slot for a "…" dropdown; the panel ships no menu of its own  |
-| Files    | `files`, `folder`               | Paths in; the tree is built for you                          |
-| Files    | `renderPreview`                 | The only part of the tree the panel does not draw            |
-| Dialog   | `open` / `onOpenChange`         | Uncontrolled with `defaultOpen`, like the panel's selection  |
+| Region   | Prop                            | Notes                                                             |
+| -------- | ------------------------------- | ----------------------------------------------------------------- |
+| Card     | `cover`, `title`, `description` | The summary: one line, clamped to two, cover at 16:9              |
+| Card     | `onOpen` / `href`               | Opens in place, or navigates when the skill has a page            |
+| Identity | `tags`, `title`, `author`       | The heading is the only required prop                             |
+| Identity | `cover`                         | The rail's background, cropped; portrait crop                     |
+| Identity | `updatedAt`                     | Already formatted — the panel does not touch dates                |
+| Action   | `onTry` / `tryLabel`            | The last thing in the rail, full width; needs a handler           |
+| Identity | `description`                   | In the rail; narrow, under the banner                             |
+| Results  | `results`, `resultsNote`        | First tab: the work the skill made, and where it came from        |
+| Results  | `resultsLabel`                  | Name of the first tab, `"Results"` by default                     |
+| Prompts  | `prompts` / `promptsLabel`      | First tab, under the results; rows become buttons with `onPrompt` |
+| Toolbar  | `enabled` / `defaultEnabled`    | Passing either draws the switch, controlled or not                |
+| Toolbar  | `menu`                          | Slot for a "…" dropdown; the panel ships no menu of its own       |
+| Files    | `files`, `folder`               | Paths in; the tree is built for you                               |
+| Files    | `renderPreview`                 | The only part of the tree the panel does not draw                 |
+| Dialog   | `open` / `onOpenChange`         | Uncontrolled with `defaultOpen`, like the panel's selection       |
 
 ## Motion
 

@@ -18,7 +18,7 @@
   `prompt-input`, `voice-input`, `attachment`, `scroll-rail`, `approval-card`,
   `skill-detail`
 - 🎛️ **Components** — `aspect-ratio-picker`, `resolution-segmented`, `duration-slider`,
-  `generation-overlay`, `cover-fan`, `flow-edge`, `toolbar`, `settings-dialog`,
+  `generation-overlay`, `cover-fan`, `flow-edge`, `toolbar`, `line-tabs`, `settings-dialog`,
   `activity-heatmap`
 - 🏗️ **Blocks** — whole surfaces assembled from the parts, starting with `chat-app`
 

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 640" width="480" height="640" role="img" aria-label="Invoice Reconciler result: Matched">
+  <defs>
+    <linearGradient id="plate" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#123a72" />
+      <stop offset="0.55" stop-color="#0c2a55" />
+      <stop offset="1" stop-color="#071b39" />
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#8fc4ff" stroke-opacity="0.14" stroke-width="1" />
+    </pattern>
+  </defs>
+  <rect width="480" height="640" fill="url(#plate)" />
+  <rect width="480" height="640" fill="url(#grid)" />
+  <path d="M150 420l60 60 130-150" fill="none" stroke="#86efac" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><g fill="#dbeafe" fill-opacity="0.8"><rect x="90" y="140" width="220" height="14" rx="7"/><rect x="90" y="180" width="320" height="14" rx="7"/><rect x="90" y="220" width="180" height="14" rx="7"/></g>
+</svg>

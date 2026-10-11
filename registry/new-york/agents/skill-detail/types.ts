@@ -11,6 +11,13 @@ export interface SkillFile {
   path: string;
 }
 
+/** One thing the skill has made: a picture and, optionally, what it was. */
+export interface SkillResult {
+  /** Drawn under the picture, one line. */
+  label?: string;
+  src: string;
+}
+
 export interface SkillAuthor {
   /** Avatar URL. Drawn only when given. */
   avatar?: string;
@@ -41,7 +48,8 @@ export interface SkillDetailProps {
   /** Drawn beside the updated line. */
   author?: SkillAuthor;
   className?: string;
-  /** Cover art, drawn as a banner at the top of the rail. */
+  /** Cover art, filling the rail down the left edge. Cropped, not letterboxed, so ship
+   *  a portrait crop. Narrow, the same art is a banner across the top. */
   cover?: string;
   /** Starts the enable switch on; ignored when `enabled` is passed. */
   defaultEnabled?: boolean;
@@ -71,6 +79,12 @@ export interface SkillDetailProps {
   promptsLabel?: string;
   /** Contents of the selected file. Without it the tree stands alone. */
   renderPreview?: (file: SkillFile) => ReactNode;
+  /** Work the skill has made, drawn on the first tab above the example prompts. */
+  results?: SkillResult[];
+  /** Name of the first tab, which holds `results` and `prompts`. */
+  resultsLabel?: string;
+  /** One line under the results: where they came from, what they cost. */
+  resultsNote?: ReactNode;
   /** Selected file, when you own the selection. */
   selectedPath?: string;
   /** Pills above the heading. */

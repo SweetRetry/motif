@@ -18,6 +18,12 @@ import type { KeyboardEvent, ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+  LineTabs,
+  LineTabsContent,
+  LineTabsList,
+  LineTabsTrigger,
+} from "@/components/ui/line-tabs";
 import { Switch } from "@/components/ui/switch";
 import { EASE_OUT, SPRING_SWAP } from "@/lib/ease";
 import { cn } from "@/lib/utils";
@@ -29,6 +35,7 @@ import type {
   SkillDetailDialogProps,
   SkillDetailProps,
   SkillFile,
+  SkillResult,
 } from "./types";
 
 export type {
@@ -38,12 +45,15 @@ export type {
   SkillDetailDialogProps,
   SkillDetailProps,
   SkillFile,
+  SkillResult,
 } from "./types";
 
 /** The toolbar's icon buttons and the copy button on a code block are the same control,
  *  so they share one plate. */
 const ICON_BUTTON =
   "grid size-8 shrink-0 cursor-pointer place-items-center rounded-full text-muted-foreground outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50";
+
+type PanelTab = "files" | "overview";
 
 /** The root of the tree is a row of its own, so it needs a key no path can take. */
 const ROOT = "";
@@ -258,14 +268,21 @@ const IconButton = ({
  *  rounded square is a logo pretending to be a face. */
 const MetaLine = ({
   author,
+  className,
   updatedAt,
   updatedLabel,
 }: {
   author?: SkillAuthor;
+  className?: string;
   updatedAt?: string;
   updatedLabel: string;
 }) => (
-  <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted-foreground">
+  <div
+    className={cn(
+      "flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted-foreground",
+      className
+    )}
+  >
     {author ? (
       <span className="flex items-center gap-1.5">
         {author.avatar ? (
@@ -276,7 +293,7 @@ const MetaLine = ({
             src={author.avatar}
           />
         ) : null}
-        <span className="font-medium text-foreground/80">{author.name}</span>
+        <span className="font-medium">{author.name}</span>
       </span>
     ) : null}
     {author && updatedAt ? <span aria-hidden="true">·</span> : null}
@@ -288,20 +305,26 @@ const MetaLine = ({
   </div>
 );
 
-/**
- * The cover fills the height of the head rather than sitting at its top corner, so the left
- * edge of the panel is one block and nothing has to line up with a thumbnail's bottom.
- *
- * The height is why the art is cropped rather than letterboxed: a cover that keeps its own
- * ratio cannot also be flush with a block whose height comes from the text beside it. Ship a
- * portrait crop for this and a 16:9 one for the card — they are different boxes.
- */
-const Cover = ({ src }: { src: string }) => (
-  <div className="w-28 shrink-0 self-start overflow-hidden rounded-lg ring-1 ring-border @3xl:self-stretch">
-    {/* eslint-disable-next-line @next/next/no-img-element */}
-    <img alt="" className="size-full object-cover" src={src} />
-  </div>
-);
+/** A pane of the workspace. Under a tab strip it is that tab's panel, so Radix ties the
+ *  tab to it by id; with no strip there is nothing to tie it to, and it is a plain box. */
+const Panel = ({
+  children,
+  className,
+  tabbed,
+  value,
+}: {
+  children: ReactNode;
+  className: string;
+  tabbed: boolean;
+  value: PanelTab;
+}) =>
+  tabbed ? (
+    <LineTabsContent className={className} value={value}>
+      {children}
+    </LineTabsContent>
+  ) : (
+    <div className={className}>{children}</div>
+  );
 
 /** An example is a line you might have typed, not a card: a number to scan by, the text,
  *  and an arrow that only shows up when the cell is live. Three of them sit across the
@@ -504,6 +527,9 @@ export const SkillDetail = ({
   prompts,
   promptsLabel = "Start with",
   renderPreview,
+  results,
+  resultsLabel = "Results",
+  resultsNote,
   selectedPath: selectedPathProp,
   tags,
   title,
@@ -521,6 +547,7 @@ export const SkillDetail = ({
   );
   const [enabledState, setEnabledState] = useState(defaultEnabled ?? false);
   const [selectedState, setSelectedState] = useState(defaultSelectedPath ?? "");
+  const [tab, setTab] = useState<PanelTab>("overview");
 
   // The first file is selected until told otherwise: a panel that opens with an empty
   // preview pane looks broken rather than unselected.
@@ -587,6 +614,10 @@ export const SkillDetail = ({
       }
 
       const row = rows[index];
+      if (!row) {
+        return;
+      }
+
       let target: TreeRow | undefined;
 
       switch (event.key) {
@@ -648,215 +679,325 @@ export const SkillDetail = ({
 
   const toolbar = showSwitch || menu || onClose;
   const workspace = rows.length > 0 || hasPreview;
+  // The first tab is what the skill makes, the second is what it is made of. A skill with
+  // only one of them draws that one, without a tab strip to switch nothing.
+  const hasOverview = Boolean(results?.length || prompts?.length);
+  const showTabs = hasOverview && workspace;
+  const activeTab: PanelTab =
+    !workspace || (hasOverview && tab === "overview") ? "overview" : "files";
+  const header = showTabs || toolbar;
 
   return (
+    // Two elements, not one: a container query styles what is inside the container, never
+    // the container itself, so the grid that changes shape has to be a child of the box
+    // whose width decides it. The same panel sits in a page, a sheet or a dialog, so the
+    // break is about its own width. Narrow, the rail is a banner over the workspace; wide,
+    // it is a column beside it.
     <div
       className={cn(
-        // A container, because where this panel breaks into two columns is about the
-        // panel's own width: the same panel sits in a page, a sheet or a dialog.
-        "@container relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl border border-border bg-card",
+        "@container relative h-full min-h-0 w-full overflow-hidden rounded-2xl border border-border bg-card",
         className
       )}
     >
-      {toolbar ? (
-        // A header, not a sticky bar: the body is its own scroll box, so nothing passes
-        // underneath the controls and there is no translucent corner to get wrong.
-        <div className="flex shrink-0 items-center justify-end gap-1 px-4 py-3">
-          {showSwitch ? (
-            <Switch
-              aria-label={`Enable ${title}`}
-              checked={isEnabled}
-              className="mr-1"
-              onCheckedChange={setEnabled}
-            />
-          ) : null}
-          {menu}
-          {onClose ? (
-            <IconButton label="Close" onClick={onClose}>
-              <X className="size-4" />
-            </IconButton>
-          ) : null}
-        </div>
-      ) : null}
-
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+      <div className="grid size-full min-h-0 grid-cols-1 grid-rows-[13rem_minmax(0,1fr)] gap-0 @3xl:grid-cols-[22rem_minmax(0,1fr)] @3xl:grid-rows-1">
         <div
           className={cn(
-            "flex flex-col gap-5 px-6 pb-6",
-            // The header carries its own padding, so the identity only needs air above
-            // it when there is no header to sit under.
-            toolbar ? "pt-1" : "pt-6"
+            "relative flex min-h-0 flex-col gap-3 overflow-hidden p-5 @3xl:gap-4 @3xl:border-r @3xl:border-border @3xl:p-6",
+            // Text sits at the foot of the art, where the scrim is; with no art there is
+            // nothing to sit on, so it starts at the top like any column.
+            cover ? "justify-end" : "justify-start"
           )}
         >
-          {/* Two-up: the skill on the left, what it is for on the right. Below 48rem of
-              panel width the two stack, identity first, because a column of prose beside a
-              column of identity needs width that neither of them has on a phone. */}
-          <div className="flex flex-col gap-5 @3xl:flex-row @3xl:gap-10">
-            <div className="flex min-w-0 gap-4 @3xl:w-[24rem] @3xl:shrink-0">
-              {cover ? <Cover src={cover} /> : null}
-              {/* Name first, metadata after it. The tags used to open the column, which put
-                  a row of chips on the line where the name belongs — and it put the summary
-                  opposite the chips, so it read as their subtitle. With the name at the top,
-                  the paragraph beside it shares its first line and reads as the name's
-                  expansion, which is what it is. */}
-              <div className="flex min-w-0 flex-col items-start gap-2">
-                <h2 className="text-xl font-semibold tracking-tight text-balance">
-                  {title}
-                </h2>
-                {author || updatedAt ? (
-                  <MetaLine
-                    author={author}
-                    updatedAt={updatedAt}
-                    updatedLabel={updatedLabel}
-                  />
-                ) : null}
-                {tags?.length ? (
-                  <div className="flex flex-wrap gap-1.5">
-                    {tags.map((tag) => (
-                      <span
-                        className="rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground"
-                        key={tag}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-              </div>
-            </div>
-
-            {description || onTry ? (
-              // The summary column: the sentence and the one thing to do about it, in that
-              // order and 16px apart. The action is not pushed to the column's floor — a
-              // button with a paragraph of empty space above it belongs to nothing, and the
-              // eye reads proximity as ownership.
-              <div className="flex min-w-0 flex-1 flex-col items-start gap-4">
-                {description ? (
-                  <p className="max-w-2xl text-sm text-pretty text-muted-foreground">
-                    {description}
-                  </p>
-                ) : null}
-                {onTry ? (
-                  <Button className="self-end" onClick={onTry} type="button">
-                    {tryLabel}
-                  </Button>
-                ) : null}
-              </div>
-            ) : null}
-          </div>
-
-          {prompts?.length ? (
-            <div className="flex flex-col gap-3">
-              <h3 className="text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
-                {promptsLabel}
-              </h3>
-              {/* No vertical rules: a three-column strip cannot line up with a two-column
-                  head, and a rule that lines up with nothing is a grid the panel cannot
-                  keep. The gap is the head's own gap, so the two bands still read as one. */}
-              <div className="divide-border/60 border-border/60 grid grid-cols-1 divide-y border-t @3xl:grid-cols-3 @3xl:gap-x-10 @3xl:divide-y-0">
-                {prompts.map((prompt, index) => (
-                  <PromptCell
-                    index={index}
-                    key={prompt}
-                    onSelect={onPrompt}
-                    prompt={prompt}
-                  />
-                ))}
-              </div>
-            </div>
+          {cover ? (
+            <>
+              {/* The art is cropped to the rail, not letterboxed: a cover that keeps its
+                own ratio cannot also fill a column whose height is the dialog's. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                alt=""
+                className="absolute inset-0 size-full object-cover"
+                src={cover}
+              />
+              {/* Literal black and white: a scrim over user artwork is measured against the
+                artwork, not the theme. Heavy at the foot where the text is, gone by the
+                top so the art keeps its colour. */}
+              <div
+                aria-hidden="true"
+                className="absolute inset-0"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(to top, rgb(0 0 0 / 0.92) 0%, rgb(0 0 0 / 0.75) 38%, rgb(0 0 0 / 0.12) 68%, rgb(0 0 0 / 0) 100%)",
+                }}
+              />
+            </>
           ) : null}
-        </div>
 
-        {workspace ? (
           <div
             className={cn(
-              "border-t border-border/60",
-              hasPreview && "@3xl:grid @3xl:grid-cols-[14rem_minmax(0,1fr)]",
-              "@3xl:min-h-0 @3xl:overflow-hidden"
+              "relative flex min-w-0 items-end justify-between gap-4 @3xl:flex-col @3xl:items-stretch @3xl:justify-start @3xl:gap-4",
+              cover && "text-white"
             )}
           >
-            <div
-              aria-label={folder ?? "Skill files"}
-              className={cn(
-                "flex flex-col gap-0.5 p-4",
-                hasPreview &&
-                  "border-border/60 border-b @3xl:border-r @3xl:border-b-0",
-                "@3xl:min-h-0 @3xl:overflow-y-auto @3xl:overscroll-contain"
-              )}
-              onKeyDown={handleKeyDown}
-              role="tree"
-            >
-              <AnimatePresence initial={false}>
-                {rows.map((row) => {
-                  const open = row.expandable && expanded.has(row.key);
-                  const selected = !row.expandable && row.key === currentPath;
-
-                  return (
-                    <motion.div
-                      animate={{ height: "auto", opacity: 1 }}
-                      className="overflow-hidden"
-                      exit={{ height: 0, opacity: 0 }}
-                      initial={reduceMotion ? false : { height: 0, opacity: 0 }}
-                      key={row.key}
-                      role="none"
-                      transition={ROW_SLIDE}
+            <div className="flex min-w-0 flex-col items-start gap-2 @3xl:gap-4">
+              {tags?.length ? (
+                <div className="flex flex-wrap gap-1.5">
+                  {tags.map((tag) => (
+                    <span
+                      className={cn(
+                        "rounded-full px-2.5 py-0.5 text-xs",
+                        cover
+                          ? "bg-white/15 text-white backdrop-blur-sm"
+                          : "bg-muted text-muted-foreground"
+                      )}
+                      key={tag}
                     >
-                      <button
-                        aria-expanded={row.expandable ? open : undefined}
-                        aria-level={row.depth + 1}
-                        aria-posinset={row.posinset}
-                        aria-selected={row.expandable ? undefined : selected}
-                        aria-setsize={row.setsize}
-                        className={cn(
-                          // The ring is inset: a row is clipped top and bottom by the
-                          // height its folder animates, and an outside ring would lose
-                          // its two horizontal runs the moment the wrapper clipped.
-                          "flex w-full cursor-pointer items-center gap-1.5 rounded-lg py-1.5 pr-2 text-left text-sm outline-none transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring",
-                          selected
-                            ? "bg-muted text-foreground"
-                            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                        )}
-                        onClick={() =>
-                          row.expandable ? toggle(row.key) : select(row.key)
-                        }
-                        onFocus={() => setActiveKey(row.key)}
-                        ref={(node) => registerRow(row.key, node)}
-                        role="treeitem"
-                        style={{ paddingLeft: 8 + row.depth * 14 }}
-                        tabIndex={row.key === activeKey ? 0 : -1}
-                        type="button"
-                      >
-                        <RowIcon
-                          expandable={row.expandable}
-                          file={row.file}
-                          open={open}
-                        />
-                        <span className="truncate">{row.label}</span>
-                      </button>
-                    </motion.div>
-                  );
-                })}
-              </AnimatePresence>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+              <h2 className="text-3xl font-semibold tracking-tight text-balance">
+                {title}
+              </h2>
+              {description ? (
+                <p
+                  className={cn(
+                    "hidden max-w-sm text-sm text-pretty @3xl:block",
+                    cover ? "text-white/80" : "text-muted-foreground"
+                  )}
+                >
+                  {description}
+                </p>
+              ) : null}
+              {author || updatedAt ? (
+                <MetaLine
+                  author={author}
+                  className={cover ? "text-white/65" : undefined}
+                  updatedAt={updatedAt}
+                  updatedLabel={updatedLabel}
+                />
+              ) : null}
             </div>
-
-            {hasPreview && renderPreview && currentFile ? (
-              <div className="min-w-0 p-6 @3xl:min-h-0 @3xl:overflow-y-auto @3xl:overscroll-contain">
-                {reduceMotion ? (
-                  <div>{renderPreview(currentFile)}</div>
-                ) : (
-                  <motion.div
-                    animate={{ opacity: 1, y: 0 }}
-                    initial={{ opacity: 0, y: 4 }}
-                    key={currentFile.path}
-                    transition={PREVIEW_FADE}
-                  >
-                    {renderPreview(currentFile)}
-                  </motion.div>
-                )}
-              </div>
+            {onTry ? (
+              <Button
+                className="shrink-0 @3xl:w-full"
+                onClick={onTry}
+                type="button"
+              >
+                {tryLabel}
+              </Button>
             ) : null}
           </div>
-        ) : null}
+        </div>
+
+        <LineTabs
+          className="min-h-0 min-w-0"
+          onValueChange={(next) => setTab(next as PanelTab)}
+          value={activeTab}
+        >
+          {/* The rail has no room for the sentence in its banner form, so it moves here,
+            above the tabs, rather than being dropped. */}
+          {description ? (
+            <p className="shrink-0 border-b border-border/60 px-5 py-3 text-sm text-pretty text-muted-foreground @3xl:hidden">
+              {description}
+            </p>
+          ) : null}
+
+          {header ? (
+            // A header, not a sticky bar: the body is its own scroll box, so nothing passes
+            // underneath the controls and there is no translucent corner to get wrong.
+            <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border/60 pr-3 pl-5 @3xl:pl-6">
+              {showTabs ? (
+                <LineTabsList aria-label="Skill sections">
+                  <LineTabsTrigger value="overview">
+                    {resultsLabel}
+                  </LineTabsTrigger>
+                  <LineTabsTrigger value="files">
+                    Files
+                    <span className="ml-1.5 font-mono text-xs tabular-nums">
+                      {list.length}
+                    </span>
+                  </LineTabsTrigger>
+                </LineTabsList>
+              ) : (
+                <span />
+              )}
+              {toolbar ? (
+                <div className="flex items-center gap-1">
+                  {showSwitch ? (
+                    <Switch
+                      aria-label={`Enable ${title}`}
+                      checked={isEnabled}
+                      className="mr-1"
+                      onCheckedChange={setEnabled}
+                    />
+                  ) : null}
+                  {menu}
+                  {onClose ? (
+                    <IconButton label="Close" onClick={onClose}>
+                      <X className="size-4" />
+                    </IconButton>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          <div className="min-h-0 flex-1">
+            {hasOverview && activeTab === "overview" ? (
+              <Panel
+                className="flex h-full flex-col gap-6 overflow-y-auto overscroll-contain p-6"
+                tabbed={showTabs}
+                value="overview"
+              >
+                {results?.length ? (
+                  <div className="flex flex-col gap-3">
+                    <div className="grid grid-cols-2 gap-3 @xl:grid-cols-4">
+                      {results.map((result) => (
+                        <figure
+                          className="flex min-w-0 flex-col gap-1.5"
+                          key={result.src}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            alt=""
+                            className="aspect-[3/4] w-full rounded-xl object-cover ring-1 ring-border"
+                            src={result.src}
+                          />
+                          {result.label ? (
+                            <figcaption className="truncate text-xs text-muted-foreground">
+                              {result.label}
+                            </figcaption>
+                          ) : null}
+                        </figure>
+                      ))}
+                    </div>
+                    {resultsNote ? (
+                      <p className="text-xs text-muted-foreground">
+                        {resultsNote}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                {prompts?.length ? (
+                  <div className="flex flex-col gap-3">
+                    <h3 className="text-[11px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
+                      {promptsLabel}
+                    </h3>
+                    <div className="divide-border/60 border-border/60 flex flex-col divide-y border-t">
+                      {prompts.map((prompt, index) => (
+                        <PromptCell
+                          index={index}
+                          key={prompt}
+                          onSelect={onPrompt}
+                          prompt={prompt}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </Panel>
+            ) : null}
+
+            {workspace && activeTab === "files" ? (
+              <Panel
+                className={cn(
+                  "h-full overflow-y-auto overscroll-contain",
+                  hasPreview &&
+                    "@xl:grid @xl:grid-cols-[13rem_minmax(0,1fr)] @xl:overflow-hidden"
+                )}
+                tabbed={showTabs}
+                value="files"
+              >
+                <div
+                  aria-label={folder ?? "Skill files"}
+                  className={cn(
+                    "flex flex-col gap-0.5 p-4",
+                    hasPreview &&
+                      "border-border/60 border-b @xl:min-h-0 @xl:overflow-y-auto @xl:overscroll-contain @xl:border-r @xl:border-b-0"
+                  )}
+                  onKeyDown={handleKeyDown}
+                  role="tree"
+                >
+                  <AnimatePresence initial={false}>
+                    {rows.map((row) => {
+                      const open = row.expandable && expanded.has(row.key);
+                      const selected =
+                        !row.expandable && row.key === currentPath;
+
+                      return (
+                        <motion.div
+                          animate={{ height: "auto", opacity: 1 }}
+                          className="overflow-hidden"
+                          exit={{ height: 0, opacity: 0 }}
+                          initial={
+                            reduceMotion ? false : { height: 0, opacity: 0 }
+                          }
+                          key={row.key}
+                          role="none"
+                          transition={ROW_SLIDE}
+                        >
+                          <button
+                            aria-expanded={row.expandable ? open : undefined}
+                            aria-level={row.depth + 1}
+                            aria-posinset={row.posinset}
+                            aria-selected={
+                              row.expandable ? undefined : selected
+                            }
+                            aria-setsize={row.setsize}
+                            className={cn(
+                              // The ring is inset: a row is clipped top and bottom by the
+                              // height its folder animates, and an outside ring would lose
+                              // its two horizontal runs the moment the wrapper clipped.
+                              "flex w-full cursor-pointer items-center gap-1.5 rounded-lg py-1.5 pr-2 text-left text-sm outline-none transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring",
+                              selected
+                                ? "bg-muted text-foreground"
+                                : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                            )}
+                            onClick={() =>
+                              row.expandable ? toggle(row.key) : select(row.key)
+                            }
+                            onFocus={() => setActiveKey(row.key)}
+                            ref={(node) => registerRow(row.key, node)}
+                            role="treeitem"
+                            style={{ paddingLeft: 8 + row.depth * 14 }}
+                            tabIndex={row.key === activeKey ? 0 : -1}
+                            type="button"
+                          >
+                            <RowIcon
+                              expandable={row.expandable}
+                              file={row.file}
+                              open={open}
+                            />
+                            <span className="truncate">{row.label}</span>
+                          </button>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
+                </div>
+
+                {hasPreview && renderPreview && currentFile ? (
+                  <div className="min-w-0 p-6 @xl:min-h-0 @xl:overflow-y-auto @xl:overscroll-contain">
+                    {reduceMotion ? (
+                      <div>{renderPreview(currentFile)}</div>
+                    ) : (
+                      <motion.div
+                        animate={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0, y: 4 }}
+                        key={currentFile.path}
+                        transition={PREVIEW_FADE}
+                      >
+                        {renderPreview(currentFile)}
+                      </motion.div>
+                    )}
+                  </div>
+                ) : null}
+              </Panel>
+            ) : null}
+          </div>
+        </LineTabs>
       </div>
     </div>
   );
