@@ -130,6 +130,56 @@
       ]
     },
     {
+      "name": "date-range-picker",
+      "type": "registry:ui",
+      "title": "Date Range Picker",
+      "description": "A date range made by name, drawn on two months, or typed: one draft behind all three, a shortcut commits in one press, and OK commits the rest.",
+      "dependencies": ["cn", "date-fns", "lucide-react", "react-day-picker"],
+      "registryDependencies": ["button", "calendar", "input", "popover"],
+      "files": [
+        {
+          "path": "registry/new-york/date-range-picker/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/date-range-picker/index.tsx"
+        },
+        {
+          "path": "registry/new-york/date-range-picker/parts.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/date-range-picker/parts.tsx"
+        },
+        {
+          "path": "registry/new-york/date-range-picker/range-calendar.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/date-range-picker/range-calendar.tsx"
+        },
+        {
+          "path": "registry/new-york/date-range-picker/bounds.ts",
+          "type": "registry:ui",
+          "target": "@components/ui/date-range-picker/bounds.ts"
+        },
+        {
+          "path": "registry/new-york/date-range-picker/context.ts",
+          "type": "registry:ui",
+          "target": "@components/ui/date-range-picker/context.ts"
+        },
+        {
+          "path": "registry/new-york/date-range-picker/format.ts",
+          "type": "registry:ui",
+          "target": "@components/ui/date-range-picker/format.ts"
+        },
+        {
+          "path": "registry/new-york/date-range-picker/presets.ts",
+          "type": "registry:ui",
+          "target": "@components/ui/date-range-picker/presets.ts"
+        },
+        {
+          "path": "registry/new-york/date-range-picker/types.ts",
+          "type": "registry:ui",
+          "target": "@components/ui/date-range-picker/types.ts"
+        }
+      ]
+    },
+    {
       "name": "conversation",
       "type": "registry:ui",
       "title": "Conversation",

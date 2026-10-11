@@ -1,0 +1,280 @@
+---
+title: Date Range Picker
+description: "A date range made by name, drawn on two months, or typed: one draft behind all three, a shortcut commits in one press, and OK commits the rest."
+---
+
+import {
+  DateRangePickerCalendarDemo,
+  DateRangePickerChineseDemo,
+  DateRangePickerDemo,
+} from "@/examples/date-range-picker";
+
+<ComponentPreview name="date-range-picker" align="start">
+  <DateRangePickerDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif-ui.vercel.app/r/date-range-picker.json
+```
+
+It brings the shadcn [Calendar](https://ui.shadcn.com/docs/components/calendar) with it,
+and with that `react-day-picker`. The picker does not edit the calendar: everything that
+makes it a range calendar is passed in from outside, so the file you get at
+`components/ui/calendar.tsx` is the one shadcn publishes. That includes the calendar's
+root: the shadcn file writes it inline, which remounts the whole grid on every render, and
+the picker re-renders on every day the pointer crosses, so it passes a root of its own.
+
+## Usage
+
+```tsx
+import {
+  DateRangePicker,
+  DateRangePickerCalendar,
+  DateRangePickerConfirm,
+  DateRangePickerContent,
+  DateRangePickerFooter,
+  DateRangePickerShortcuts,
+  DateRangePickerTrigger,
+} from "@/components/ui/date-range-picker";
+
+export function ReportRange() {
+  const [range, setRange] = useState<DateRangeValue>();
+
+  return (
+    <DateRangePicker max={new Date()} onValueChange={setRange} value={range}>
+      <DateRangePickerTrigger />
+      <DateRangePickerContent>
+        <DateRangePickerCalendar />
+        <DateRangePickerFooter>
+          <DateRangePickerShortcuts />
+          <DateRangePickerConfirm />
+        </DateRangePickerFooter>
+      </DateRangePickerContent>
+    </DateRangePicker>
+  );
+}
+```
+
+`value` and `defaultValue` are a finished range, `{ from, to }`, and `onValueChange` is
+called with one. A range with only a start is the picker's own business and never leaves it.
+
+## Three ways in, one draft
+
+A range is made by name, drawn on the calendar, or typed into the field. They do not
+compete: it is one range, edited from three places, so there is one draft behind them. A
+shortcut moves the highlight, a day moves the field's text, a typed range moves the
+calendar.
+
+Two of them are done the moment they are pressed, and one is not:
+
+- **A shortcut** commits and closes in one press. A name is already a whole range.
+- **Drawing** is complete on the second day, but not done: the draft is a range and OK
+  lights up. A person who clicked the wrong day looks at it before it becomes the value.
+- **Typing** is the same. Enter in the field commits, and so does OK.
+
+Pressing Escape, or clicking away, throws the draft away.
+
+## Between the two presses
+
+After the first day, the calendar previews the range to wherever the pointer or the arrow
+keys are. The end that is only a question is drawn as an outline, and the first day stays
+solid: one more press turns the outline into an answer, and nothing in the picture says the
+range is decided before it is. While it waits, the field reads `2026-10-05 ~` and OK is
+disabled.
+
+## The band
+
+A range is a filled square at each end and a band between them. The band has no corners of
+its own: where a row wraps, or one month ends and the range carries on in the other, it is
+cut flat, because a rounded edge there would say the range stops. Only the two ends are
+round, and they are the squares.
+
+## The field
+
+The trigger is a text field: `2026-10-05 ~ 2026-10-11`. It is the one place that always
+says what is chosen, so nothing else repeats it. The shortcut that equals the draft is
+highlighted in the panel, but the field never names it — "Last 7 days" and the dates it
+stands for are the same fact, and a label that changes length with every choice moves the
+whole trigger.
+
+Focusing the field opens the panel, and the icon opens it for a person who is not going
+to type. `className` on `DateRangePickerTrigger` sizes the field — it is `w-64` until you
+say otherwise — and every other prop goes to the input. A handler you pass, like `onBlur`,
+runs before the picker's own; call `preventDefault` in it to skip the picker's. Text is accepted in the shape it is shown in, and the panel follows it as soon as
+it is a whole range. A text that is not one — the wrong shape, a day that is not real
+like `2026-02-31`, a range backwards, days outside `min` or `max` — is left on screen and
+marked `aria-invalid` when the person leaves the field or presses Enter. Fixing it
+silently would be a guess about what they meant.
+
+The format is ISO order and not the locale's. It means the same thing in every language,
+and the server and the client write the same string.
+
+## Shortcuts
+
+```tsx
+import { DateRangePicker, lastDays } from "@/components/ui/date-range-picker";
+
+const PRESETS = [
+  lastDays("today", "Today", 1),
+  lastDays("7d", "Last 7 days", 7),
+  lastDays("30d", "Last 30 days", 30),
+  {
+    id: "this-month",
+    label: "This month",
+    range: (today) => ({
+      from: new Date(today.getFullYear(), today.getMonth(), 1),
+      to: today,
+    }),
+  },
+];
+
+<DateRangePicker presets={PRESETS} />;
+```
+
+`range` is handed today's date each time, so a shortcut written as "the last 7 days" is
+still right the next morning, in a tab that has been open overnight. `lastDays(id, label,
+days)` counts today as one of the days.
+
+A shortcut whose range falls outside `min` or `max` is disabled, because pressing it would
+choose days the calendar refuses.
+
+`presets={[]}`, or leaving `DateRangePickerShortcuts` out, gives a bare range calendar:
+
+<ComponentPreview name="date-range-picker" align="start">
+  <DateRangePickerCalendarDemo />
+</ComponentPreview>
+
+The footer, the shortcuts and OK are three parts so that any of them can go. The footer is
+the row and its rule; it is the caller's to leave out when there is nothing to put in it.
+
+## Bounds
+
+`min` and `max` are the first and last day that can be picked. Days past them are drawn,
+faint, rather than left out, so a month is always a month; the arrows stop at the last
+month that holds a pickable day.
+
+```tsx
+<DateRangePicker max={new Date()} min={new Date("2025-01-01")} />
+```
+
+The calendar draws six weeks for each month, so the panel keeps one height from month to
+month instead of moving the footer under the pointer.
+
+## Language
+
+`locale` is a `react-day-picker` locale. It sets the month and weekday names and the first
+day of the week. The labels of the shortcuts, OK and the icon button are words the
+component does not own, so they are props or children:
+
+<ComponentPreview name="date-range-picker" align="start">
+  <DateRangePickerChineseDemo />
+</ComponentPreview>
+
+```tsx
+import { zhCN } from "react-day-picker/locale";
+
+<DateRangePicker locale={zhCN} presets={PRESETS}>
+  <DateRangePickerTrigger calendarLabel="打开日历" />
+  <DateRangePickerContent>
+    <DateRangePickerCalendar />
+    <DateRangePickerFooter>
+      <DateRangePickerShortcuts aria-label="快捷选择" />
+      <DateRangePickerConfirm>确定</DateRangePickerConfirm>
+    </DateRangePickerFooter>
+  </DateRangePickerContent>
+</DateRangePicker>;
+```
+
+## Controlled and not
+
+`value`, `open`, and their `default` and `on…Change` partners work as they do everywhere
+else here: pass one and the picker is yours, leave it out and the picker keeps its own.
+
+The initial range is the caller's to pick. A range written as "the last 7 days" depends on
+the reader's day, so computing it while rendering makes the server and the client disagree
+near midnight; set it after mount, as the demo does.
+
+## The parts
+
+| Part                       | Draws                                                             |
+| -------------------------- | ----------------------------------------------------------------- |
+| `DateRangePicker`          | Nothing but the popover; owns the draft and the pending first day |
+| `DateRangePickerTrigger`   | The field and the icon button                                     |
+| `DateRangePickerContent`   | The panel, as wide as its calendar                                |
+| `DateRangePickerCalendar`  | The shadcn calendar as a range, two months                        |
+| `DateRangePickerFooter`    | The row under the calendar, and the rule above it                 |
+| `DateRangePickerShortcuts` | The presets; nothing when there are none                          |
+| `DateRangePickerConfirm`   | OK; disabled until the draft is a whole range                     |
+
+`useDateRangePicker` hands over the same state the parts read, for a part of your own.
+
+## Small screens
+
+Below `sm` the calendar is rendered as one month, the later of the two, and the arrows walk
+back from it. Two 16rem months do not fit a phone, and stacking them would put the footer
+a scroll away. It is one month rendered, not two with one hidden: the grid decides which
+day the Tab key lands on from the days it holds, and a day in a month nobody can see is a
+place focus can never arrive.
+
+## The days of the neighbouring month
+
+Each month's grid is padded with the days of the months beside it, so with two months on
+screen those days are on screen twice. They are drawn as a faint number and nothing else —
+no band, no filled end, no hover, and a press does nothing — so a range is never drawn
+twice and the start is never in two places.
+
+## Accessibility
+
+`react-day-picker` supplies the grid: one tab stop, the arrow keys, Home and End for the
+week, Page Up and Page Down for the month. Opened from the icon, focus lands on the day
+those keys will move from; opened by focusing the field, it stays in the field so typing is
+not interrupted. Moving with the keyboard previews the range just as the pointer does.
+
+Each day is a button named by its date, and the days in the range are `aria-pressed`. The
+shortcuts are `aria-pressed` too, in a labelled group.
+
+## Component source
+
+<ComponentSource
+  name="date-range-picker"
+  src="registry/new-york/date-range-picker/index.tsx"
+  title="index.tsx"
+/>
+
+<ComponentSource
+  name="date-range-picker"
+  src="registry/new-york/date-range-picker/parts.tsx"
+  title="parts.tsx"
+/>
+
+<ComponentSource
+  name="date-range-picker"
+  src="registry/new-york/date-range-picker/range-calendar.tsx"
+  title="range-calendar.tsx"
+/>
+
+<ComponentSource
+  name="date-range-picker"
+  src="registry/new-york/date-range-picker/context.ts"
+  title="context.ts"
+/>
+
+<ComponentSource
+  name="date-range-picker"
+  src="registry/new-york/date-range-picker/format.ts"
+  title="format.ts"
+/>
+
+<ComponentSource
+  name="date-range-picker"
+  src="registry/new-york/date-range-picker/presets.ts"
+  title="presets.ts"
+/>
+
+<ComponentSource
+  name="date-range-picker"
+  src="registry/new-york/date-range-picker/types.ts"
+  title="types.ts"
+/>
