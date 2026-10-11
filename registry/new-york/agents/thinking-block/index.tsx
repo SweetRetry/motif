@@ -27,7 +27,9 @@ const useClock = (
 ) => {
   useEffect(() => {
     const el = node.current;
-    if (!el || controlledElapsed !== undefined) {return;}
+    if (!el || controlledElapsed !== undefined) {
+      return;
+    }
 
     const origin = startedAt ?? Date.now();
     let timeout = 0;

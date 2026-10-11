@@ -23,19 +23,19 @@ npx shadcn@latest add https://motif-ui.vercel.app/r/agent-indicator.json
 ```tsx
 import { AgentIndicator } from "@/components/agents/agent-indicator";
 
-<AgentIndicator state="thinking" />
+<AgentIndicator state="thinking" />;
 ```
 
 ## States
 
 Four states covering the wait, each with its own colour, shape and motion:
 
-| State | Colour | Shape | Motion |
-| --- | --- | --- | --- |
-| `idle` | Muted | Full grid | Static |
-| `thinking` | Info (blue) | Full grid | Diagonal wave |
-| `tool-call` | Foreground | Cross ↔ corners | Alternating shapes |
-| `streaming` | Success (green) | Full grid | Column wave left → right |
+| State       | Colour          | Shape           | Motion                   |
+| ----------- | --------------- | --------------- | ------------------------ |
+| `idle`      | Muted           | Full grid       | Static                   |
+| `thinking`  | Info (blue)     | Full grid       | Diagonal wave            |
+| `tool-call` | Foreground      | Cross ↔ corners | Alternating shapes       |
+| `streaming` | Success (green) | Full grid       | Column wave left → right |
 
 <ComponentPreview name="agent-indicator-switch">
   <AgentIndicatorSwitchDemo />

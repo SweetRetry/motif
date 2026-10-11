@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 
-import { AgentIndicator } from '@/registry/new-york/agents/agent-indicator';
-import type { AgentState } from '@/registry/new-york/agents/agent-indicator';
+import { AgentIndicator } from "@/registry/new-york/agents/agent-indicator";
+import type { AgentState } from "@/registry/new-york/agents/agent-indicator";
 
 const STATES: { state: AgentState; label: string }[] = [
   { label: "Idle", state: "idle" },

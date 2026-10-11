@@ -153,11 +153,15 @@ export const AgentIndicator = ({ className, state }: AgentIndicatorProps) => {
 
   useEffect(() => {
     const node = ref.current;
-    if (!node || reduce || !spec.run) {return;}
+    if (!node || reduce || !spec.run) {
+      return;
+    }
 
     const animations = spec.run([...node.children] as HTMLElement[]);
     return () => {
-      for (const a of animations) {a.cancel();}
+      for (const a of animations) {
+        a.cancel();
+      }
     };
   }, [spec, reduce]);
 
