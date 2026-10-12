@@ -1,0 +1,14 @@
+{
+  "name": "motif-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mts",
+    "capture": "node --max-old-space-size=1024 capture.mts"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "geist": "^1.7.2",
+    "playwright": "^1.64.0"
+  }
+}

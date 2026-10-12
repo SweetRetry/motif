@@ -1,0 +1,23 @@
+/* The site's own stylesheet, so a shot draws with the tokens and utilities the docs
+   draw with. The site gets Geist from next/font; the stage has no Next, so the faces
+   are declared here and copied next to the bundle by build.mts. */
+@import "../../styles/globals.css";
+
+@font-face {
+  font-display: block;
+  font-family: "Geist";
+  font-weight: 100 900;
+  src: url("./fonts/Geist-Variable.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: block;
+  font-family: "Geist Mono";
+  font-weight: 100 900;
+  src: url("./fonts/GeistMono-Variable.woff2") format("woff2");
+}
+
+:root {
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+}
