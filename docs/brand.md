@@ -10,7 +10,7 @@
 | 名称            | `Motif`                                 | `SITE.NAME`                      |
 | 发行标识 scope  | `@motif`                                | `registry.json:name`             |
 | 包名            | `motif`                                 | `package.json:name`              |
-| 站点 / registry | `https://motif-ui.vercel.app`           | `constants/site.ts` fallback     |
+| 站点 / registry | `https://motif.sweetretry.com`          | `constants/site.ts` fallback     |
 | 仓库            | `https://github.com/SweetRetry/motif`   | `constants/links.ts` `GITHUB`    |
 | 作者            | `SweetRetry`（GitHub handle，不用真名） | `SITE.AUTHOR.NAME`               |
 | X               | `@SweetRetry`                           | `SITE.AUTHOR.TWITTER` / `LINK.X` |
@@ -35,9 +35,7 @@
 | `content/docs/**/*.mdx`      | 每个安装命令的 `https://…/r/<name>.json`                |
 | `README.md`                  | banner、标题、徽章、正文                                |
 | `app/(app)/(root)/page.tsx`  | `<h1>` 与描述句                                         |
-| `app/(app)/sponsor/page.tsx` | 文案与 metadata description                             |
 | `examples/toolbar.tsx`       | demo 里指向源码仓库的链接                               |
-| `.github/FUNDING.yml`        | funding 账号                                            |
 | `LICENSE`                    | 版权行                                                  |
 
 ## 生成物（不要手改，重新构建即覆盖）
@@ -53,7 +51,7 @@
 | 项                    | 值                                                                                                                                       |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | Project               | `motif`（原 `startercn`，已改名）                                                                                                        |
-| 生产域                | `https://motif-ui.vercel.app`                                                                                                            |
+| 生产域                | `https://motif.sweetretry.com`                                                                                                           |
 | Deployment Protection | 已关闭（`ssoProtection: null`）——registry 必须公开可取；preview 也一并公开了，只想护 preview 就到 dashboard 设成 preview-only            |
 | 旧域                  | `startercn-livid.vercel.app` 已从 project domains 删除（`DELETE /v10/projects/{id}/domains/...`），否则每次 deploy 会把它重新 alias 出来 |
 
@@ -70,7 +68,6 @@ URL 就要自定义域。
 - **X**：`@SweetRetry` 需确认；没有 X 账号则删 `SITE.AUTHOR.TWITTER` 并把
   `LINK.X` 与 `seo/metadata.ts`、`seo/json-ld.tsx`、`components/docs-toc-footer.tsx`
   里的引用一并去掉。
-- **FUNDING.yml**：仅在已开通 GitHub Sponsors 时生效。
 
 ## 关于上游
 

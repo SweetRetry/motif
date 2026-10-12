@@ -360,7 +360,7 @@
       "description": "A collapsible window onto a reasoning stream: a capped height, a mask that says there is more below, and a follow that lets the newest line rise into place instead of jumping the scroll.",
       "dependencies": ["cn", "lucide-react", "motion", "streamdown"],
       "registryDependencies": [
-        "https://motif-ui.vercel.app/r/agent-indicator.json"
+        "https://motif.sweetretry.com/r/agent-indicator.json"
       ],
       "files": [
         {
@@ -465,10 +465,10 @@
       "description": "The box a message is written in, assembled from parts: a field that grows and then scrolls, the files riding with the draft as chips above it, the model answering it, and the one button that ends the turn.",
       "dependencies": ["cn", "lucide-react"],
       "registryDependencies": [
-        "https://motif-ui.vercel.app/r/provider-mark.json",
+        "https://motif.sweetretry.com/r/provider-mark.json",
         "button",
         "dropdown-menu",
-        "https://motif-ui.vercel.app/r/attachment.json"
+        "https://motif.sweetretry.com/r/attachment.json"
       ],
       "files": [
         {
@@ -522,7 +522,7 @@
         "button",
         "dialog",
         "switch",
-        "https://motif-ui.vercel.app/r/line-tabs.json"
+        "https://motif.sweetretry.com/r/line-tabs.json"
       ],
       "files": [
         {
@@ -580,13 +580,13 @@
       "registryDependencies": [
         "button",
         "tooltip",
-        "https://motif-ui.vercel.app/r/attachment.json",
-        "https://motif-ui.vercel.app/r/conversation.json",
-        "https://motif-ui.vercel.app/r/message.json",
-        "https://motif-ui.vercel.app/r/prompt-input.json",
-        "https://motif-ui.vercel.app/r/scroll-rail.json",
-        "https://motif-ui.vercel.app/r/thinking-block.json",
-        "https://motif-ui.vercel.app/r/agent-indicator.json"
+        "https://motif.sweetretry.com/r/attachment.json",
+        "https://motif.sweetretry.com/r/conversation.json",
+        "https://motif.sweetretry.com/r/message.json",
+        "https://motif.sweetretry.com/r/prompt-input.json",
+        "https://motif.sweetretry.com/r/scroll-rail.json",
+        "https://motif.sweetretry.com/r/thinking-block.json",
+        "https://motif.sweetretry.com/r/agent-indicator.json"
       ],
       "files": [
         {
