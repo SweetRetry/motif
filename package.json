@@ -8,6 +8,7 @@
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit",
     "registry:build": "shadcn build registry.json --output ./public/r",
+    "icons": "node scripts/generate-icons.mts",
     "registry:marks": "node scripts/generate-provider-marks.mts && ultracite fix registry/new-york/provider-mark.tsx",
     "postinstall": "fumadocs-mdx",
     "check": "ultracite check",

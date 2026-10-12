@@ -5,13 +5,14 @@ import { useTheme } from "next-themes";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
-import { LogoMark, getLogoMarkSVG } from "@/components/logo";
+import { LogoMark } from "@/components/logo";
 import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { logoMarkSvg } from "@/constants/logo-mark";
 import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 
 export const BrandContextMenu = ({
@@ -22,7 +23,7 @@ export const BrandContextMenu = ({
   const { resolvedTheme } = useTheme();
   const { copyToClipboard } = useCopyToClipboard();
 
-  const logoMarkSvgString = getLogoMarkSVG(
+  const logoMarkSvgString = logoMarkSvg(
     resolvedTheme === "light" ? "#000" : "#fff"
   );
 
