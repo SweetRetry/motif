@@ -5,7 +5,6 @@ export const ROUTES = {
   API_STATUS: "/api/status",
   DOCS: "/docs",
   DOCS_COMPONENTS: "/docs/components",
-  DOCS_DESIGN: "/docs/design",
   DOCS_INSTALLATION: "/docs/installation",
   HOME: "/",
   LLMS: "/llms.txt",
