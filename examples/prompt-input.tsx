@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { AgentIndicator } from "@/components/agents/agent-indicator";
+import { AgentIndicator } from "@/components/ui/agent-indicator";
 import {
   ModelPicker,
   PromptInput,

@@ -21,21 +21,21 @@ npx shadcn@latest add https://motif.sweetretry.com/r/agent-indicator.json
 ## Usage
 
 ```tsx
-import { AgentIndicator } from "@/components/agents/agent-indicator";
+import { AgentIndicator } from "@/components/ui/agent-indicator";
 
 <AgentIndicator state="thinking" />;
 ```
 
 ## States
 
-Four states covering the wait, each with its own colour, shape and motion:
+Four states covering the wait. They share one colour, the foreground, so the indicator never competes with the surrounding UI. Shape and motion tell them apart. Pass a `text-*` class to recolour it.
 
-| State       | Colour          | Shape           | Motion                   |
-| ----------- | --------------- | --------------- | ------------------------ |
-| `idle`      | Muted           | Full grid       | Static                   |
-| `thinking`  | Info (blue)     | Full grid       | Diagonal wave            |
-| `tool-call` | Foreground      | Cross ↔ corners | Alternating shapes       |
-| `streaming` | Success (green) | Full grid       | Column wave left → right |
+| State       | Shape           | Motion                   |
+| ----------- | --------------- | ------------------------ |
+| `idle`      | Full grid       | Static, dim              |
+| `thinking`  | Full grid       | Diagonal wave            |
+| `tool-call` | Cross ↔ corners | Alternating shapes       |
+| `streaming` | Full grid       | Column wave left → right |
 
 <ComponentPreview name="agent-indicator-switch">
   <AgentIndicatorSwitchDemo />

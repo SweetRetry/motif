@@ -17,8 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { SPRING_LAYOUT, SPRING_SWAP } from "@/lib/ease";
-import { useHoverCapable } from "@/lib/hooks/use-hover-capable";
+import { useHoverCapable } from "@/hooks/use-hover-capable";
 import { cn } from "@/lib/utils";
 
 import type {
@@ -34,6 +33,10 @@ export type {
   ScrollRailPreviewProps,
   ScrollRailProps,
 } from "./types";
+
+// Motion tokens, kept in this file so it installs on its own.
+const SPRING_LAYOUT = { damping: 32, mass: 0.6, stiffness: 360 } as const;
+const SPRING_SWAP = { damping: 30, mass: 0.55, stiffness: 460 } as const;
 
 /** The rail has one shape: a Gaussian falloff away from the focus. `spread` sets how
  *  far it reaches for the width, `highlight` how far it reaches for the colour. */

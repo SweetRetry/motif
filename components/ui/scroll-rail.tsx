@@ -2,7 +2,7 @@
 
 /**
  * The site's copy of the scroll rail, at the path the registry publishes it to.
- * Consumers get the files at `@/components/scroll-rail`; the chat block imports them
+ * Consumers get the files at `@/components/ui/scroll-rail`; the chat block imports them
  * from there, so this is only here to keep that one path resolvable without keeping a
  * second copy of the source.
  */

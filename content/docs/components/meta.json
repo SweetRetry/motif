@@ -1,22 +1,4 @@
 {
   "title": "Components",
-  "pages": [
-    "index",
-    "activity-heatmap",
-    "aspect-ratio-picker",
-    "audio-preview",
-    "breakdown",
-    "cover-fan",
-    "date-range-picker",
-    "duration-slider",
-    "flow-edge",
-    "generation-overlay",
-    "line-tabs",
-    "model-select",
-    "provider-mark",
-    "resolution-segmented",
-    "settings-dialog",
-    "strength-select",
-    "toolbar"
-  ]
+  "pages": ["index", "line-tabs", "settings-dialog"]
 }

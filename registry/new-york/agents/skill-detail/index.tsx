@@ -25,7 +25,6 @@ import {
   LineTabsTrigger,
 } from "@/components/ui/line-tabs";
 import { Switch } from "@/components/ui/switch";
-import { EASE_OUT, SPRING_SWAP } from "@/lib/ease";
 import { cn } from "@/lib/utils";
 
 import type {
@@ -35,7 +34,6 @@ import type {
   SkillDetailDialogProps,
   SkillDetailProps,
   SkillFile,
-  SkillResult,
 } from "./types";
 
 export type {
@@ -47,6 +45,10 @@ export type {
   SkillFile,
   SkillResult,
 } from "./types";
+
+// Motion tokens, kept in this file so it installs on its own.
+const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+const SPRING_SWAP = { damping: 30, mass: 0.55, stiffness: 460 } as const;
 
 /** The toolbar's icon buttons and the copy button on a code block are the same control,
  *  so they share one plate. */

@@ -5,24 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Streamdown } from "streamdown";
 
-import { AgentIndicator } from "@/components/agents/agent-indicator";
-import {
-  ModelPicker,
-  PromptInput,
-  PromptInputAttach,
-  PromptInputAttachment,
-  PromptInputFooter,
-  PromptInputHeader,
-  PromptInputSubmit,
-  PromptInputTextarea,
-} from "@/components/agents/prompt-input";
-import type {
-  PromptAttachment,
-  PromptModel,
-} from "@/components/agents/prompt-input";
-import { ThinkingBlock } from "@/components/agents/thinking-block";
-import { ScrollRail, ScrollRailPreview } from "@/components/scroll-rail";
-import type { ScrollRailItem } from "@/components/scroll-rail";
+import { AgentIndicator } from "@/components/ui/agent-indicator";
 import { Attachment } from "@/components/ui/attachment";
 import { Button } from "@/components/ui/button";
 import type { ButtonProps } from "@/components/ui/button";
@@ -38,11 +21,28 @@ import {
   MessageContent,
 } from "@/components/ui/message";
 import {
+  ModelPicker,
+  PromptInput,
+  PromptInputAttach,
+  PromptInputAttachment,
+  PromptInputFooter,
+  PromptInputHeader,
+  PromptInputSubmit,
+  PromptInputTextarea,
+} from "@/components/ui/prompt-input";
+import type {
+  PromptAttachment,
+  PromptModel,
+} from "@/components/ui/prompt-input";
+import { ScrollRail, ScrollRailPreview } from "@/components/ui/scroll-rail";
+import type { ScrollRailItem } from "@/components/ui/scroll-rail";
+import { ThinkingBlock } from "@/components/ui/thinking-block";
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useMessageFocus } from "@/lib/hooks/use-scroll-focus";
+import { useMessageFocus } from "@/hooks/use-scroll-focus";
 import { cn } from "@/lib/utils";
 
 /* -- The app -------------------------------------------------------------------

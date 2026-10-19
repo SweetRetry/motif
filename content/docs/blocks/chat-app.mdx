@@ -15,6 +15,11 @@ import { ChatAppDemo, ChatAppEmptyDemo } from "@/examples/chat-app";
 npx shadcn@latest add https://motif.sweetretry.com/r/chat-app.json
 ```
 
+It writes one file, `components/chat-app.tsx`, and the pieces below land beside your
+other primitives in `components/ui/`. It adds no page and no route. The transport in the
+usage example is a docs-only stand-in, so it is not installed. Copy `use-demo-chat.ts`
+from the source below if you want it.
+
 ## What it is made of
 
 The block adds no surfaces of its own. Every part of it is a component this registry
@@ -39,8 +44,9 @@ The surface takes a thread and four doors out of it. It owns the draft's attachm
 nothing else — the turns belong to whatever transport you point it at.
 
 ```tsx
-import { ChatApp } from "@/components/chat/chat-app";
-import { useDemoChat } from "@/components/chat/use-demo-chat";
+import { ChatApp } from "@/components/chat-app";
+// Copied from the source below. Replace it with your own transport.
+import { useDemoChat } from "@/components/use-demo-chat";
 
 export default function ChatPage() {
   const chat = useDemoChat();

@@ -41,7 +41,7 @@ import {
   PromptInputTextarea,
   type PromptAttachment,
   type PromptModel,
-} from "@/components/agents/prompt-input";
+} from "@/components/ui/prompt-input";
 
 const MODELS: PromptModel[] = [
   { id: "gpt-5.2", name: "GPT-5.2", provider: "openai" },
@@ -173,7 +173,7 @@ menu covering the thing you are deciding about.
 controlled; on its own the picker holds it, starting at `defaultValue` or the first model.
 
 `ProviderMark` draws [LobeHub's icon set](https://github.com/lobehub/lobe-icons) (MIT) in
-its coloured cut, and it lives in [Provider Mark](/docs/components/provider-mark) rather
+its coloured cut, and it lives in [Provider Mark](/docs/media/provider-mark) rather
 than here — the marks are the same artwork a browsing picker needs, so they ship once and
 both components depend on them. This item re-exports `ProviderMark` and `PROVIDER_NAMES`
 for convenience, and `shadcn add` brings the marks along with it.

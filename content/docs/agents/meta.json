@@ -5,11 +5,12 @@
     "message",
     "thinking-block",
     "agent-indicator",
+    "scroll-rail",
     "prompt-input",
     "voice-input",
     "attachment",
-    "scroll-rail",
     "approval-card",
+    "cover-fan",
     "skill-detail"
   ]
 }

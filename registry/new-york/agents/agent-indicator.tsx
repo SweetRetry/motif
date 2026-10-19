@@ -81,7 +81,6 @@ const ST_REST = [0.2, 0.452, 0.665];
 /* -- Per-state definition --------------------------------------------------- */
 
 interface StateSpec {
-  colorClass: string;
   mask: boolean[];
   rest: (i: number) => number;
   run?: (cells: HTMLElement[]) => Animation[];
@@ -89,13 +88,11 @@ interface StateSpec {
 
 const STATES: Record<AgentState, StateSpec> = {
   idle: {
-    colorClass: "text-muted-foreground",
     mask: ALL,
     rest: () => 0.25,
   },
 
   streaming: {
-    colorClass: "text-success",
     mask: ALL,
     rest: (i) => ST_REST[i % GRID],
     run: (cells) =>
@@ -110,7 +107,6 @@ const STATES: Record<AgentState, StateSpec> = {
   },
 
   thinking: {
-    colorClass: "text-info",
     mask: ALL,
     rest: (i) => TH_REST[thAntiDiag(i) % TH_REST.length],
     run: (cells) =>
@@ -125,7 +121,6 @@ const STATES: Record<AgentState, StateSpec> = {
   },
 
   "tool-call": {
-    colorClass: "text-foreground",
     mask: ALL,
     rest: (i) => (TC_CROSS[i] ? TC_BRIGHT : TC_DIM),
     run: (cells) =>
@@ -169,8 +164,7 @@ export const AgentIndicator = ({ className, state }: AgentIndicatorProps) => {
     <span
       aria-hidden="true"
       className={cn(
-        "inline-grid grid-cols-3 gap-[2.5px]",
-        spec.colorClass,
+        "inline-grid grid-cols-3 gap-[2.5px] text-foreground",
         className
       )}
       data-slot="agent-indicator"

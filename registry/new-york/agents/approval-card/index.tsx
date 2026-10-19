@@ -4,7 +4,7 @@ import { LoaderCircle, X } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { AgentDisclosure } from "@/components/agents/agent-disclosure";
+import { AgentDisclosure } from "@/components/ui/agent-disclosure";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -13,7 +13,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { EASE_OUT, SPRING_SWAP } from "@/lib/ease";
 import { cn } from "@/lib/utils";
 
 import type {
@@ -32,6 +31,10 @@ export type {
   ApprovalCardQuestion,
   ApprovalCardStatus,
 } from "./types";
+
+// Motion tokens, kept in this file so it installs on its own.
+const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+const SPRING_SWAP = { damping: 30, mass: 0.55, stiffness: 460 } as const;
 
 const EMPTY_ANSWER: ApprovalCardAnswer = { custom: "", selected: [] };
 

@@ -23,9 +23,8 @@ export default defineConfig({
       // code (examples/, docs, app) is not exempt.
       files: [
         "components/motion/**",
-        "components/agents/agent-disclosure.tsx",
-        "lib/ease.ts",
-        "lib/hooks/use-hover-capable.ts",
+        "components/ui/agent-disclosure.tsx",
+        "hooks/use-hover-capable.ts",
         "registry/new-york/agents/**",
         "registry/new-york/scroll-rail/**",
       ],

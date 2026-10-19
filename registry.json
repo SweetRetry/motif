@@ -7,7 +7,6 @@
       "type": "registry:ui",
       "title": "Activity Heatmap",
       "description": "A year of daily activity as a GitHub-style grid: a column per week, a row per weekday, one square per day, shaded by how much happened.",
-      "dependencies": ["cn"],
       "files": [
         {
           "path": "registry/new-york/activity-heatmap.tsx",
@@ -18,10 +17,10 @@
     },
     {
       "name": "approval-card",
-      "type": "registry:component",
+      "type": "registry:ui",
       "title": "Approval Card",
       "description": "A human-in-the-loop decision surface for approvals, single-choice questions, custom responses, and multi-step review flows.",
-      "dependencies": ["cn", "lucide-react", "motion"],
+      "dependencies": ["lucide-react", "motion"],
       "registryDependencies": ["button", "input", "radio-group", "tooltip"],
       "cssVars": {
         "theme": {
@@ -37,32 +36,27 @@
       "files": [
         {
           "path": "registry/new-york/agents/approval-card/index.tsx",
-          "type": "registry:component",
-          "target": "@components/agents/approval-card/index.tsx"
+          "type": "registry:ui",
+          "target": "@components/ui/approval-card/index.tsx"
         },
         {
           "path": "registry/new-york/agents/approval-card/types.ts",
-          "type": "registry:component",
-          "target": "@components/agents/approval-card/types.ts"
+          "type": "registry:ui",
+          "target": "@components/ui/approval-card/types.ts"
         },
         {
-          "path": "components/agents/agent-disclosure.tsx",
-          "type": "registry:component",
-          "target": "@components/agents/agent-disclosure.tsx"
-        },
-        {
-          "path": "lib/ease.ts",
-          "type": "registry:lib",
-          "target": "@lib/ease.ts"
+          "path": "components/ui/agent-disclosure.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/agent-disclosure.tsx"
         }
       ]
     },
     {
       "name": "agent-indicator",
-      "type": "registry:component",
+      "type": "registry:ui",
       "title": "Agent Indicator",
       "description": "A 3×3 grid badge that shows agent state — idle, thinking, executing, streaming, done, failed — through color, shape, and an opacity wave.",
-      "dependencies": ["cn", "motion"],
+      "dependencies": ["motion"],
       "cssVars": {
         "theme": {
           "color-success": "var(--success)",
@@ -80,8 +74,8 @@
       "files": [
         {
           "path": "registry/new-york/agents/agent-indicator.tsx",
-          "type": "registry:component",
-          "target": "@components/agents/agent-indicator.tsx"
+          "type": "registry:ui",
+          "target": "@components/ui/agent-indicator.tsx"
         }
       ]
     },
@@ -90,7 +84,7 @@
       "type": "registry:ui",
       "title": "Attachment",
       "description": "A square attachment chip for composer rows: image thumbnails, file glyphs and upload progress traced around the card border.",
-      "dependencies": ["cn", "lucide-react"],
+      "dependencies": ["lucide-react"],
       "files": [
         {
           "path": "registry/new-york/attachment.tsx",
@@ -104,7 +98,7 @@
       "type": "registry:ui",
       "title": "Audio Preview",
       "description": "A recording you can read before you play it: the whole waveform on screen, the part you have heard lit, and a press anywhere on it to seek there.",
-      "dependencies": ["cn", "lucide-react"],
+      "dependencies": ["lucide-react"],
       "registryDependencies": ["button"],
       "files": [
         {
@@ -119,7 +113,6 @@
       "type": "registry:ui",
       "title": "Breakdown",
       "description": "A whole cut into its parts: one bar, each cut as wide as its share, and a legend that names every part and its amount.",
-      "dependencies": ["cn"],
       "registryDependencies": ["tooltip"],
       "files": [
         {
@@ -134,7 +127,7 @@
       "type": "registry:ui",
       "title": "Date Range Picker",
       "description": "A date range made by name, drawn on two months, or typed: one draft behind all three, a shortcut commits in one press, and OK commits the rest.",
-      "dependencies": ["cn", "date-fns", "lucide-react", "react-day-picker"],
+      "dependencies": ["date-fns", "lucide-react", "react-day-picker"],
       "registryDependencies": ["button", "calendar", "input", "popover"],
       "files": [
         {
@@ -184,7 +177,7 @@
       "type": "registry:ui",
       "title": "Conversation",
       "description": "The scroll region a transcript lives in: it follows its own tail while the reader is at the end, stops the moment they scroll up, and offers a way back when they have.",
-      "dependencies": ["cn", "lucide-react"],
+      "dependencies": ["lucide-react"],
       "registryDependencies": ["button"],
       "files": [
         {
@@ -199,7 +192,6 @@
       "type": "registry:ui",
       "title": "Message",
       "description": "One turn of a transcript, assembled from parts: who it is from, the body, and the actions that appear once you are done reading.",
-      "dependencies": ["cn"],
       "files": [
         {
           "path": "registry/new-york/message.tsx",
@@ -210,36 +202,29 @@
     },
     {
       "name": "scroll-rail",
-      "type": "registry:component",
+      "type": "registry:ui",
       "title": "Scroll Rail",
       "description": "A tick rail that mirrors a long scroll region: width carries distance from the reading line, colour carries focus. Hover a tick to preview the turn, click to jump to it.",
-      "dependencies": ["cn", "motion"],
+      "dependencies": ["motion"],
       "registryDependencies": ["popover"],
       "files": [
         {
           "path": "registry/new-york/scroll-rail/index.tsx",
-          "type": "registry:component",
-          "target": "@components/scroll-rail/index.tsx"
+          "type": "registry:ui",
+          "target": "@components/ui/scroll-rail/index.tsx"
         },
         {
           "path": "registry/new-york/scroll-rail/types.ts",
-          "type": "registry:component",
-          "target": "@components/scroll-rail/types.ts"
+          "type": "registry:ui",
+          "target": "@components/ui/scroll-rail/types.ts"
         },
         {
-          "path": "lib/hooks/use-scroll-focus.ts",
-          "type": "registry:hook",
-          "target": "@lib/hooks/use-scroll-focus.ts"
+          "path": "hooks/use-scroll-focus.ts",
+          "type": "registry:hook"
         },
         {
-          "path": "lib/hooks/use-hover-capable.ts",
-          "type": "registry:hook",
-          "target": "@lib/hooks/use-hover-capable.ts"
-        },
-        {
-          "path": "lib/ease.ts",
-          "type": "registry:lib",
-          "target": "@lib/ease.ts"
+          "path": "hooks/use-hover-capable.ts",
+          "type": "registry:hook"
         }
       ]
     },
@@ -248,7 +233,7 @@
       "type": "registry:ui",
       "title": "Aspect Ratio Picker",
       "description": "Aspect ratio as a grid of to-scale glyphs, each drawn inside the same square window so the shapes line up and the ratio reads without the label.",
-      "dependencies": ["cn", "lucide-react"],
+      "dependencies": ["lucide-react"],
       "files": [
         {
           "path": "registry/new-york/aspect-ratio-picker.tsx",
@@ -262,7 +247,6 @@
       "type": "registry:ui",
       "title": "Resolution Segmented",
       "description": "A segmented resolution control with a sliding plate and a dot-matrix glyph that carries sampling density: two dots standard, three high, four retina.",
-      "dependencies": ["cn"],
       "files": [
         {
           "path": "registry/new-york/resolution-segmented.tsx",
@@ -276,7 +260,6 @@
       "type": "registry:ui",
       "title": "Provider Mark",
       "description": "One maker's logo at 20px, in the colour the brand draws it: twenty-three marks, taken from LobeHub's icon set and inlined so a picker never pays for an icon package.",
-      "dependencies": ["cn"],
       "files": [
         {
           "path": "registry/new-york/provider-mark.tsx",
@@ -290,7 +273,7 @@
       "type": "registry:ui",
       "title": "Model Select",
       "description": "A catalogue you can walk: what is recommended first, then every maker in one scroll, with a rail that indexes the list and follows you down it.",
-      "dependencies": ["cn", "lucide-react"],
+      "dependencies": ["lucide-react"],
       "registryDependencies": ["command", "popover"],
       "files": [
         {
@@ -320,7 +303,6 @@
       "type": "registry:ui",
       "title": "Duration Slider",
       "description": "Duration as a compact clip on a timeline: drag the playhead, read the live value in a HUD, commit one settled number on release.",
-      "dependencies": ["cn"],
       "files": [
         {
           "path": "registry/new-york/duration-slider.tsx",
@@ -334,7 +316,6 @@
       "type": "registry:ui",
       "title": "Strength Select",
       "description": "Strength as a track you drag: one seat per level, the playhead riding the fill's leading edge, and a slow drift of motes across the fill of the top level.",
-      "dependencies": ["cn"],
       "css": {
         "@keyframes strength-mote": {
           "from": {
@@ -355,28 +336,23 @@
     },
     {
       "name": "thinking-block",
-      "type": "registry:component",
+      "type": "registry:ui",
       "title": "Thinking Block",
       "description": "A collapsible window onto a reasoning stream: a capped height, a mask that says there is more below, and a follow that lets the newest line rise into place instead of jumping the scroll.",
-      "dependencies": ["cn", "lucide-react", "motion", "streamdown"],
+      "dependencies": ["lucide-react", "motion", "streamdown"],
       "registryDependencies": [
         "https://motif.sweetretry.com/r/agent-indicator.json"
       ],
       "files": [
         {
           "path": "registry/new-york/agents/thinking-block/index.tsx",
-          "type": "registry:component",
-          "target": "@components/agents/thinking-block/index.tsx"
+          "type": "registry:ui",
+          "target": "@components/ui/thinking-block.tsx"
         },
         {
-          "path": "components/agents/agent-disclosure.tsx",
-          "type": "registry:component",
-          "target": "@components/agents/agent-disclosure.tsx"
-        },
-        {
-          "path": "lib/ease.ts",
-          "type": "registry:lib",
-          "target": "@lib/ease.ts"
+          "path": "components/ui/agent-disclosure.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/agent-disclosure.tsx"
         }
       ]
     },
@@ -385,7 +361,7 @@
       "type": "registry:ui",
       "title": "Generation Overlay",
       "description": "The overlay a media node wears while it generates: a two-tone flow drifting behind the result, a blur-to-focus reveal once the media decodes, and a failure line when it never arrives.",
-      "dependencies": ["cn", "motion"],
+      "dependencies": ["motion"],
       "files": [
         {
           "path": "registry/new-york/generation-overlay.tsx",
@@ -399,7 +375,7 @@
       "type": "registry:ui",
       "title": "Flow Edge",
       "description": "A bezier connector that carries a pulse of light from one end to the other while work is in flight — bright in the middle, faded at both ends — and rests as a plain line when it is not.",
-      "dependencies": ["cn", "motion"],
+      "dependencies": ["motion"],
       "files": [
         {
           "path": "registry/new-york/flow-edge.tsx",
@@ -413,7 +389,7 @@
       "type": "registry:ui",
       "title": "Toolbar",
       "description": "A floating dock of glyphs that names itself on approach: the icon under the pointer swells and its label arrives above it, while the bar itself never moves. Items that earn the width can pin their label into the row.",
-      "dependencies": ["cn", "motion"],
+      "dependencies": ["motion"],
       "registryDependencies": ["tooltip"],
       "files": [
         {
@@ -422,48 +398,37 @@
           "target": "@components/ui/toolbar.tsx"
         },
         {
-          "path": "lib/hooks/use-hover-capable.ts",
-          "type": "registry:hook",
-          "target": "@lib/hooks/use-hover-capable.ts"
-        },
-        {
-          "path": "lib/ease.ts",
-          "type": "registry:lib",
-          "target": "@lib/ease.ts"
+          "path": "hooks/use-hover-capable.ts",
+          "type": "registry:hook"
         }
       ]
     },
     {
       "name": "settings-dialog",
-      "type": "registry:component",
+      "type": "registry:ui",
       "title": "Settings Dialog",
       "description": "Destinations down the left, one panel on the right: a rail you can walk with the arrow keys, a panel that fades in, and the row, section and card the panel is built from.",
-      "dependencies": ["cn", "lucide-react", "motion"],
+      "dependencies": ["lucide-react", "motion"],
       "registryDependencies": ["dialog"],
       "files": [
         {
           "path": "registry/new-york/settings-dialog/index.tsx",
-          "type": "registry:component",
-          "target": "@components/settings-dialog/index.tsx"
+          "type": "registry:ui",
+          "target": "@components/ui/settings-dialog/index.tsx"
         },
         {
           "path": "registry/new-york/settings-dialog/types.ts",
-          "type": "registry:component",
-          "target": "@components/settings-dialog/types.ts"
-        },
-        {
-          "path": "lib/ease.ts",
-          "type": "registry:lib",
-          "target": "@lib/ease.ts"
+          "type": "registry:ui",
+          "target": "@components/ui/settings-dialog/types.ts"
         }
       ]
     },
     {
       "name": "prompt-input",
-      "type": "registry:component",
+      "type": "registry:ui",
       "title": "Prompt Input",
       "description": "The box a message is written in, assembled from parts: a field that grows and then scrolls, the files riding with the draft as chips above it, the model answering it, and the one button that ends the turn.",
-      "dependencies": ["cn", "lucide-react"],
+      "dependencies": ["lucide-react"],
       "registryDependencies": [
         "https://motif.sweetretry.com/r/provider-mark.json",
         "button",
@@ -473,28 +438,28 @@
       "files": [
         {
           "path": "registry/new-york/agents/prompt-input/index.tsx",
-          "type": "registry:component",
-          "target": "@components/agents/prompt-input/index.tsx"
+          "type": "registry:ui",
+          "target": "@components/ui/prompt-input/index.tsx"
         },
         {
           "path": "registry/new-york/agents/prompt-input/parts.tsx",
-          "type": "registry:component",
-          "target": "@components/agents/prompt-input/parts.tsx"
+          "type": "registry:ui",
+          "target": "@components/ui/prompt-input/parts.tsx"
         },
         {
           "path": "registry/new-york/agents/prompt-input/context.ts",
-          "type": "registry:component",
-          "target": "@components/agents/prompt-input/context.ts"
+          "type": "registry:ui",
+          "target": "@components/ui/prompt-input/context.ts"
         },
         {
           "path": "registry/new-york/agents/prompt-input/model-picker.tsx",
-          "type": "registry:component",
-          "target": "@components/agents/prompt-input/model-picker.tsx"
+          "type": "registry:ui",
+          "target": "@components/ui/prompt-input/model-picker.tsx"
         },
         {
           "path": "registry/new-york/agents/prompt-input/types.ts",
-          "type": "registry:component",
-          "target": "@components/agents/prompt-input/types.ts"
+          "type": "registry:ui",
+          "target": "@components/ui/prompt-input/types.ts"
         }
       ]
     },
@@ -503,7 +468,6 @@
       "type": "registry:ui",
       "title": "Cover Fan",
       "description": "A fan of cover cards for an empty state: full-bleed art, the title sitting on it, and enough of every card left showing that the whole set reads in one look. Hover lifts a card out of the fan.",
-      "dependencies": ["cn"],
       "files": [
         {
           "path": "registry/new-york/cover-fan.tsx",
@@ -514,10 +478,10 @@
     },
     {
       "name": "skill-detail",
-      "type": "registry:component",
+      "type": "registry:ui",
       "title": "Skill Detail",
       "description": "A skill's detail surface: a card that opens it, and a panel that says what it is, what it is for, and what is inside it. A cover rail with the name and the one action over it, then a workspace of what the skill makes and a file tree whose preview is your renderer — with only the toolbar controls you wired up.",
-      "dependencies": ["cn", "lucide-react", "motion"],
+      "dependencies": ["lucide-react", "motion"],
       "registryDependencies": [
         "button",
         "dialog",
@@ -527,18 +491,13 @@
       "files": [
         {
           "path": "registry/new-york/agents/skill-detail/index.tsx",
-          "type": "registry:component",
-          "target": "@components/agents/skill-detail/index.tsx"
+          "type": "registry:ui",
+          "target": "@components/ui/skill-detail/index.tsx"
         },
         {
           "path": "registry/new-york/agents/skill-detail/types.ts",
-          "type": "registry:component",
-          "target": "@components/agents/skill-detail/types.ts"
-        },
-        {
-          "path": "lib/ease.ts",
-          "type": "registry:lib",
-          "target": "@lib/ease.ts"
+          "type": "registry:ui",
+          "target": "@components/ui/skill-detail/types.ts"
         }
       ]
     },
@@ -547,7 +506,7 @@
       "type": "registry:ui",
       "title": "Line Tabs",
       "description": "Tabs drawn as words with a line under the selected one. No pill and no plate: the strip sits on the rule of the header around it, and the line reads as that rule thickening under one word.",
-      "dependencies": ["cn", "radix-ui"],
+      "dependencies": ["radix-ui"],
       "files": [
         {
           "path": "registry/new-york/line-tabs.tsx",
@@ -561,7 +520,7 @@
       "type": "registry:ui",
       "title": "Voice Input",
       "description": "A composer's mic. A press asks for the microphone and the composer becomes a recording bar: cancel on the left, the live level across the middle, stop on the right. The level is written straight to the DOM, so a sixty-frame meter never re-renders anything.",
-      "dependencies": ["cn", "lucide-react"],
+      "dependencies": ["lucide-react"],
       "registryDependencies": ["button"],
       "files": [
         {
@@ -576,7 +535,7 @@
       "type": "registry:block",
       "title": "Chat App",
       "description": "A whole chat surface for a page: a thread that follows its own tail, turns that carry reasoning and actions, and a composer that holds files and a model. Assembled from conversation, message, thinking-block, agent-indicator and prompt-input.",
-      "dependencies": ["cn", "lucide-react", "streamdown"],
+      "dependencies": ["lucide-react", "streamdown"],
       "registryDependencies": [
         "button",
         "tooltip",
@@ -592,17 +551,24 @@
         {
           "path": "registry/new-york/blocks/chat-app/chat-app.tsx",
           "type": "registry:component",
-          "target": "@components/chat/chat-app.tsx"
-        },
+          "target": "@components/chat-app.tsx"
+        }
+      ]
+    },
+    {
+      "name": "generation-canvas",
+      "type": "registry:block",
+      "title": "Generation Canvas",
+      "description": "A dotted plane for generative work: nodes that hold a prompt, its settings or a result, edges that carry light while the result is on its way, and a dock above the plane. One file, built on flow-edge and generation-overlay.",
+      "registryDependencies": [
+        "https://motif.sweetretry.com/r/flow-edge.json",
+        "https://motif.sweetretry.com/r/generation-overlay.json"
+      ],
+      "files": [
         {
-          "path": "registry/new-york/blocks/chat-app/use-demo-chat.ts",
+          "path": "registry/new-york/blocks/generation-canvas/generation-canvas.tsx",
           "type": "registry:component",
-          "target": "@components/chat/use-demo-chat.ts"
-        },
-        {
-          "path": "registry/new-york/blocks/chat-app/page.tsx",
-          "type": "registry:page",
-          "target": "app/chat/page.tsx"
+          "target": "@components/generation-canvas.tsx"
         }
       ]
     }

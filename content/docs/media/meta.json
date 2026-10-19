@@ -1,0 +1,15 @@
+{
+  "title": "Media",
+  "pages": [
+    "model-select",
+    "provider-mark",
+    "aspect-ratio-picker",
+    "resolution-segmented",
+    "duration-slider",
+    "strength-select",
+    "generation-overlay",
+    "flow-edge",
+    "toolbar",
+    "audio-preview"
+  ]
+}

@@ -19,13 +19,11 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { EASE_OUT } from "@/lib/ease";
 import { cn } from "@/lib/utils";
 
 import type {
   SettingsCardProps,
   SettingsDialogProps,
-  SettingsNavGroup,
   SettingsNavItem,
   SettingsRowProps,
   SettingsSectionProps,
@@ -39,6 +37,9 @@ export type {
   SettingsRowProps,
   SettingsSectionProps,
 } from "./types";
+
+// Motion tokens, kept in this file so it installs on its own.
+const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
 /** The rail is a tablist, so arrows are handled by hand. Left and right are accepted
  *  alongside up and down: below `md` the rail turns into a horizontal strip, and a key

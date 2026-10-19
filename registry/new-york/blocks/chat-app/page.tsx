@@ -1,8 +1,8 @@
 "use client";
 
-import { ChatApp } from "@/components/chat/chat-app";
-import { useDemoChat } from "@/components/chat/use-demo-chat";
+import { ChatApp } from "@/components/chat-app";
 import { Button } from "@/components/ui/button";
+import { useDemoChat } from "@/components/use-demo-chat";
 
 /* -- The page ------------------------------------------------------------------
  * The whole app in one screen: the thread fills the window, the composer is anchored

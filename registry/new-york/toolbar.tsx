@@ -17,9 +17,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { SPRING_LAYOUT } from "@/lib/ease";
-import { useHoverCapable } from "@/lib/hooks/use-hover-capable";
+import { useHoverCapable } from "@/hooks/use-hover-capable";
 import { cn } from "@/lib/utils";
+
+// Motion tokens, kept in this file so it installs on its own.
+const SPRING_LAYOUT = { damping: 32, mass: 0.6, stiffness: 360 } as const;
 
 /* -- The dock ----------------------------------------------------------------
  * A row of glyphs that names itself on approach: the icon under the pointer

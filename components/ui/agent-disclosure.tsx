@@ -4,8 +4,10 @@ import { motion, useReducedMotion } from "motion/react";
 import type { HTMLMotionProps } from "motion/react";
 import type { CSSProperties } from "react";
 
-import { EASE_OUT } from "@/lib/ease";
 import { cn } from "@/lib/utils";
+
+// Motion tokens, kept in this file so it installs on its own.
+const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
 export interface AgentDisclosureProps extends Omit<
   HTMLMotionProps<"div">,

@@ -2,7 +2,7 @@
 
 /**
  * The site's copy of the composer, at the path the registry publishes it to. Consumers
- * get the files at `@/components/agents/prompt-input`; the chat block imports them from
+ * get the files at `@/components/ui/prompt-input`; the chat block imports them from
  * there, so this is only here to keep that one path resolvable without keeping a second
  * copy of the source.
  */

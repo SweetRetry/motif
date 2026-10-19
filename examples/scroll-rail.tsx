@@ -3,10 +3,7 @@
 import { useReducedMotion } from "motion/react";
 import { useCallback, useMemo, useRef } from "react";
 
-import {
-  useMessageFocus,
-  useScrollProgress,
-} from "@/lib/hooks/use-scroll-focus";
+import { useMessageFocus, useScrollProgress } from "@/hooks/use-scroll-focus";
 import { ScrollRail, ScrollRailPreview } from "@/registry/new-york/scroll-rail";
 
 const TRANSCRIPT = [
