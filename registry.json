@@ -11,7 +11,7 @@
         {
           "path": "registry/new-york/activity-heatmap.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/activity-heatmap.tsx"
+          "target": "@components/ui/motif/activity-heatmap.tsx"
         }
       ]
     },
@@ -37,17 +37,17 @@
         {
           "path": "registry/new-york/agents/approval-card/index.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/approval-card/index.tsx"
+          "target": "@components/ui/motif/approval-card/index.tsx"
         },
         {
           "path": "registry/new-york/agents/approval-card/types.ts",
           "type": "registry:ui",
-          "target": "@components/ui/approval-card/types.ts"
+          "target": "@components/ui/motif/approval-card/types.ts"
         },
         {
-          "path": "components/ui/agent-disclosure.tsx",
+          "path": "components/ui/motif/agent-disclosure.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/agent-disclosure.tsx"
+          "target": "@components/ui/motif/agent-disclosure.tsx"
         }
       ]
     },
@@ -75,7 +75,7 @@
         {
           "path": "registry/new-york/agents/agent-indicator.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/agent-indicator.tsx"
+          "target": "@components/ui/motif/agent-indicator.tsx"
         }
       ]
     },
@@ -89,7 +89,7 @@
         {
           "path": "registry/new-york/attachment.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/attachment.tsx"
+          "target": "@components/ui/motif/attachment.tsx"
         }
       ]
     },
@@ -104,7 +104,7 @@
         {
           "path": "registry/new-york/audio-preview.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/audio-preview.tsx"
+          "target": "@components/ui/motif/audio-preview.tsx"
         }
       ]
     },
@@ -118,7 +118,7 @@
         {
           "path": "registry/new-york/breakdown.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/breakdown.tsx"
+          "target": "@components/ui/motif/breakdown.tsx"
         }
       ]
     },
@@ -133,42 +133,42 @@
         {
           "path": "registry/new-york/date-range-picker/index.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/date-range-picker/index.tsx"
+          "target": "@components/ui/motif/date-range-picker/index.tsx"
         },
         {
           "path": "registry/new-york/date-range-picker/parts.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/date-range-picker/parts.tsx"
+          "target": "@components/ui/motif/date-range-picker/parts.tsx"
         },
         {
           "path": "registry/new-york/date-range-picker/range-calendar.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/date-range-picker/range-calendar.tsx"
+          "target": "@components/ui/motif/date-range-picker/range-calendar.tsx"
         },
         {
           "path": "registry/new-york/date-range-picker/bounds.ts",
           "type": "registry:ui",
-          "target": "@components/ui/date-range-picker/bounds.ts"
+          "target": "@components/ui/motif/date-range-picker/bounds.ts"
         },
         {
           "path": "registry/new-york/date-range-picker/context.ts",
           "type": "registry:ui",
-          "target": "@components/ui/date-range-picker/context.ts"
+          "target": "@components/ui/motif/date-range-picker/context.ts"
         },
         {
           "path": "registry/new-york/date-range-picker/format.ts",
           "type": "registry:ui",
-          "target": "@components/ui/date-range-picker/format.ts"
+          "target": "@components/ui/motif/date-range-picker/format.ts"
         },
         {
           "path": "registry/new-york/date-range-picker/presets.ts",
           "type": "registry:ui",
-          "target": "@components/ui/date-range-picker/presets.ts"
+          "target": "@components/ui/motif/date-range-picker/presets.ts"
         },
         {
           "path": "registry/new-york/date-range-picker/types.ts",
           "type": "registry:ui",
-          "target": "@components/ui/date-range-picker/types.ts"
+          "target": "@components/ui/motif/date-range-picker/types.ts"
         }
       ]
     },
@@ -183,7 +183,7 @@
         {
           "path": "registry/new-york/conversation.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/conversation.tsx"
+          "target": "@components/ui/motif/conversation.tsx"
         }
       ]
     },
@@ -196,7 +196,7 @@
         {
           "path": "registry/new-york/message.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/message.tsx"
+          "target": "@components/ui/motif/message.tsx"
         }
       ]
     },
@@ -211,12 +211,12 @@
         {
           "path": "registry/new-york/scroll-rail/index.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/scroll-rail/index.tsx"
+          "target": "@components/ui/motif/scroll-rail/index.tsx"
         },
         {
           "path": "registry/new-york/scroll-rail/types.ts",
           "type": "registry:ui",
-          "target": "@components/ui/scroll-rail/types.ts"
+          "target": "@components/ui/motif/scroll-rail/types.ts"
         },
         {
           "path": "hooks/use-scroll-focus.ts",
@@ -238,7 +238,7 @@
         {
           "path": "registry/new-york/aspect-ratio-picker.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/aspect-ratio-picker.tsx"
+          "target": "@components/ui/motif/aspect-ratio-picker.tsx"
         }
       ]
     },
@@ -251,7 +251,7 @@
         {
           "path": "registry/new-york/resolution-segmented.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/resolution-segmented.tsx"
+          "target": "@components/ui/motif/resolution-segmented.tsx"
         }
       ]
     },
@@ -264,7 +264,7 @@
         {
           "path": "registry/new-york/provider-mark.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/provider-mark.tsx"
+          "target": "@components/ui/motif/provider-mark.tsx"
         }
       ]
     },
@@ -279,22 +279,22 @@
         {
           "path": "registry/new-york/model-select/index.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/model-select/index.tsx"
+          "target": "@components/ui/motif/model-select/index.tsx"
         },
         {
           "path": "registry/new-york/model-select/parts.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/model-select/parts.tsx"
+          "target": "@components/ui/motif/model-select/parts.tsx"
         },
         {
           "path": "registry/new-york/model-select/context.ts",
           "type": "registry:ui",
-          "target": "@components/ui/model-select/context.ts"
+          "target": "@components/ui/motif/model-select/context.ts"
         },
         {
           "path": "registry/new-york/model-select/types.ts",
           "type": "registry:ui",
-          "target": "@components/ui/model-select/types.ts"
+          "target": "@components/ui/motif/model-select/types.ts"
         }
       ]
     },
@@ -307,7 +307,7 @@
         {
           "path": "registry/new-york/duration-slider.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/duration-slider.tsx"
+          "target": "@components/ui/motif/duration-slider.tsx"
         }
       ]
     },
@@ -330,7 +330,7 @@
         {
           "path": "registry/new-york/strength-select.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/strength-select.tsx"
+          "target": "@components/ui/motif/strength-select.tsx"
         }
       ]
     },
@@ -347,12 +347,12 @@
         {
           "path": "registry/new-york/agents/thinking-block/index.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/thinking-block.tsx"
+          "target": "@components/ui/motif/thinking-block.tsx"
         },
         {
-          "path": "components/ui/agent-disclosure.tsx",
+          "path": "components/ui/motif/agent-disclosure.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/agent-disclosure.tsx"
+          "target": "@components/ui/motif/agent-disclosure.tsx"
         }
       ]
     },
@@ -366,7 +366,7 @@
         {
           "path": "registry/new-york/generation-overlay.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/generation-overlay.tsx"
+          "target": "@components/ui/motif/generation-overlay.tsx"
         }
       ]
     },
@@ -380,7 +380,7 @@
         {
           "path": "registry/new-york/flow-edge.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/flow-edge.tsx"
+          "target": "@components/ui/motif/flow-edge.tsx"
         }
       ]
     },
@@ -395,7 +395,7 @@
         {
           "path": "registry/new-york/toolbar.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/toolbar.tsx"
+          "target": "@components/ui/motif/toolbar.tsx"
         },
         {
           "path": "hooks/use-hover-capable.ts",
@@ -414,12 +414,12 @@
         {
           "path": "registry/new-york/settings-dialog/index.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/settings-dialog/index.tsx"
+          "target": "@components/ui/motif/settings-dialog/index.tsx"
         },
         {
           "path": "registry/new-york/settings-dialog/types.ts",
           "type": "registry:ui",
-          "target": "@components/ui/settings-dialog/types.ts"
+          "target": "@components/ui/motif/settings-dialog/types.ts"
         }
       ]
     },
@@ -439,27 +439,27 @@
         {
           "path": "registry/new-york/agents/prompt-input/index.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/prompt-input/index.tsx"
+          "target": "@components/ui/motif/prompt-input/index.tsx"
         },
         {
           "path": "registry/new-york/agents/prompt-input/parts.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/prompt-input/parts.tsx"
+          "target": "@components/ui/motif/prompt-input/parts.tsx"
         },
         {
           "path": "registry/new-york/agents/prompt-input/context.ts",
           "type": "registry:ui",
-          "target": "@components/ui/prompt-input/context.ts"
+          "target": "@components/ui/motif/prompt-input/context.ts"
         },
         {
           "path": "registry/new-york/agents/prompt-input/model-picker.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/prompt-input/model-picker.tsx"
+          "target": "@components/ui/motif/prompt-input/model-picker.tsx"
         },
         {
           "path": "registry/new-york/agents/prompt-input/types.ts",
           "type": "registry:ui",
-          "target": "@components/ui/prompt-input/types.ts"
+          "target": "@components/ui/motif/prompt-input/types.ts"
         }
       ]
     },
@@ -472,7 +472,7 @@
         {
           "path": "registry/new-york/cover-fan.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/cover-fan.tsx"
+          "target": "@components/ui/motif/cover-fan.tsx"
         }
       ]
     },
@@ -492,12 +492,12 @@
         {
           "path": "registry/new-york/agents/skill-detail/index.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/skill-detail/index.tsx"
+          "target": "@components/ui/motif/skill-detail/index.tsx"
         },
         {
           "path": "registry/new-york/agents/skill-detail/types.ts",
           "type": "registry:ui",
-          "target": "@components/ui/skill-detail/types.ts"
+          "target": "@components/ui/motif/skill-detail/types.ts"
         }
       ]
     },
@@ -511,7 +511,7 @@
         {
           "path": "registry/new-york/line-tabs.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/line-tabs.tsx"
+          "target": "@components/ui/motif/line-tabs.tsx"
         }
       ]
     },
@@ -526,7 +526,7 @@
         {
           "path": "registry/new-york/voice-input.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/voice-input.tsx"
+          "target": "@components/ui/motif/voice-input.tsx"
         }
       ]
     },
@@ -551,7 +551,7 @@
         {
           "path": "registry/new-york/blocks/chat-app/chat-app.tsx",
           "type": "registry:component",
-          "target": "@components/chat-app.tsx"
+          "target": "@components/ui/motif/chat-app.tsx"
         }
       ]
     },
@@ -568,7 +568,7 @@
         {
           "path": "registry/new-york/blocks/generation-canvas/generation-canvas.tsx",
           "type": "registry:component",
-          "target": "@components/generation-canvas.tsx"
+          "target": "@components/ui/motif/generation-canvas.tsx"
         }
       ]
     }

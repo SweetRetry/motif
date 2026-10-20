@@ -28,7 +28,7 @@ Wrap whatever the node renders and tell the surface what is pending. The surface
 its children hidden while it waits, then reveals them once `mediaSrc` has decoded:
 
 ```tsx
-import { GenerationOverlay } from "@/components/ui/generation-overlay";
+import { GenerationOverlay } from "@/components/ui/motif/generation-overlay";
 
 export function ImageNode({ run }) {
   const pending = run.phase === "generating";

@@ -2,7 +2,7 @@
 
 /**
  * The site's copy of the conversation frame, at the path the registry publishes it to.
- * Consumers get the file at `@/components/ui/conversation`; the docs demo it from
+ * Consumers get the file at `@/components/ui/motif/conversation`; the docs demo it from
  * `registry/new-york`, so this is only here to keep that one path resolvable without
  * keeping a second copy of the source.
  */

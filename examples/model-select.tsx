@@ -3,7 +3,7 @@
 import { Frame, Image, Music } from "lucide-react";
 import { useState } from "react";
 
-import { ProviderMark } from "@/components/ui/provider-mark";
+import { ProviderMark } from "@/components/ui/motif/provider-mark";
 import {
   ModelSelect,
   ModelSelectContent,

@@ -23,7 +23,7 @@ import {
   LineTabsContent,
   LineTabsList,
   LineTabsTrigger,
-} from "@/components/ui/line-tabs";
+} from "@/components/ui/motif/line-tabs";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 

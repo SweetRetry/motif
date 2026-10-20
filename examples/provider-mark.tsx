@@ -1,7 +1,10 @@
 "use client";
 
-import { PROVIDER_NAMES, ProviderMark } from "@/components/ui/provider-mark";
-import type { ProviderId } from "@/components/ui/provider-mark";
+import {
+  PROVIDER_NAMES,
+  ProviderMark,
+} from "@/components/ui/motif/provider-mark";
+import type { ProviderId } from "@/components/ui/motif/provider-mark";
 
 /** Every mark in the set, named underneath so it is clear which is which — a logo grid
  *  is a riddle without the labels. */

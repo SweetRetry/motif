@@ -22,10 +22,11 @@ with it:
 npx shadcn@latest add https://motif.sweetretry.com/r/approval-card.json
 ```
 
-Then import it from `@/components/…`:
+Every Motif file lands in one folder, `components/ui/motif/`, so our names never collide with yours
+and you can see everything it added. Import it from there:
 
 ```tsx
-import { ApprovalCard } from "@/components/ui/approval-card";
+import { ApprovalCard } from "@/components/ui/motif/approval-card";
 
 export function Review() {
   return (

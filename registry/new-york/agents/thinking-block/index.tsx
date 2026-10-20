@@ -13,8 +13,8 @@ import {
 import type { RefObject } from "react";
 import { Streamdown } from "streamdown";
 
-import { AgentDisclosure } from "@/components/ui/agent-disclosure";
-import { AgentIndicator } from "@/components/ui/agent-indicator";
+import { AgentDisclosure } from "@/components/ui/motif/agent-disclosure";
+import { AgentIndicator } from "@/components/ui/motif/agent-indicator";
 import { cn } from "@/lib/utils";
 
 // Motion tokens, kept in this file so it installs on its own.

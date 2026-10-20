@@ -2,7 +2,7 @@
 
 /**
  * The site's copy of the flow edge, at the path the registry publishes it to. Consumers
- * get the file at `@/components/ui/flow-edge`, and the generation canvas imports it from
+ * get the file at `@/components/ui/motif/flow-edge`, and the generation canvas imports it from
  * there, so this is only here to keep that one path resolvable without keeping a second
  * copy of the source.
  */

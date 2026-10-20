@@ -48,4 +48,4 @@ Agents 覆盖了"人说话"（输入框、语音、附件）和"agent 想"（思
 ## 动手前
 
 - `CONTEXT.md` 现在只收了封面扇那一套词。Activity、Step、Tool Call 这几个词最容易在代码、文档和对话里漂，先写进去。
-- 每个新件都按安装足迹的约定走：落在 `components/ui/`，不写页面和路由，不引入共享工具文件，hooks 走 `hooks/`。
+- 每个新件都按安装足迹的约定走：落在 `components/ui/motif/`，不写页面和路由，不引入共享工具文件，hooks 走 `hooks/`。

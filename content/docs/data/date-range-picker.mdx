@@ -37,7 +37,7 @@ import {
   DateRangePickerFooter,
   DateRangePickerShortcuts,
   DateRangePickerTrigger,
-} from "@/components/ui/date-range-picker";
+} from "@/components/ui/motif/date-range-picker";
 
 export function ReportRange() {
   const [range, setRange] = useState<DateRangeValue>();
@@ -114,7 +114,10 @@ and the server and the client write the same string.
 ## Shortcuts
 
 ```tsx
-import { DateRangePicker, lastDays } from "@/components/ui/date-range-picker";
+import {
+  DateRangePicker,
+  lastDays,
+} from "@/components/ui/motif/date-range-picker";
 
 const PRESETS = [
   lastDays("today", "Today", 1),

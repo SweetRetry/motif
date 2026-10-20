@@ -29,14 +29,14 @@
 
 ## 硬编码位置（不随上面派生，换名时逐个改）
 
-| 位置                         | 内容                                                    |
-| ---------------------------- | ------------------------------------------------------- |
-| `registry.json`              | `name`、`homepage`、`registryDependencies` 里的绝对 URL |
-| `content/docs/**/*.mdx`      | 每个安装命令的 `https://…/r/<name>.json`                |
-| `README.md`                  | banner、标题、徽章、正文                                |
-| `app/(app)/(root)/page.tsx`  | `<h1>` 与描述句                                         |
-| `examples/toolbar.tsx`       | demo 里指向源码仓库的链接                               |
-| `LICENSE`                    | 版权行                                                  |
+| 位置                        | 内容                                                    |
+| --------------------------- | ------------------------------------------------------- |
+| `registry.json`             | `name`、`homepage`、`registryDependencies` 里的绝对 URL |
+| `content/docs/**/*.mdx`     | 每个安装命令的 `https://…/r/<name>.json`                |
+| `README.md`                 | banner、标题、徽章、正文                                |
+| `app/(app)/(root)/page.tsx` | `<h1>` 与描述句                                         |
+| `examples/toolbar.tsx`      | demo 里指向源码仓库的链接                               |
+| `LICENSE`                   | 版权行                                                  |
 
 ## 生成物（不要手改，重新构建即覆盖）
 

@@ -2,8 +2,8 @@
 
 import type { CSSProperties, ReactNode } from "react";
 
-import { FlowEdge } from "@/components/ui/flow-edge";
-import { GenerationOverlay } from "@/components/ui/generation-overlay";
+import { FlowEdge } from "@/components/ui/motif/flow-edge";
+import { GenerationOverlay } from "@/components/ui/motif/generation-overlay";
 import { cn } from "@/lib/utils";
 
 /* -- The plane ---------------------------------------------------------------

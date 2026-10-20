@@ -22,7 +22,7 @@ npx shadcn@latest add https://motif.sweetretry.com/r/voice-input.json
 ## Usage
 
 ```tsx
-import { VoiceInput } from "@/components/ui/voice-input";
+import { VoiceInput } from "@/components/ui/motif/voice-input";
 
 export function Composer() {
   return (
@@ -87,7 +87,7 @@ import {
   useVoiceRecorder,
   VoiceBars,
   VoiceRecording,
-} from "@/components/ui/voice-input";
+} from "@/components/ui/motif/voice-input";
 
 const { status, start, stop, cancel, readLevel, startedAt } = useVoiceRecorder({
   onRecord: (blob) => upload(blob),

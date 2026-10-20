@@ -4,10 +4,10 @@ import { ArrowUp, Plus, Square } from "lucide-react";
 import type { ChangeEvent, ComponentProps, KeyboardEvent } from "react";
 import { Children, useLayoutEffect, useRef } from "react";
 
-import type { AttachmentProps } from "@/components/ui/attachment";
-import { Attachment } from "@/components/ui/attachment";
 import type { ButtonProps } from "@/components/ui/button";
 import { Button } from "@/components/ui/button";
+import type { AttachmentProps } from "@/components/ui/motif/attachment";
+import { Attachment } from "@/components/ui/motif/attachment";
 import { cn } from "@/lib/utils";
 
 import { usePromptInput } from "./context";

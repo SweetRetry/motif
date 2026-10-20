@@ -2,7 +2,7 @@
 
 /**
  * The site's copy of the generation overlay, at the path the registry publishes it to.
- * Consumers get the file at `@/components/ui/generation-overlay`, and the generation
+ * Consumers get the file at `@/components/ui/motif/generation-overlay`, and the generation
  * canvas imports it from there, so this is only here to keep that one path resolvable
  * without keeping a second copy of the source.
  */

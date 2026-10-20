@@ -22,7 +22,10 @@ npx shadcn@latest add https://motif.sweetretry.com/r/skill-detail.json
 ## Usage
 
 ```tsx
-import { SkillCard, SkillDetailDialog } from "@/components/ui/skill-detail";
+import {
+  SkillCard,
+  SkillDetailDialog,
+} from "@/components/ui/motif/skill-detail";
 
 export function Library({ skills }: { skills: Skill[] }) {
   const [openId, setOpenId] = useState<string | null>(null);

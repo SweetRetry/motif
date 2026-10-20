@@ -2,7 +2,7 @@
 
 /**
  * The site's copy of the attachment chip, at the path the registry publishes it to.
- * Consumers get the file at `@/components/ui/attachment`, and the composer imports it
+ * Consumers get the file at `@/components/ui/motif/attachment`, and the composer imports it
  * from there, so this is only here to keep that one path resolvable without keeping a
  * second copy of the source.
  */

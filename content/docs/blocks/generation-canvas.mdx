@@ -22,10 +22,9 @@ import {
 npx shadcn@latest add https://motif.sweetretry.com/r/generation-canvas.json
 ```
 
-It writes one file, `components/generation-canvas.tsx`, and brings two registry items
-along with it: [Flow Edge](/docs/media/flow-edge) and
-[Generation Overlay](/docs/media/generation-overlay). It adds no page, no route and no
-npm package.
+It writes one file, `components/ui/motif/generation-canvas.tsx`, and brings two registry
+items along with it: [Flow Edge](/docs/media/flow-edge) and
+[Generation Overlay](/docs/media/generation-overlay). It adds no page and no route, and the only package it needs is `motion`.
 
 ## What it is made of
 
@@ -57,7 +56,7 @@ import {
   CanvasNode,
   GenerationCanvas,
   portOf,
-} from "@/components/generation-canvas";
+} from "@/components/ui/motif/generation-canvas";
 
 const prompt = { x: 24, y: 24, width: 272 };
 const image = { x: 368, y: 24, width: 336 };

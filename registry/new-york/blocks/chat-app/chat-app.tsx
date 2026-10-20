@@ -5,21 +5,21 @@ import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Streamdown } from "streamdown";
 
-import { AgentIndicator } from "@/components/ui/agent-indicator";
-import { Attachment } from "@/components/ui/attachment";
 import { Button } from "@/components/ui/button";
 import type { ButtonProps } from "@/components/ui/button";
+import { AgentIndicator } from "@/components/ui/motif/agent-indicator";
+import { Attachment } from "@/components/ui/motif/attachment";
 import {
   Conversation,
   ConversationContent,
   ConversationScrollButton,
   useConversation,
-} from "@/components/ui/conversation";
+} from "@/components/ui/motif/conversation";
 import {
   Message,
   MessageActions,
   MessageContent,
-} from "@/components/ui/message";
+} from "@/components/ui/motif/message";
 import {
   ModelPicker,
   PromptInput,
@@ -29,14 +29,17 @@ import {
   PromptInputHeader,
   PromptInputSubmit,
   PromptInputTextarea,
-} from "@/components/ui/prompt-input";
+} from "@/components/ui/motif/prompt-input";
 import type {
   PromptAttachment,
   PromptModel,
-} from "@/components/ui/prompt-input";
-import { ScrollRail, ScrollRailPreview } from "@/components/ui/scroll-rail";
-import type { ScrollRailItem } from "@/components/ui/scroll-rail";
-import { ThinkingBlock } from "@/components/ui/thinking-block";
+} from "@/components/ui/motif/prompt-input";
+import {
+  ScrollRail,
+  ScrollRailPreview,
+} from "@/components/ui/motif/scroll-rail";
+import type { ScrollRailItem } from "@/components/ui/motif/scroll-rail";
+import { ThinkingBlock } from "@/components/ui/motif/thinking-block";
 import {
   Tooltip,
   TooltipContent,

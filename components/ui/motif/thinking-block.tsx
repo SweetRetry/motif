@@ -2,7 +2,7 @@
 
 /**
  * The site's copy of the thinking block, at the path the registry publishes it to.
- * Consumers get the file at `@/components/ui/thinking-block`; the chat block
+ * Consumers get the file at `@/components/ui/motif/thinking-block`; the chat block
  * imports it from there, so this is only here to keep that one path resolvable without
  * keeping a second copy of the source.
  */

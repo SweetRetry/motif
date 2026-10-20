@@ -4,9 +4,9 @@ import { LoaderCircle, X } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { AgentDisclosure } from "@/components/ui/agent-disclosure";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AgentDisclosure } from "@/components/ui/motif/agent-disclosure";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Tooltip,

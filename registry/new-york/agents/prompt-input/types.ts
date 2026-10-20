@@ -1,8 +1,8 @@
 import type { ComponentProps } from "react";
 
-import type { AttachmentProps } from "@/components/ui/attachment";
 import type { ButtonProps } from "@/components/ui/button";
-import type { ProviderId } from "@/components/ui/provider-mark";
+import type { AttachmentProps } from "@/components/ui/motif/attachment";
+import type { ProviderId } from "@/components/ui/motif/provider-mark";
 
 /**
  * A file riding along with the draft, the way a composer usually holds them: the chip's

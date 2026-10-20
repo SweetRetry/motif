@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { PromptModel } from "@/components/ui/prompt-input";
+import type { PromptModel } from "@/components/ui/motif/prompt-input";
 
 import type { ChatTurn } from "./chat-app";
 
