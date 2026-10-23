@@ -47,3 +47,15 @@ _Avoid_: pending、success、error、loading
 **Loading state**（等待态）：
 agent 在干活、还没有结果的那一行：点阵、一个词、一个计时。只有这一种，不按在想、调工具、出字分形状。
 _Avoid_: agent indicator、spinner、loader、status badge
+
+**Mention**（提及）：
+草稿里用户从菜单挑出来的一个对象，画成一枚 chip。它是整体：光标进不去，退格整块删。消息把它当对象带走（`id`），不是拼出它的那几个字符。
+_Avoid_: tag、token、pill、entity
+
+**Trigger**（触发符）：
+在编辑器里打开菜单的那个字符。`@` 指向东西，`/` 执行东西，二者是同一个部件。
+_Avoid_: shortcut、hotkey、prefix
+
+**Segment**（片段）：
+草稿按消息的样子切开的一段，要么是文本，要么是一个 mention。`value` 是它们拼起来的字符串，片段保留字符串带不走的 `id`。
+_Avoid_: token、part、chunk

@@ -460,8 +460,19 @@
       "name": "prompt-input",
       "type": "registry:ui",
       "title": "Prompt Input",
-      "description": "The box a message is written in, assembled from parts: a field that grows and then scrolls, the files riding with the draft as chips above it, the model answering it, and the one button that ends the turn.",
-      "dependencies": ["lucide-react"],
+      "description": "The box a message is written in, assembled from parts: a field that grows and then scrolls, the files riding with the draft as chips above it, the model answering it, and the one button that ends the turn. Swap the field for the editor and @ mentions and / commands become chips in the draft.",
+      "dependencies": [
+        "lucide-react",
+        "@floating-ui/dom",
+        "@tiptap/core",
+        "@tiptap/extension-document",
+        "@tiptap/extension-paragraph",
+        "@tiptap/extension-text",
+        "@tiptap/extensions",
+        "@tiptap/pm",
+        "@tiptap/react",
+        "@tiptap/suggestion"
+      ],
       "registryDependencies": [
         "https://motif.sweetretry.com/r/provider-mark.json",
         "button",
@@ -488,6 +499,21 @@
           "path": "registry/new-york/agents/prompt-input/model-picker.tsx",
           "type": "registry:ui",
           "target": "@components/ui/motif/prompt-input/model-picker.tsx"
+        },
+        {
+          "path": "registry/new-york/agents/prompt-input/editor.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/motif/prompt-input/editor.tsx"
+        },
+        {
+          "path": "registry/new-york/agents/prompt-input/trigger.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/motif/prompt-input/trigger.tsx"
+        },
+        {
+          "path": "registry/new-york/agents/prompt-input/segments.ts",
+          "type": "registry:ui",
+          "target": "@components/ui/motif/prompt-input/segments.ts"
         },
         {
           "path": "registry/new-york/agents/prompt-input/types.ts",

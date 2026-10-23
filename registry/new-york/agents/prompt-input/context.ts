@@ -3,6 +3,8 @@
 import type { RefObject } from "react";
 import { createContext, useContext } from "react";
 
+import type { PromptSegment } from "./types";
+
 /**
  * What a part needs from the root to do its job: the draft, the door out of it, and the
  * field — so a part that takes a click can hand focus back to the place the user was
@@ -13,7 +15,10 @@ export interface PromptInputState {
   /** There is something to send and the composer is not disabled. */
   canSend: boolean;
   disabled: boolean;
-  field: RefObject<HTMLTextAreaElement | null>;
+  /** Whichever field is mounted: the textarea, or the editor's contenteditable. */
+  field: RefObject<HTMLElement | null>;
+  /** Set by the editor, which is the only field that holds more than text. */
+  segments: RefObject<(() => PromptSegment[]) | null>;
   setValue: (value: string) => void;
   /** The composer's `onStop`, for the submit part's stop face. */
   stop?: () => void;

@@ -5,6 +5,7 @@ description: "The box a message is written in, assembled from parts: a field tha
 
 import {
   PromptInputDemo,
+  PromptInputMentionDemo,
   PromptInputStreamingDemo,
 } from "@/examples/prompt-input";
 
@@ -19,7 +20,9 @@ npx shadcn@latest add https://motif.sweetretry.com/r/prompt-input.json
 ```
 
 Pulls in [attachment](https://motif.sweetretry.com/docs/agents/attachment) for the chips
-in the header, plus `dropdown-menu` for the model picker.
+in the header, plus `dropdown-menu` for the model picker. The editor and triggers bring
+[Tiptap](https://tiptap.dev) with them; a composer that only uses `PromptInputTextarea` never
+loads it.
 
 ## Usage
 
@@ -97,6 +100,8 @@ about first. So the root takes the message and nothing else.
 | `PromptInput`           | The root: the card, the draft, the submit contract                           |
 | `PromptInputHeader`     | Flex row above the field; draws nothing while it holds nothing               |
 | `PromptInputTextarea`   | The field, with the growth cap, the two-line floor and the Enter binding     |
+| `PromptInputEditor`     | The field when the draft holds mentions; same rules, a document under it     |
+| `PromptInputTrigger`    | Inside the editor: a character, its menu, and what picking a row does        |
 | `PromptInputFooter`     | Flex row under the field                                                     |
 | `PromptInputAttachment` | A chip in the header: the attachment card plus its entrance                  |
 | `PromptInputButton`     | A round control for the row: the platform `Button` at `size-10 rounded-full` |
@@ -161,6 +166,56 @@ hands over the `File`s as `onFiles`. Whatever you do with them — upload them, 
 keep the last one — ends in the same place: new chips in the header with progress running
 from 0 to 100.
 
+## Mentions and commands
+
+Swap `PromptInputTextarea` for `PromptInputEditor` and the draft can hold more than text.
+Typing `@` or `/` opens a menu at the caret, and picking a row replaces what was typed with a
+chip. The chip is one thing: the caret cannot stop inside it, Backspace takes it whole, and a
+selection holds all of it or none. A textarea cannot do that, which is why the editor is a
+document and not a field.
+
+<ComponentPreview name="prompt-input" align="start">
+  <PromptInputMentionDemo />
+</ComponentPreview>
+
+```tsx
+<PromptInput onSubmit={(text, segments) => send(segments)}>
+  <PromptInputEditor placeholder="Type @ to point at a file, / to run a command.">
+    <PromptInputTrigger char="@" items={files} />
+    <PromptInputTrigger
+      char="/"
+      items={commands}
+      lineStart
+      onSelect={(item) => (item.id === "clear" ? false : undefined)}
+    />
+  </PromptInputEditor>
+  <PromptInputFooter>
+    <PromptInputSubmit />
+  </PromptInputFooter>
+</PromptInput>
+```
+
+A trigger is a character and its rows, and `@` and `/` are the same part. `lineStart` keeps a
+command from opening mid-sentence. The menu keeps focus in the field: arrows move, Enter or
+Tab picks, Escape closes, and with no row matching nothing is drawn and Enter sends as
+usual. `items` can also be a function of the query, for rows that live behind a search.
+
+`onSelect` returns `false` for a row that acts on the spot. Nothing is left in the draft, so
+a command like `/clear` does not become part of the message.
+
+`value` stays a string, with a mention written as its trigger and label, so everything that
+reads the draft as text keeps working. `onSubmit` receives the same draft as segments as its
+second argument, where each mention keeps the `id` the string cannot carry:
+
+```ts
+type PromptSegment =
+  | { type: "text"; text: string }
+  | { type: "mention"; trigger: string; id: string; label: string };
+```
+
+Setting `value` from outside, as a prompt card does, replaces the document with plain text.
+Mentions do not survive that, and there is no way yet to start the editor from segments.
+
 ## Models
 
 The picker is one mark, one name and one chevron. The mark is the loud part because it is
@@ -206,16 +261,16 @@ frame. Enter cannot send while it is true. `onStop` is called when it is pressed
 
 ### PromptInput
 
-| Prop            | Default | Meaning                                                             |
-| --------------- | ------- | ------------------------------------------------------------------- |
-| `value`         | —       | Controlled draft, never cleared by a send                           |
-| `defaultValue`  | `""`    | Draft the composer starts with                                      |
-| `onValueChange` | —       | Called with the draft on every change                               |
-| `onSubmit`      | —       | Called with the trimmed draft; <kbd>Enter</kbd> or submit           |
-| `streaming`     | `false` | Swaps the submit part's arrow for stop, and blocks <kbd>Enter</kbd> |
-| `onStop`        | —       | Called when the stop face is pressed                                |
-| `disabled`      | `false` | Disables the field and the submit button                            |
-| `className`     | —       | Extra classes for the card                                          |
+| Prop            | Default | Meaning                                                                    |
+| --------------- | ------- | -------------------------------------------------------------------------- |
+| `value`         | —       | Controlled draft, never cleared by a send                                  |
+| `defaultValue`  | `""`    | Draft the composer starts with                                             |
+| `onValueChange` | —       | Called with the draft on every change                                      |
+| `onSubmit`      | —       | Called with the trimmed draft and its segments; <kbd>Enter</kbd> or submit |
+| `streaming`     | `false` | Swaps the submit part's arrow for stop, and blocks <kbd>Enter</kbd>        |
+| `onStop`        | —       | Called when the stop face is pressed                                       |
+| `disabled`      | `false` | Disables the field and the submit button                                   |
+| `className`     | —       | Extra classes for the card                                                 |
 
 Anything else goes to the underlying `form`.
 
@@ -224,6 +279,8 @@ Anything else goes to the underlying `form`.
 | Part                                      | Props                                                                       |
 | ----------------------------------------- | --------------------------------------------------------------------------- |
 | `PromptInputTextarea`                     | `maxHeight`, plus `textarea` props; `onKeyDown` runs before the binding     |
+| `PromptInputEditor`                       | `maxHeight`, `placeholder`, plus `div` props; `PromptInputTrigger` children |
+| `PromptInputTrigger`                      | `char`, `items`, `lineStart`, `onSelect`                                    |
 | `PromptInputAttachment`                   | `AttachmentProps` — `name`, `src`, `progress`, `status`, `icon`, `onRemove` |
 | `PromptInputAttach`                       | `onFiles`, `accept`, plus `ButtonProps`                                     |
 | `PromptInputSubmit`                       | `ButtonProps`; `className` lands on the button                              |
@@ -243,6 +300,24 @@ Anything else goes to the underlying `form`.
   name="prompt-input"
   src="registry/new-york/agents/prompt-input/parts.tsx"
   title="parts.tsx"
+/>
+
+<ComponentSource
+  name="prompt-input"
+  src="registry/new-york/agents/prompt-input/editor.tsx"
+  title="editor.tsx"
+/>
+
+<ComponentSource
+  name="prompt-input"
+  src="registry/new-york/agents/prompt-input/trigger.tsx"
+  title="trigger.tsx"
+/>
+
+<ComponentSource
+  name="prompt-input"
+  src="registry/new-york/agents/prompt-input/segments.ts"
+  title="segments.ts"
 />
 
 <ComponentSource

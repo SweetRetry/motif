@@ -157,7 +157,9 @@ export const PromptInputTextarea = ({
       disabled={disabled}
       onChange={(event) => setValue(event.target.value)}
       onKeyDown={handleKeyDown}
-      ref={field}
+      ref={(node) => {
+        field.current = node;
+      }}
       rows={rows ?? MIN_ROWS}
       style={{ maxHeight, ...style }}
       value={value}

@@ -13,10 +13,12 @@ export {
   PromptInputAttach,
   PromptInputAttachment,
   PromptInputButton,
+  PromptInputEditor,
   PromptInputFooter,
   PromptInputHeader,
   PromptInputSubmit,
   PromptInputTextarea,
+  PromptInputTrigger,
   ProviderMark,
 } from "@/registry/new-york/agents/prompt-input";
 export type {
@@ -24,9 +26,13 @@ export type {
   PromptAttachment,
   PromptInputAttachProps,
   PromptInputButtonProps,
+  PromptInputEditorProps,
   PromptInputProps,
   PromptInputTextareaProps,
+  PromptInputTriggerProps,
   PromptModel,
+  PromptSegment,
+  PromptTriggerItem,
   ProviderId,
   ProviderMarkProps,
 } from "@/registry/new-york/agents/prompt-input";

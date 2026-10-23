@@ -12,14 +12,18 @@ import {
   PromptInput,
   PromptInputAttach,
   PromptInputAttachment,
+  PromptInputEditor,
   PromptInputFooter,
   PromptInputHeader,
   PromptInputSubmit,
   PromptInputTextarea,
+  PromptInputTrigger,
 } from "@/registry/new-york/agents/prompt-input";
 import type {
   PromptAttachment,
   PromptModel,
+  PromptSegment,
+  PromptTriggerItem,
 } from "@/registry/new-york/agents/prompt-input";
 
 /** Shipped with the docs so the demo needs no external host. */
@@ -171,6 +175,51 @@ export const PromptInputStreamingDemo = () => {
           <PromptInputSubmit />
         </PromptInputFooter>
       </PromptInput>
+    </div>
+  );
+};
+
+const FILES: PromptTriggerItem[] = [
+  { description: "components/chat", id: "chat-app", label: "chat-app.tsx" },
+  { description: "components/chat", id: "message", label: "message.tsx" },
+  { description: "registry", id: "registry", label: "registry.json" },
+];
+
+const COMMANDS: PromptTriggerItem[] = [
+  { description: "Read the diff", id: "review", label: "review" },
+  { description: "Write the failing test first", id: "test", label: "test" },
+  { description: "Clear the conversation", id: "clear", label: "clear" },
+];
+
+/** `@` points at something and stays in the message as a chip. `/clear` acts on the spot,
+ *  so it returns `false` and leaves nothing behind. Sending shows the segments the caller
+ *  receives, which is where the ids are. */
+export const PromptInputMentionDemo = () => {
+  const [sent, setSent] = useState<PromptSegment[] | null>(null);
+
+  return (
+    <div className="flex w-full max-w-2xl flex-col items-center gap-3">
+      <PromptInput onSubmit={(_, segments) => setSent(segments)}>
+        <PromptInputEditor placeholder="Type @ to point at a file, / to run a command.">
+          <PromptInputTrigger char="@" items={FILES} />
+          <PromptInputTrigger
+            char="/"
+            items={COMMANDS}
+            lineStart
+            onSelect={(item) => (item.id === "clear" ? false : undefined)}
+          />
+        </PromptInputEditor>
+        <PromptInputFooter>
+          <PromptInputSubmit />
+        </PromptInputFooter>
+      </PromptInput>
+
+      <pre
+        aria-live="polite"
+        className="min-h-5 w-full overflow-x-auto text-muted-foreground text-xs"
+      >
+        {sent ? JSON.stringify(sent) : null}
+      </pre>
     </div>
   );
 };

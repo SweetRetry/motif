@@ -7,8 +7,10 @@ import { cn } from "@/lib/utils";
 
 import { PromptInputContext } from "./context";
 import type { PromptInputState } from "./context";
-import type { PromptInputProps } from "./types";
+import type { PromptInputProps, PromptSegment } from "./types";
 
+export { PromptInputEditor } from "./editor";
+export { PromptInputTrigger } from "./trigger";
 export {
   PromptInputAttach,
   PromptInputAttachment,
@@ -30,9 +32,13 @@ export type {
   PromptAttachment,
   PromptInputAttachProps,
   PromptInputButtonProps,
+  PromptInputEditorProps,
   PromptInputProps,
   PromptInputTextareaProps,
+  PromptInputTriggerProps,
   PromptModel,
+  PromptSegment,
+  PromptTriggerItem,
 } from "./types";
 export type {
   ProviderId,
@@ -84,7 +90,8 @@ export const PromptInput = ({
   ...props
 }: PromptInputProps) => {
   const [draft, setDraft] = useState(defaultValue ?? "");
-  const field = useRef<HTMLTextAreaElement>(null);
+  const field = useRef<HTMLElement>(null);
+  const segments = useRef<(() => PromptSegment[]) | null>(null);
 
   // Controlled when the caller passes `value`; otherwise the root keeps the draft and
   // clears it after a send.
@@ -106,7 +113,10 @@ export const PromptInput = ({
     if (message.length === 0 || disabled || streaming) {
       return;
     }
-    onSubmit?.(message);
+    onSubmit?.(
+      message,
+      segments.current?.() ?? [{ text: message, type: "text" }]
+    );
     if (!controlled) {
       setValue("");
     }
@@ -118,13 +128,14 @@ export const PromptInput = ({
       canSend: text.trim().length > 0 && !disabled,
       disabled,
       field,
+      segments,
       setValue,
       stop: onStop,
       streaming,
       submit,
       value: text,
     }),
-    [disabled, field, onStop, setValue, streaming, submit, text]
+    [disabled, field, onStop, segments, setValue, streaming, submit, text]
   );
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
