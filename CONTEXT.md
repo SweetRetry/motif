@@ -84,6 +84,18 @@ _Avoid_: token meter、usage bar、context gauge
 环所处的位置，只有三个词：`ok` 有余地、`near` 快满了、`full` 没有余地。色调是角色（`warning`、`destructive`），不是色相。
 _Avoid_: level、severity、threshold state
 
+**Queue**（排队）：
+agent 还在跑时用户发出的消息，不打断，按顺序等着。agent 的工具调用一结束或这一轮结束就会取走。取走之前仍是用户的：可以撤回，也可以 send now。
+_Avoid_: pending messages、outbox、backlog
+
+**Send now**（立即发送）：
+对一条排队消息的动作：不等 agent 来取，现在就发出去，发出去之后它不再排队。对在途工作的影响（等工具调用结束、转后台、打断正在写的回复）由宿主决定。用户拿它来纠正方向，但词只用 send now。
+_Avoid_: steer、interrupt、jump the queue
+
+**Queued message**（排队消息）：
+queue 里的一条。它是消息，不是 tool call，`queued` 这个词只属于 tool call status。
+_Avoid_: pending item、draft、task
+
 **Video preview**（视频预览）：
 一条生成出来的视频在播放前就能读：画面、帧条，播放键盖在画面上，读数放在帧条的轴上。根不画外框，几个部分各是各的形状。
 _Avoid_: video player、video card、media preview

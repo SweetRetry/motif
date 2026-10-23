@@ -1,0 +1,112 @@
+---
+title: Queue
+description: "Messages the user sent while the agent was running: what is waiting, in the order the agent will take it, and two ways out of the queue, send it now or take it back."
+---
+
+import { QueueDemo } from "@/examples/queue";
+
+<ComponentPreview name="queue">
+  <QueueDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif.sweetretry.com/r/queue.json
+```
+
+## Usage
+
+```tsx
+import {
+  Queue,
+  QueueHeader,
+  QueueItem,
+  QueueItemMarker,
+  QueueItemRemove,
+  QueueItemSendNow,
+  QueueItemText,
+  QueueList,
+} from "@/components/ui/motif/queue";
+
+export function Waiting({ messages, onRemove, onSendNow }) {
+  return (
+    <Queue>
+      <QueueHeader>{messages.length} queued</QueueHeader>
+      <QueueList>
+        {messages.map((message) => (
+          <QueueItem key={message.id}>
+            <QueueItemMarker />
+            <QueueItemText>{message.text}</QueueItemText>
+            <QueueItemSendNow onClick={() => onSendNow(message.id)} />
+            <QueueItemRemove onClick={() => onRemove(message.id)} />
+          </QueueItem>
+        ))}
+      </QueueList>
+    </Queue>
+  );
+}
+```
+
+| Part               | Draws                                                  |
+| ------------------ | ------------------------------------------------------ |
+| `Queue`            | The card the rows sit in; nothing while it has no rows |
+| `QueueHeader`      | A line above the rows, for the count                   |
+| `QueueList`        | The rows, as an ordered list                           |
+| `QueueItem`        | One waiting message                                    |
+| `QueueItemMarker`  | The arrow that says _after this one_                   |
+| `QueueItemText`    | What the user sent, on one line                        |
+| `QueueItemSendNow` | The button that hands the message to the agent now     |
+| `QueueItemRemove`  | The button that takes the message back                 |
+
+## The list is yours
+
+A queue has no state of its own. What is waiting is a fact about the run, so it lives
+with the run, and the parts draw it. There is no context for a part to read, and a part
+of your own can sit in a row beside the shipped ones.
+
+The order is the order of the children, because that is the order the agent takes them
+in. `QueueList` is an `ol`, so a screen reader hears the position as well as the text.
+
+## Empty, and nothing to press
+
+A slot with nothing in it draws nothing. `Queue` with no children is not drawn, so the
+box does not sit empty above the composer between runs. `QueueHeader` and `QueueItemText`
+do the same for an empty string.
+
+`QueueItemSendNow` and `QueueItemRemove` are not drawn without an `onClick`. A button that
+does nothing is a promise the part cannot keep.
+
+## Send now, or take it back
+
+A waiting message has two ways out. **Send now** sends it, without waiting for the agent
+to reach the queue. **Remove** takes it back. Send now is the one a user reaches
+for to steer the agent when they see it heading the wrong way and the correction cannot wait.
+
+Left alone, the agent takes the queue in order: when its running tool calls finish, or
+when the turn ends. Sending now skips that wait, and what it does to the work in flight is
+the host's call. Claude Code does the same: it lets a shell command or a subagent carry on in
+the background and interrupts a reply that is being written.
+
+The component only reports the press. Whether a message sent now leaves the queue is the
+host's too: it usually does, since it has been sent, and the demo above removes it. Pass
+`children` to `QueueItemSendNow` to relabel it. The default label is `Send now`.
+
+Both actions are hidden until the pointer or the keyboard is on the row, so three waiting
+messages read as three messages and not three toolbars. On a touch screen they are always
+there, since there is no hover to reveal them. Pass `aria-label` to translate the default
+`Remove from queue`.
+
+## No rules between rows
+
+The frame is the one line. Rows are told apart by the space between them, and the one
+under the pointer takes `accent`, which is a fill that answers the pointer and is safe
+inside the card.
+
+## Component source
+
+<ComponentSource
+  name="queue"
+  src="registry/new-york/agents/queue.tsx"
+  title="queue.tsx"
+/>

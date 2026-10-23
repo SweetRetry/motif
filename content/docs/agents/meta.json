@@ -9,6 +9,7 @@
     "agent-activity",
     "loading-state",
     "context-usage",
+    "queue",
     "scroll-rail",
     "prompt-input",
     "voice-input",

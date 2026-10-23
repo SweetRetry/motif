@@ -419,6 +419,20 @@
       ]
     },
     {
+      "name": "queue",
+      "type": "registry:ui",
+      "title": "Queue",
+      "description": "Messages the user sent while the agent was running: what is waiting, in the order the agent will take it, and a way to take one back.",
+      "dependencies": ["lucide-react"],
+      "files": [
+        {
+          "path": "registry/new-york/agents/queue.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/motif/queue.tsx"
+        }
+      ]
+    },
+    {
       "name": "source",
       "type": "registry:ui",
       "title": "Source",
