@@ -1,0 +1,88 @@
+---
+title: Question Card
+description: A human-in-the-loop question surface. The agent asks, the reader picks an option or types an answer, one question at a time.
+---
+
+import { QuestionCardDemo } from "@/examples/question-card";
+
+<ComponentPreview name="question-card">
+  <QuestionCardDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif.sweetretry.com/r/question-card.json
+```
+
+Pulls in the platform [`button`](https://ui.shadcn.com/docs/components/button),
+[`input`](https://ui.shadcn.com/docs/components/input) and
+[`radio-group`](https://ui.shadcn.com/docs/components/radio-group) — the same bases Prompt
+Input and Skill Detail build on, not copies of their own — plus `tooltip` for the
+step-bar previews.
+
+For a yes or no on an action, see [Approval Card](/docs/agents/approval-card).
+
+The card reads a step walked past in `warning`, a token the base theme does not have. The
+registry item carries it, so `shadcn add` adds it to your CSS — `:root`, `.dark` and
+`@theme`, the same three places `styles/globals.css` keeps it here.
+
+## Usage
+
+```tsx
+import { QuestionCard } from "@/components/ui/motif/question-card";
+
+export function Review() {
+  return (
+    <QuestionCard
+      questions={[
+        {
+          id: "scope",
+          title: "How focused should the first release be?",
+          options: [
+            { value: "focused", label: "A focused starter set" },
+            { value: "broad", label: "A broader collection" },
+          ],
+        },
+      ]}
+      onAnswersChange={(answers) => console.log(answers)}
+      onSubmit={(answers) => console.log("submitted", answers)}
+    />
+  );
+}
+```
+
+## Status
+
+The card walks through `questions` one step at a time. There is one answer shape:
+a single choice plus free text. Picking an option clears the text field, typing in the
+field clears the pick, and the answer is stored in an `answers` map keyed by question id.
+Step position lives in the footer as one bar per question, which is also the only step
+control. Width carries position: the question you are on is twice the resting width.
+Colour carries state: the current bar is at full strength, an answered one sits at 55%,
+one not reached yet at 20%, and one walked past without an answer turns the `warning`
+token's amber. Clicking a bar jumps to that
+question (hovering lengthens it, nudges the rest of the row along, and previews the
+question in a tooltip), and every bar names itself to assistive tech
+("Question 2 of 3: Who signs off… (answered)"). Navigation is free — `Skip` and `Continue`
+both move on without an answer — and only `Submit` on the last question enforces that
+every question is answered.
+
+The root is a `bg-card` container with a border, so it reads as raised on the page or
+inside a `bg-muted` panel. The free-text field is the platform input, so its border and
+focus ring are the same as everywhere else in the app; the card only pins the field's
+`h-10 rounded-xl` geometry.
+
+| Status       | Meaning                                        |
+| ------------ | ---------------------------------------------- |
+| `pending`    | Waiting for the user, controls enabled         |
+| `submitting` | Controls locked while the request is in flight |
+| `answered`   | Done, no controls: `result` or the status text |
+
+## Component source
+
+<ComponentSource
+  name="question-card"
+  src="registry/new-york/agents/question-card/index.tsx"
+  title="question-card.tsx"
+/>

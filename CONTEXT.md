@@ -48,6 +48,22 @@ _Avoid_: pending、success、error、loading
 一次运行的整块：头部一行，下面是它走过的步骤。运行中头部是等待态加计时，时间线展开；结束后头部收成一行"Worked for 42s"，时间线折起。读者按过头部之后，折叠归读者，运行结束不再动它。
 _Avoid_: run log、trace、timeline card、steps panel
 
+**Step**（步骤）：
+agent activity 时间线里按发生顺序排的一项，要么是一段 note，要么是一次调用，要么是一个问题。它们不是部件，activity 不给步骤再套一层。
+_Avoid_: action、event、node
+
+**Note**（旁白）：
+agent 在两轮工作之间说的话，说刚发现了什么、接下来做什么。是正文，不是灰色的思考，它紧挨着自己解释的那批动作。
+_Avoid_: thought、reasoning、commentary、status message
+
+**Batch**（一批）：
+一串已完成的连续调用，在它们之后出现了旁白、提问或这一回合停下，就折成一行动词摘要，如 `Read 2 files, searched 1 query`。折之前读者正在看它们到达，不动。
+_Avoid_: group、stack、cluster
+
+**Done row**（完成行）：
+已完成的步骤不画状态，行首是它这类动作的图标，动词的时态说明状态。状态图形只给例外：运行中、等读者、失败。
+_Avoid_: success row、checked row
+
 **Source**（来源）：
 agent 引用的一个外部页面，画成一枚小标：标记加主机名，整枚是链接，页面标题收在悬停里。它有字那么大，能嵌在句子里，也能排成一行。
 _Avoid_: citation、reference、result、link card、link preview、badge

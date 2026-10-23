@@ -180,7 +180,7 @@ export const PromptInputStreamingDemo = () => {
 };
 
 const FILES: PromptTriggerItem[] = [
-  { description: "components/chat", id: "chat-app", label: "chat-app.tsx" },
+  { description: "components/chat", id: "agent-run", label: "agent-run.tsx" },
   { description: "components/chat", id: "message", label: "message.tsx" },
   { description: "registry", id: "registry", label: "registry.json" },
 ];

@@ -2,62 +2,34 @@
 
 import { useState } from "react";
 
-import type {
-  ApprovalCardAnswers,
-  ApprovalCardQuestion,
-  ApprovalCardStatus,
-} from "@/registry/new-york/agents/approval-card";
+import { Button } from "@/components/ui/button";
 import { ApprovalCard } from "@/registry/new-york/agents/approval-card";
 
-const QUESTIONS: ApprovalCardQuestion[] = [
-  {
-    customPlaceholder: "Describe another scope…",
-    id: "scope",
-    options: [
-      { label: "A focused starter set", value: "focused" },
-      { label: "A broader collection", value: "broad" },
-      { label: "One flagship experience", value: "flagship" },
-    ],
-    title: "How focused should the first release be?",
-  },
-  {
-    id: "review",
-    options: [
-      { label: "A single maintainer", value: "maintainer" },
-      { label: "Two reviewers", value: "pair" },
-      { label: "Anyone on the team", value: "team" },
-    ],
-    title: "Who signs off before anything ships?",
-  },
-  {
-    id: "signals",
-    options: [
-      { label: "Tests and type checks", value: "tests" },
-      { label: "Usage in a real app", value: "usage" },
-      { label: "Docs and examples", value: "docs" },
-    ],
-    title: "Which signal should gate the release?",
-  },
-];
-
+/** The card is only there while the call is held. Once it is answered it is gone, and the
+ *  call's row is what says how it went, so the demo leaves a line of text in its place. */
 export const ApprovalCardDemo = () => {
-  const [answers, setAnswers] = useState<ApprovalCardAnswers>({});
-  const [status, setStatus] = useState<ApprovalCardStatus>("pending");
+  const [outcome, setOutcome] = useState<string | null>(null);
 
   return (
     <div className="w-full max-w-md">
-      <ApprovalCard
-        questions={QUESTIONS}
-        status={status}
-        answers={answers}
-        onAnswersChange={setAnswers}
-        onSubmit={() => setStatus("answered")}
-        onDismiss={() => {
-          setAnswers({});
-          setStatus("pending");
-        }}
-        result="Thanks — the plan was recorded."
-      />
+      {outcome ? (
+        <p className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
+          {outcome}
+          <Button variant="ghost" size="sm" onClick={() => setOutcome(null)}>
+            Ask again
+          </Button>
+        </p>
+      ) : (
+        <ApprovalCard
+          onApprove={() => setOutcome("Approved.")}
+          onReject={(reason) =>
+            setOutcome(reason ? `Rejected: ${reason}` : "Rejected.")
+          }
+        >
+          This tool wants to delete the file <code>/tmp/example.txt</code>. Do
+          you approve this action?
+        </ApprovalCard>
+      )}
     </div>
   );
 };

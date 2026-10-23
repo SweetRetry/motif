@@ -19,18 +19,18 @@ the path the registry item names, and brings the base components it is built on 
 with it:
 
 ```bash
-npx shadcn@latest add https://motif.sweetretry.com/r/approval-card.json
+npx shadcn@latest add https://motif.sweetretry.com/r/question-card.json
 ```
 
 Every Motif file lands in one folder, `components/ui/motif/`, so our names never collide with yours
 and you can see everything it added. Import it from there:
 
 ```tsx
-import { ApprovalCard } from "@/components/ui/motif/approval-card";
+import { QuestionCard } from "@/components/ui/motif/question-card";
 
 export function Review() {
   return (
-    <ApprovalCard
+    <QuestionCard
       questions={[
         {
           id: "scope",
@@ -50,11 +50,12 @@ export function Review() {
 ## Install a block
 
 A block is a whole surface assembled from parts the registry already publishes — the
-`chat-app` block is `conversation`, `message`, `thinking-block`, `loading-state`,
-`prompt-input`, `scroll-rail` and `attachment` wired together:
+`agent-run` block is `conversation`, `message`, `agent-activity`, `tool-call`,
+`source`, `approval-card`, `question-card`, `loading-state`, `context-usage`, `prompt-input`, `scroll-rail` and
+`attachment` wired together:
 
 ```bash
-npx shadcn@latest add https://motif.sweetretry.com/r/chat-app.json
+npx shadcn@latest add https://motif.sweetretry.com/r/agent-run.json
 ```
 
 Because the dependencies travel with it, you get every part in one command — and you can

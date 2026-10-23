@@ -84,7 +84,7 @@ export const TYPING = {
   command: {
     at: CUE.install + on(1.5),
     cps: 70,
-    text: "npx shadcn@latest add https://motif.sweetretry.com/r/chat-app.json",
+    text: "npx shadcn@latest add https://motif.sweetretry.com/r/agent-run.json",
   },
   prompt: {
     at: CUE.attach + on(2.5),

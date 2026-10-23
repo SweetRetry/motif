@@ -1,6 +1,6 @@
 import { PageTransition } from "@/components/page-transition";
 import { ROUTES } from "@/constants/routes";
-import { ChatAppDemo } from "@/examples/chat-app";
+import { AgentRunDemo } from "@/examples/agent-run";
 import { GenerationCanvasDemo } from "@/examples/generation-canvas";
 import { BreadcrumbJsonLd } from "@/seo/json-ld";
 import { createPageMetadata } from "@/seo/metadata";
@@ -10,22 +10,22 @@ export const revalidate = false;
 
 export const metadata = createPageMetadata({
   description:
-    "The chat app and the canvas app running whole: the pieces assembled into the two surfaces they were made for.",
+    "The agent run and the canvas app running whole: the pieces assembled into the two surfaces they were made for.",
   path: ROUTES.PLAYGROUND,
   title: "Playground",
 });
 
 const SECTIONS = [
   {
-    demo: <ChatAppDemo />,
+    demo: <AgentRunDemo />,
     description:
-      "A thread that follows its own tail, a composer, and the reasoning behind each answer.",
-    title: "Chat app",
+      "A thread that follows its own tail, the calls and approvals inside each turn, and a composer.",
+    title: "Agent run",
   },
   {
     demo: <GenerationCanvasDemo />,
     description:
-      "A prompt and its settings feeding an image node, with light travelling the edges while it generates.",
+      "A graph you can pan, zoom and rewire: prompts and settings feeding an image, that image feeding a clip, and light on the edges while a result is on its way.",
     title: "Canvas app",
   },
 ];

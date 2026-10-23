@@ -12,11 +12,11 @@ step.
 
 - **Agents** — the surfaces a conversation is made of: `conversation`, `message`,
   `thinking-block`, `loading-state`, `prompt-input`, `voice-input`, `attachment`,
-  `scroll-rail`, `approval-card` and `skill-detail`.
+  `scroll-rail`, `approval-card`, `question-card` and `skill-detail`.
 - **Components** — the controls that frame a media surface: `aspect-ratio-picker`,
   `resolution-segmented`, `duration-slider`, `generation-overlay`, `cover-fan`,
   `flow-edge`, `toolbar`, `line-tabs`, `settings-dialog` and `activity-heatmap`.
-- **Blocks** — whole surfaces assembled from the parts, starting with `chat-app`.
+- **Blocks** — whole surfaces assembled from the parts, starting with `agent-run`.
 
 ## How the parts are built
 
@@ -35,13 +35,13 @@ step.
 ## Install
 
 ```bash
-npx shadcn@latest add https://motif.sweetretry.com/r/approval-card.json
+npx shadcn@latest add https://motif.sweetretry.com/r/question-card.json
 ```
 
 Then import it from the path `shadcn add` wrote it to:
 
 ```tsx
-import { ApprovalCard } from "@/components/ui/motif/approval-card";
+import { QuestionCard } from "@/components/ui/motif/question-card";
 ```
 
 ## FAQ

@@ -16,40 +16,37 @@ import {
 import { cn } from "@/lib/utils";
 
 import type {
-  ApprovalCardAnswer,
-  ApprovalCardAnswers,
-  ApprovalCardProps,
-  ApprovalCardQuestion,
-  ApprovalCardStatus,
+  QuestionCardAnswer,
+  QuestionCardAnswers,
+  QuestionCardProps,
+  QuestionCardQuestion,
+  QuestionCardStatus,
 } from "./types";
 
 export type {
-  ApprovalCardAnswer,
-  ApprovalCardAnswers,
-  ApprovalCardOption,
-  ApprovalCardProps,
-  ApprovalCardQuestion,
-  ApprovalCardStatus,
+  QuestionCardAnswer,
+  QuestionCardAnswers,
+  QuestionCardOption,
+  QuestionCardProps,
+  QuestionCardQuestion,
+  QuestionCardStatus,
 } from "./types";
 
 // Motion tokens, kept in this file so it installs on its own.
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 const SPRING_SWAP = { damping: 30, mass: 0.55, stiffness: 460 } as const;
 
-const EMPTY_ANSWER: ApprovalCardAnswer = { custom: "", selected: [] };
+const EMPTY_ANSWER: QuestionCardAnswer = { custom: "", selected: [] };
 
-const STATUS_LABEL: Record<ApprovalCardStatus, string> = {
+const STATUS_LABEL: Record<QuestionCardStatus, string> = {
   answered: "Response submitted",
-  approved: "Approved",
-  "changes-requested": "Changes requested",
   pending: "Input required",
-  rejected: "Rejected",
   submitting: "Submitting",
 };
 
-const getStatusLabel = (status: ApprovalCardStatus) => STATUS_LABEL[status];
+const getStatusLabel = (status: QuestionCardStatus) => STATUS_LABEL[status];
 
-function isAnswered(answer: ApprovalCardAnswer) {
+function isAnswered(answer: QuestionCardAnswer) {
   return answer.selected.length > 0 || Boolean(answer.custom?.trim());
 }
 
@@ -60,10 +57,10 @@ function QuestionOptions({
   onChange,
   onAutoAdvance,
 }: {
-  question: ApprovalCardQuestion;
-  answer: ApprovalCardAnswer;
+  question: QuestionCardQuestion;
+  answer: QuestionCardAnswer;
   disabled: boolean;
-  onChange: (answer: ApprovalCardAnswer) => void;
+  onChange: (answer: QuestionCardAnswer) => void;
   onAutoAdvance?: () => void;
 }) {
   const custom = answer.custom ?? "";
@@ -157,8 +154,8 @@ function StepBars({
   onSelect,
 }: {
   current: number;
-  questions: ApprovalCardQuestion[];
-  answers: ApprovalCardAnswers;
+  questions: QuestionCardQuestion[];
+  answers: QuestionCardAnswers;
   onSelect: (index: number) => void;
 }) {
   const reduce = useReducedMotion() ?? false;
@@ -222,11 +219,8 @@ function StepBars({
   );
 }
 
-export function ApprovalCard({
-  title = "Approval required",
-  description,
-  children,
-  questions = [],
+export function QuestionCard({
+  questions,
   status = "pending",
   answers,
   defaultAnswers = {},
@@ -235,20 +229,16 @@ export function ApprovalCard({
   defaultStep = 0,
   onStepChange,
   onSubmit,
-  onApprove,
-  onReject,
-  onRequestChanges,
   onDismiss,
-  approveLabel = "Approve",
   submitLabel = "Submit",
   continueLabel = "Continue",
   skipLabel = "Skip",
   result,
   className,
-}: ApprovalCardProps) {
+}: QuestionCardProps) {
   const reduce = useReducedMotion() ?? false;
   const [internalAnswers, setInternalAnswers] =
-    useState<ApprovalCardAnswers>(defaultAnswers);
+    useState<QuestionCardAnswers>(defaultAnswers);
   const [internalStep, setInternalStep] = useState(defaultStep);
   const autoAdvanceTimer = useRef<number | null>(null);
   // Which way the last step change went, so the question slides in from the side
@@ -260,14 +250,12 @@ export function ApprovalCard({
     Math.max(0, questions.length - 1)
   );
   const question = questions[currentStep];
-  const questionMode = questions.length > 0;
   const pending = status === "pending";
   const busy = status === "submitting";
   const interactive = pending || busy;
   const currentAnswer = question
     ? (currentAnswers[question.id] ?? EMPTY_ANSWER)
     : EMPTY_ANSWER;
-  const displayTitle = question?.title ?? title;
   const statusLabel = getStatusLabel(status);
   const lastStep = currentStep === questions.length - 1;
   // One read-out per question: solid = answered, amber = walked past without an
@@ -299,7 +287,7 @@ export function ApprovalCard({
   }, [currentStep]);
 
   const setAnswers = useCallback(
-    (next: ApprovalCardAnswers) => {
+    (next: QuestionCardAnswers) => {
       if (answers === undefined) {
         setInternalAnswers(next);
       }
@@ -316,7 +304,7 @@ export function ApprovalCard({
     onStepChange?.(next);
   };
 
-  const updateCurrentAnswer = (next: ApprovalCardAnswer) => {
+  const updateCurrentAnswer = (next: QuestionCardAnswer) => {
     if (!question) {
       return;
     }
@@ -359,7 +347,7 @@ export function ApprovalCard({
       <div className="min-w-0">
         <div className="flex min-w-0 items-start gap-3">
           <h3 className="min-w-0 flex-1 text-base font-medium leading-5 text-foreground">
-            {displayTitle}
+            {question?.title}
           </h3>
           {onDismiss ? (
             <button
@@ -374,7 +362,7 @@ export function ApprovalCard({
         </div>
 
         <AgentDisclosure open={interactive}>
-          {questionMode && question ? (
+          {question ? (
             <motion.div
               key={question.id}
               initial={{ opacity: 0, x: 8 * slide }}
@@ -394,89 +382,45 @@ export function ApprovalCard({
                 onAutoAdvance={queueAutoAdvance}
               />
             </motion.div>
-          ) : (
-            <div>
-              {description ? (
-                <p className="mt-1 leading-5 text-muted-foreground">
-                  {description}
-                </p>
-              ) : null}
-              {children ? <div className="mt-3">{children}</div> : null}
-            </div>
-          )}
+          ) : null}
 
-          {questionMode ? (
-            <div className="mt-4 flex items-center gap-3">
-              <StepBars
-                answers={currentAnswers}
-                current={currentStep}
-                onSelect={setStep}
-                questions={questions}
-              />
-              <div className="ml-auto flex items-center gap-2">
-                {lastStep ? null : (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    disabled={busy}
-                    onClick={() => setStep(currentStep + 1)}
-                    className="rounded-full"
-                  >
-                    {skipLabel}
-                  </Button>
-                )}
-                <Button
-                  size="sm"
-                  disabled={busy || (lastStep && !allAnswered)}
-                  onClick={continueQuestion}
-                  className="rounded-full"
-                >
-                  {busy ? (
-                    <LoaderCircle
-                      className={cn("size-4", !reduce && "animate-spin")}
-                    />
-                  ) : lastStep ? (
-                    submitLabel
-                  ) : (
-                    continueLabel
-                  )}
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <Button
-                size="sm"
-                disabled={busy}
-                onClick={onApprove}
-                className="rounded-full"
-              >
-                {approveLabel}
-              </Button>
-              {onRequestChanges ? (
+          <div className="mt-4 flex items-center gap-3">
+            <StepBars
+              answers={currentAnswers}
+              current={currentStep}
+              onSelect={setStep}
+              questions={questions}
+            />
+            <div className="ml-auto flex items-center gap-2">
+              {lastStep ? null : (
                 <Button
                   variant="secondary"
                   size="sm"
                   disabled={busy}
-                  onClick={onRequestChanges}
+                  onClick={() => setStep(currentStep + 1)}
                   className="rounded-full"
                 >
-                  Request changes
+                  {skipLabel}
                 </Button>
-              ) : null}
-              {onReject ? (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  disabled={busy}
-                  onClick={onReject}
-                  className="rounded-full text-muted-foreground hover:text-destructive"
-                >
-                  Reject
-                </Button>
-              ) : null}
+              )}
+              <Button
+                size="sm"
+                disabled={busy || (lastStep && !allAnswered)}
+                onClick={continueQuestion}
+                className="rounded-full"
+              >
+                {busy ? (
+                  <LoaderCircle
+                    className={cn("size-4", !reduce && "animate-spin")}
+                  />
+                ) : lastStep ? (
+                  submitLabel
+                ) : (
+                  continueLabel
+                )}
+              </Button>
             </div>
-          )}
+          </div>
         </AgentDisclosure>
 
         {!interactive ? (

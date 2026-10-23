@@ -19,7 +19,22 @@
       "name": "approval-card",
       "type": "registry:ui",
       "title": "Approval Card",
-      "description": "A human-in-the-loop decision surface for approvals, single-choice questions, custom responses, and multi-step review flows.",
+      "description": "A human-in-the-loop approval surface: one sentence about the call a gate is holding, and Approve or Reject. Rejecting takes an optional note back to the agent.",
+      "dependencies": ["lucide-react", "motion"],
+      "registryDependencies": ["button", "input"],
+      "files": [
+        {
+          "path": "registry/new-york/agents/approval-card.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/motif/approval-card.tsx"
+        }
+      ]
+    },
+    {
+      "name": "question-card",
+      "type": "registry:ui",
+      "title": "Question Card",
+      "description": "A human-in-the-loop question surface: single-choice questions with a free-text answer, walked one step at a time, with a step bar that shows what is answered, skipped and still ahead.",
       "dependencies": ["lucide-react", "motion"],
       "registryDependencies": ["button", "input", "radio-group", "tooltip"],
       "cssVars": {
@@ -35,14 +50,14 @@
       },
       "files": [
         {
-          "path": "registry/new-york/agents/approval-card/index.tsx",
+          "path": "registry/new-york/agents/question-card/index.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/motif/approval-card/index.tsx"
+          "target": "@components/ui/motif/question-card/index.tsx"
         },
         {
-          "path": "registry/new-york/agents/approval-card/types.ts",
+          "path": "registry/new-york/agents/question-card/types.ts",
           "type": "registry:ui",
-          "target": "@components/ui/motif/approval-card/types.ts"
+          "target": "@components/ui/motif/question-card/types.ts"
         },
         {
           "path": "components/ui/motif/agent-disclosure.tsx",
@@ -654,27 +669,34 @@
       ]
     },
     {
-      "name": "chat-app",
+      "name": "agent-run",
       "type": "registry:block",
-      "title": "Chat App",
-      "description": "A whole chat surface for a page: a thread that follows its own tail, turns that carry reasoning and actions, and a composer that holds files and a model. Assembled from conversation, message, thinking-block, loading-state and prompt-input.",
+      "title": "Agent Run",
+      "description": "A whole agent run for a page: a thread that follows its own tail, turns that carry reasoning, tool calls and approvals, and a composer that holds files and a model. Assembled from conversation, message, agent-activity, tool-call, source, approval-card, question-card, loading-state, context-usage and prompt-input.",
       "dependencies": ["lucide-react", "streamdown"],
       "registryDependencies": [
         "button",
+        "popover",
+        "separator",
         "tooltip",
+        "https://motif.sweetretry.com/r/agent-activity.json",
+        "https://motif.sweetretry.com/r/context-usage.json",
+        "https://motif.sweetretry.com/r/source.json",
+        "https://motif.sweetretry.com/r/approval-card.json",
+        "https://motif.sweetretry.com/r/question-card.json",
         "https://motif.sweetretry.com/r/attachment.json",
         "https://motif.sweetretry.com/r/conversation.json",
         "https://motif.sweetretry.com/r/message.json",
         "https://motif.sweetretry.com/r/prompt-input.json",
         "https://motif.sweetretry.com/r/scroll-rail.json",
-        "https://motif.sweetretry.com/r/thinking-block.json",
+        "https://motif.sweetretry.com/r/tool-call.json",
         "https://motif.sweetretry.com/r/loading-state.json"
       ],
       "files": [
         {
-          "path": "registry/new-york/blocks/chat-app/chat-app.tsx",
+          "path": "registry/new-york/blocks/agent-run/agent-run.tsx",
           "type": "registry:component",
-          "target": "@components/ui/motif/chat-app.tsx"
+          "target": "@components/ui/motif/agent-run.tsx"
         }
       ]
     },

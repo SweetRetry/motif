@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
-import { ApprovalCard } from "@/registry/new-york/agents/approval-card";
 import { LoadingStateMark } from "@/registry/new-york/agents/loading-state";
 import {
   ModelPicker,
@@ -13,6 +12,7 @@ import {
   PromptInputTextarea,
 } from "@/registry/new-york/agents/prompt-input";
 import type { PromptModel } from "@/registry/new-york/agents/prompt-input";
+import { QuestionCard } from "@/registry/new-york/agents/question-card";
 import { ThinkingBlock } from "@/registry/new-york/agents/thinking-block";
 import { AspectRatioPicker } from "@/registry/new-york/aspect-ratio-picker";
 import { DurationSlider } from "@/registry/new-york/duration-slider";
@@ -383,7 +383,7 @@ const Names = ({
 /* -- The assembled surface, which comes apart ----------------------------- */
 
 const LAYERS = [
-  "chat-app",
+  "agent-run",
   "message",
   "thinking-block",
   "prompt-input",
@@ -659,7 +659,7 @@ export const Film = () => {
             to={CUE.settings - 0.35}
             zoom={1.35}
           >
-            <ApprovalCard
+            <QuestionCard
               answers={
                 t >= AT.approveSelect ? { render: { selected: ["wide"] } } : {}
               }
@@ -682,7 +682,7 @@ export const Film = () => {
           </Scene>
           <Names
             from={AT.approveShown + 0.15}
-            names={["approval-card"]}
+            names={["question-card"]}
             t={t}
             to={CUE.settings - 0.35}
           />

@@ -16,11 +16,11 @@
 
 - 🧩 **Agents** — `conversation`, `message`, `thinking-block`, `waiting-row`,
   `prompt-input`, `voice-input`, `attachment`, `scroll-rail`, `approval-card`,
-  `skill-detail`
+  `question-card`, `skill-detail`
 - 🎛️ **Components** — `aspect-ratio-picker`, `resolution-segmented`, `duration-slider`,
   `generation-overlay`, `cover-fan`, `flow-edge`, `toolbar`, `line-tabs`, `settings-dialog`,
   `activity-heatmap`
-- 🏗️ **Blocks** — whole surfaces assembled from the parts, starting with `chat-app`
+- 🏗️ **Blocks** — whole surfaces assembled from the parts, starting with `agent-run`
 
 ## Why it feels like one library
 
@@ -53,7 +53,7 @@
 ## Use a component
 
 ```bash
-npx shadcn@latest add https://motif.sweetretry.com/r/approval-card.json
+npx shadcn@latest add https://motif.sweetretry.com/r/question-card.json
 ```
 
 `shadcn add` writes the source into your repo at the path the registry item names and
@@ -62,7 +62,7 @@ brings its base components — `button`, `input`, `radio-group` — along with i
 ## Contributing a component
 
 1. **Add the component** under `registry/new-york/` — the reference one is
-   `registry/new-york/agents/approval-card/`
+   `registry/new-york/agents/question-card/`
 
 2. **Add a docs page and an example** under `content/docs/` and `examples/`
 
@@ -85,7 +85,7 @@ pnpm dev
 ```
 ├── registry/
 │   └── new-york/           # The component source that ships
-│       └── agents/approval-card/
+│       └── agents/question-card/
 ├── registry.json           # Registry manifest
 ├── content/docs/           # Documentation (MDX)
 ├── examples/               # Docs demos
