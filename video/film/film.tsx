@@ -102,108 +102,107 @@ const typed = (
 
 /* -- The swarm's script ---------------------------------------------------- */
 
-const keysFor = (wordmark: [number, number][]): Key[] => {
-  const mark = (wave: boolean) => grid3(MARK.x, MARK.y, MARK.gap, MARK.r, wave);
-  return [
-    { at: 0, form: point(W / 2, H / 2, 0) },
-    {
-      at: 0.05,
-      dur: 0.35,
-      ease: outBack,
-      form: point(W / 2, H / 2, 6),
-      spread: 0,
-    },
-    {
-      at: CUE.split,
-      dur: 0.5,
-      ease: outBack,
-      form: grid3(W / 2, H / 2, 30, 7),
-      spread: 0.12,
-    },
-    { at: CUE.title, dur: 0.7, form: grid3(250, H / 2, 30, 7), spread: 0.05 },
-    { at: CUE.burst, dur: 1.1, ease: out, form: field(), spread: 0.25 },
+const mark = (wave: boolean) => grid3(MARK.x, MARK.y, MARK.gap, MARK.r, wave);
 
-    {
-      at: CUE.think,
-      dur: 0.7,
-      form: matrix(THINK),
-      order: "sweep",
-      spread: 0.3,
-    },
-    { at: CUE.think + 0.9, dur: 0.4, form: matrix(THINK, 0) },
-    { at: CUE.approve - 0.35, dur: 0.3, form: matrix(THINK), spread: 0.1 },
-    { at: CUE.approve, dur: 0.6, form: matrix(APPROVE), spread: 0.2 },
-    { at: CUE.approve + 0.7, dur: 0.4, form: matrix(APPROVE, 0) },
-    { at: CUE.settings - 0.35, dur: 0.3, form: matrix(APPROVE), spread: 0.1 },
-    {
-      at: CUE.settings,
-      dur: 0.6,
-      form: matrix(PANEL),
-      order: "sweep",
-      spread: 0.2,
-    },
-    { at: CUE.settings + 0.7, dur: 0.4, form: matrix(PANEL, 0) },
-    { at: CUE.flow - 0.35, dur: 0.3, form: matrix(PANEL), spread: 0.1 },
-    {
-      at: CUE.flow,
-      dur: 0.9,
-      form: split(
-        160,
-        strand(EDGE_POINTS),
-        split(60, matrix(NODE, 0.5, 60), matrix(FRAME, 0.5, 200))
-      ),
-      spread: 0.3,
-    },
-    {
-      at: CUE.flow + 0.9,
-      dur: 0.5,
-      form: split(
-        160,
-        strand(EDGE_POINTS, 0),
-        split(60, matrix(NODE, 0, 60), matrix(FRAME, 0, 200))
-      ),
-    },
-    {
-      at: CUE.attach - 0.1,
-      dur: 0.5,
-      form: matrix(PROMPT),
-      order: "sweep",
-      spread: 0.2,
-    },
-    { at: CUE.attach + 0.5, dur: 0.4, form: matrix(PROMPT, 0) },
-    { at: CUE.compose - 0.35, dur: 0.3, form: matrix(PROMPT), spread: 0.1 },
-    { at: CUE.compose, dur: 0.6, form: matrix(SURFACE), spread: 0.2 },
-    { at: CUE.compose + 0.6, dur: 0.4, form: matrix(SURFACE, 0) },
-    { at: CUE.explode, dur: 1.2, ease: out, form: field(0.6), spread: 0.4 },
-    { at: CUE.own, dur: 0.4, form: field(0) },
-    {
-      at: CUE.install - 0.1,
-      dur: 0.5,
-      form: matrix(TERM),
-      order: "sweep",
-      spread: 0.2,
-    },
-    { at: CUE.install + 0.5, dur: 0.4, form: matrix(TERM, 0) },
-    { at: CUE.outro - 0.35, dur: 0.3, form: matrix(TERM), spread: 0.1 },
-    {
-      at: CUE.outro,
-      dur: 1.1,
-      form: split(9, mark(false), glyphs(wordmark)),
-      order: "sweep",
-      spread: 0.5,
-    },
-    {
-      at: CUE.outro + 1.4,
-      dur: 0.6,
-      form: split(9, mark(false), glyphs(wordmark, 0)),
-    },
-    {
-      at: AT.wave,
-      dur: 0.3,
-      form: split(9, mark(true), glyphs(wordmark, 0)),
-    },
-  ];
-};
+const keysFor = (wordmark: [number, number][]): Key[] => [
+  { at: 0, form: point(W / 2, H / 2, 0) },
+  {
+    at: 0.05,
+    dur: 0.35,
+    ease: outBack,
+    form: point(W / 2, H / 2, 6),
+    spread: 0,
+  },
+  {
+    at: CUE.split,
+    dur: 0.5,
+    ease: outBack,
+    form: grid3(W / 2, H / 2, 30, 7),
+    spread: 0.12,
+  },
+  { at: CUE.title, dur: 0.7, form: grid3(250, H / 2, 30, 7), spread: 0.05 },
+  { at: CUE.burst, dur: 1.1, ease: out, form: field(), spread: 0.25 },
+
+  {
+    at: CUE.think,
+    dur: 0.7,
+    form: matrix(THINK),
+    order: "sweep",
+    spread: 0.3,
+  },
+  { at: CUE.think + 0.9, dur: 0.4, form: matrix(THINK, 0) },
+  { at: CUE.approve - 0.35, dur: 0.3, form: matrix(THINK), spread: 0.1 },
+  { at: CUE.approve, dur: 0.6, form: matrix(APPROVE), spread: 0.2 },
+  { at: CUE.approve + 0.7, dur: 0.4, form: matrix(APPROVE, 0) },
+  { at: CUE.settings - 0.35, dur: 0.3, form: matrix(APPROVE), spread: 0.1 },
+  {
+    at: CUE.settings,
+    dur: 0.6,
+    form: matrix(PANEL),
+    order: "sweep",
+    spread: 0.2,
+  },
+  { at: CUE.settings + 0.7, dur: 0.4, form: matrix(PANEL, 0) },
+  { at: CUE.flow - 0.35, dur: 0.3, form: matrix(PANEL), spread: 0.1 },
+  {
+    at: CUE.flow,
+    dur: 0.9,
+    form: split(
+      160,
+      strand(EDGE_POINTS),
+      split(60, matrix(NODE, 0.5, 60), matrix(FRAME, 0.5, 200))
+    ),
+    spread: 0.3,
+  },
+  {
+    at: CUE.flow + 0.9,
+    dur: 0.5,
+    form: split(
+      160,
+      strand(EDGE_POINTS, 0),
+      split(60, matrix(NODE, 0, 60), matrix(FRAME, 0, 200))
+    ),
+  },
+  {
+    at: CUE.attach - 0.1,
+    dur: 0.5,
+    form: matrix(PROMPT),
+    order: "sweep",
+    spread: 0.2,
+  },
+  { at: CUE.attach + 0.5, dur: 0.4, form: matrix(PROMPT, 0) },
+  { at: CUE.compose - 0.35, dur: 0.3, form: matrix(PROMPT), spread: 0.1 },
+  { at: CUE.compose, dur: 0.6, form: matrix(SURFACE), spread: 0.2 },
+  { at: CUE.compose + 0.6, dur: 0.4, form: matrix(SURFACE, 0) },
+  { at: CUE.explode, dur: 1.2, ease: out, form: field(0.6), spread: 0.4 },
+  { at: CUE.own, dur: 0.4, form: field(0) },
+  {
+    at: CUE.install - 0.1,
+    dur: 0.5,
+    form: matrix(TERM),
+    order: "sweep",
+    spread: 0.2,
+  },
+  { at: CUE.install + 0.5, dur: 0.4, form: matrix(TERM, 0) },
+  { at: CUE.outro - 0.35, dur: 0.3, form: matrix(TERM), spread: 0.1 },
+  {
+    at: CUE.outro,
+    dur: 1.1,
+    form: split(9, mark(false), glyphs(wordmark)),
+    order: "sweep",
+    spread: 0.5,
+  },
+  {
+    at: CUE.outro + 1.4,
+    dur: 0.6,
+    form: split(9, mark(false), glyphs(wordmark, 0)),
+  },
+  {
+    at: AT.wave,
+    dur: 0.3,
+    form: split(9, mark(true), glyphs(wordmark, 0)),
+  },
+];
 
 const Swarm = ({ keys, t }: { keys: Key[]; t: number }) => {
   const canvas = useRef<HTMLCanvasElement>(null);
