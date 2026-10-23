@@ -104,6 +104,22 @@ _Avoid_: video player、video card、media preview
 把整条视频按时间顺序抽成一排帧，同时是进度条：已播的亮，未播的暗，点哪里就跳到哪里。帧数跟着宽度走，每一帧都是整幅画面。
 _Avoid_: timeline、scrubber、thumbnails、sprite
 
+**Canvas**（画布）：
+一张可以平移、缩放、拖线的图，用来摆生成工作。工作从左往右流：输入节点在左，结果节点在右。
+_Avoid_: whiteboard、flow editor、node editor
+
+**Input node**（输入节点）：
+画布上放"要什么"和"怎么要"的节点，只有两种：`prompt` 放文字，`settings` 放画幅、分辨率、强度。它们不产出东西，没有 run。
+_Avoid_: source node、config node
+
+**Result node**（结果节点）：
+画布上产出东西的节点，只有两种：`image` 和 `video`。它有 run，也有 tool call 那四个状态词（`idle` 没跑过、`pending` 在跑、`done` 出来了、`failed` 没出来）。
+_Avoid_: output node、media node、generation node
+
+**Run**（运行）：
+让一个结果节点去产出东西。它从连进来的边读 prompt 和 settings，种子加一再发出去。它的参考图还没出来时，先跑参考图，再跑它自己。
+_Avoid_: generate、execute、render
+
 **Mention**（提及）：
 草稿里用户从菜单挑出来的一个对象，画成一枚 chip。它是整体：光标进不去，退格整块删。消息把它当对象带走（`id`），不是拼出它的那几个字符。
 _Avoid_: tag、token、pill、entity
