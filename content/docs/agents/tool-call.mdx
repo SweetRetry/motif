@@ -1,0 +1,136 @@
+---
+title: Tool Call
+description: "One call, one row: the name, the gist of what it was given, where it stands, and the arguments and result behind a disclosure for the reader who doubts the line."
+---
+
+import { ToolCallDemo, ToolCallLifecycleDemo } from "@/examples/tool-call";
+
+<ComponentPreview name="tool-call">
+  <ToolCallDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif.sweetretry.com/r/tool-call.json
+```
+
+## Usage
+
+```tsx
+import {
+  ToolCall,
+  ToolCallContent,
+  ToolCallHeader,
+  ToolCallName,
+  ToolCallSection,
+  ToolCallStatus,
+  ToolCallSummary,
+} from "@/components/ui/motif/tool-call";
+
+export function ReadFile({ call }) {
+  return (
+    <ToolCall status={call.status}>
+      <ToolCallHeader>
+        <ToolCallStatus />
+        <ToolCallName>read_file</ToolCallName>
+        <ToolCallSummary>{call.input.path}</ToolCallSummary>
+      </ToolCallHeader>
+      <ToolCallContent>
+        <ToolCallSection title="Input">{call.inputText}</ToolCallSection>
+        <ToolCallSection title="Result">{call.resultText}</ToolCallSection>
+      </ToolCallContent>
+    </ToolCall>
+  );
+}
+```
+
+The root owns the status and whether the detail is open. The parts read them and never
+speak to each other, so a caller can move one, drop one, or put a part of their own in
+the header.
+
+| Part              | Draws                                                 |
+| ----------------- | ----------------------------------------------------- |
+| `ToolCall`        | The column, the status, and the disclosure state      |
+| `ToolCallHeader`  | The row; the control that opens the detail            |
+| `ToolCallStatus`  | Where the call stands: ring, indicator, check, cross  |
+| `ToolCallName`    | What was called, in mono                              |
+| `ToolCallSummary` | The gist of the input, one line, cut with an ellipsis |
+| `ToolCallContent` | The detail, behind a disclosure                       |
+| `ToolCallSection` | A labelled block inside the detail                    |
+| `useToolCall`     | Status, open state and toggle, for a part of your own |
+
+## A row, not a card
+
+A tool call is a line in a transcript. A dozen of them have to leave the transcript a
+transcript, so the row draws no container of its own, and the detail hangs off it behind
+a rule rather than inside a box. The arguments and the result are for the reader who
+doubts the line, not for the one following along.
+
+It is also why the summary is one line and cut. It is enough to recognise the call by; the
+full input is a press away.
+
+## Status
+
+Four words, because those are the four things a row can say:
+
+| Status    | Draws                            |
+| --------- | -------------------------------- |
+| `queued`  | An empty ring; the row is dimmed |
+| `running` | The loading mark                 |
+| `done`    | A check, in `success`            |
+| `failed`  | A cross, in `destructive`        |
+
+A running call reuses the mark from [Loading State](/docs/agents/loading-state) rather than
+drawing a spinner. It already means _the agent is working_, and a second mark for the
+same thing would be one word in two accents.
+
+The status is in the same place for all four, so the row does not shift when a call moves
+from one to the next:
+
+<ComponentPreview name="tool-call" align="start">
+  <ToolCallLifecycleDemo />
+</ComponentPreview>
+
+Each status has a text name for a screen reader. Pass `label` to `ToolCallStatus` to
+translate it.
+
+## No detail, no button
+
+The header is the control that opens the detail, but only while there is detail. Leave
+`ToolCallContent` out, or do not render it yet as the lifecycle above does, and the row is
+a plain row: no button, no chevron, nothing that does nothing when pressed.
+
+The content tells the root it is there as it mounts, before paint, so the chevron is in
+the first frame rather than a frame after the content that justifies it.
+
+## Sections
+
+A `ToolCallSection` with a string is set as preformatted text, so JSON keeps its
+indentation, and caps its height at twelve rem. Anything else is drawn as given, which is
+how a failure is shown:
+
+```tsx
+<ToolCallSection title="Error">
+  <p className="text-destructive text-xs">{call.error}</p>
+</ToolCallSection>
+```
+
+A section with nothing in it draws nothing, so `<ToolCallSection title="Result">{result}</ToolCallSection>`
+is safe to write before the result has arrived.
+
+The block is a recessed field, so it takes a border and no fill. A fill that is below the
+page in one theme is above the card in the other.
+
+## Controlled
+
+`open` and `onOpenChange` take the disclosure over, and `defaultOpen` starts it open. A
+host that opens the failed call and leaves the rest closed passes `open={status === "failed"}`.
+
+## Component source
+
+<ComponentSource
+  name="tool-call"
+  src="registry/new-york/agents/tool-call.tsx"
+  title="tool-call.tsx"
+/>

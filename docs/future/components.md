@@ -8,23 +8,22 @@
 ## 现状的盲区
 
 Agents 覆盖了"人说话"（输入框、语音、附件）和"agent 想"（思考块、状态灯），没有覆盖"agent 做了什么"。
-`agent-indicator` 有 `tool-call` 状态，但没有任何组件把一次工具调用画出来。
+`loading-state` 画"在等"，`tool-call` 把一次工具调用画成一行，但一次运行里这些行怎么排成时间线还没有组件。
 
 ## Agents
 
 按优先级排。
 
-| 组件               | 是什么                                                                                         | 依赖 / 备注                                                           |
-| ------------------ | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| Tool Call          | 一次调用一行：名称、参数摘要、状态（排队、运行、完成、失败）、可展开入参和结果                 | 基础件。`message` 与 `thinking-block` 都按 part 组装，它是下一个 part |
-| Task List          | agent 自己维护的待办。三种状态，同一时刻只有一项在进行                                         | 基础件                                                                |
-| Agent Activity     | 一次运行的实时时间线。头部"Working for 42s"，步骤是 Tool Call 或思考摘要，完成后折叠成一行总结 | 组合件，依赖 Tool Call、Thinking Block、Task List。先有基础件再写     |
-| Sources / Citation | 行内引用小标，悬停出来源卡，底部来源列表                                                       | 检索和研究类 agent 必需                                               |
-| Context Usage      | 上下文用量条，分系统提示、工具、对话、剩余                                                     | 底座是 `breakdown`，成本低                                            |
-| Queue              | agent 运行时用户排队发的消息，可撤回                                                           |                                                                       |
-| Changes            | 改了哪些文件、加减几行、可恢复的检查点                                                         | 面向编码 agent                                                        |
-| Artifact           | agent 产出的文档或代码的侧栏容器：标题栏、版本、复制、下载                                     |                                                                       |
-| Mention / Slash    | prompt-input 上的 @ 提及和 / 命令菜单                                                          | 改已有组件，不是新件                                                  |
+| 组件               | 是什么                                                                                         | 依赖 / 备注                                                       |
+| ------------------ | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Task List          | agent 自己维护的待办。三种状态，同一时刻只有一项在进行                                         | 基础件                                                            |
+| Agent Activity     | 一次运行的实时时间线。头部"Working for 42s"，步骤是 Tool Call 或思考摘要，完成后折叠成一行总结 | 组合件，依赖 Tool Call、Thinking Block、Task List。先有基础件再写 |
+| Sources / Citation | 行内引用小标，悬停出来源卡，底部来源列表                                                       | 检索和研究类 agent 必需                                           |
+| Context Usage      | 上下文用量条，分系统提示、工具、对话、剩余                                                     | 底座是 `breakdown`，成本低                                        |
+| Queue              | agent 运行时用户排队发的消息，可撤回                                                           |                                                                   |
+| Changes            | 改了哪些文件、加减几行、可恢复的检查点                                                         | 面向编码 agent                                                    |
+| Artifact           | agent 产出的文档或代码的侧栏容器：标题栏、版本、复制、下载                                     |                                                                   |
+| Mention / Slash    | prompt-input 上的 @ 提及和 / 命令菜单                                                          | 改已有组件，不是新件                                              |
 
 建议再加一个 **Agent Run** block，把消息、活动、审批和输入框装在一起。它给 Agents 一个像 `chat-app` 之外的整体证明。
 
@@ -41,7 +40,7 @@ Agents 覆盖了"人说话"（输入框、语音、附件）和"agent 想"（思
 
 - Suggestions。提示词小标签，`skill-detail` 里已有示例卡的概念。
 - Code Block。`streamdown` 已经渲染代码。
-- Loader。`agent-indicator` 够用。
+- Loader。`loading-state` 够用。
 - 折线图、统计卡。shadcn 自己的 charts 能覆盖，Data 区不自己造。
 
 ## 动手前

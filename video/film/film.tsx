@@ -1,8 +1,8 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
-import { AgentIndicator } from "@/registry/new-york/agents/agent-indicator";
 import { ApprovalCard } from "@/registry/new-york/agents/approval-card";
+import { LoadingStateMark } from "@/registry/new-york/agents/loading-state";
 import {
   ModelPicker,
   PromptInput,
@@ -762,7 +762,9 @@ export const Film = () => {
               className="flex items-center gap-3 rounded-xl border border-border bg-card px-4"
               style={{ height: NODE.h }}
             >
-              <AgentIndicator state={revealed ? "idle" : "tool-call"} />
+              {/* The mark stands down once the result is in; the spacer keeps the label where it
+                  was, so the reveal does not shift the row. */}
+              {revealed ? <span className="size-5" /> : <LoadingStateMark />}
               <span className="font-mono text-foreground text-xs">
                 16:9 · 2K · 6s
               </span>

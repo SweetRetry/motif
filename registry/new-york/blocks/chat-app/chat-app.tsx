@@ -7,7 +7,6 @@ import { Streamdown } from "streamdown";
 
 import { Button } from "@/components/ui/button";
 import type { ButtonProps } from "@/components/ui/button";
-import { AgentIndicator } from "@/components/ui/motif/agent-indicator";
 import { Attachment } from "@/components/ui/motif/attachment";
 import {
   Conversation,
@@ -15,6 +14,11 @@ import {
   ConversationScrollButton,
   useConversation,
 } from "@/components/ui/motif/conversation";
+import {
+  LoadingState,
+  LoadingStateLabel,
+  LoadingStateMark,
+} from "@/components/ui/motif/loading-state";
 import {
   Message,
   MessageActions,
@@ -52,7 +56,7 @@ import { cn } from "@/lib/utils";
  * A chat app is four surfaces stacked: a frame, a thread, a composer, and the state
  * that ties them together. Every one of them already exists in this registry — the
  * thread is `Conversation`, a turn is `Message`, the reasoning behind an answer is
- * `ThinkingBlock`, the gap before the first token is `AgentIndicator`, the rail beside the
+ * `ThinkingBlock`, the gap before the first token is `LoadingState`, the rail beside the
  * thread is `ScrollRail`, and the box the message is written in is `PromptInput` on top
  * of `Attachment`. This file is the wiring: it decides how they sit, and nothing else.
  *
@@ -211,13 +215,10 @@ const Answer = ({
       ) : null}
 
       {waiting ? (
-        <span
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground"
-          role="status"
-        >
-          <AgentIndicator state="thinking" />
-          <span>Thinking</span>
-        </span>
+        <LoadingState>
+          <LoadingStateMark />
+          <LoadingStateLabel>Thinking</LoadingStateLabel>
+        </LoadingState>
       ) : null}
 
       {answered && !turn.streaming ? (

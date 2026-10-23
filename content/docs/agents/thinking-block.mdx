@@ -118,17 +118,17 @@ frame shows the thought as it is rather than sliding the whole passage into plac
 
 ## Streaming
 
-While the work is happening the header is an `AgentIndicator` in the thinking state, a
-label, and the seconds so far. The indicator is the part of the block that says _now_, and
+While the work is happening the header is a [Loading State](/docs/agents/loading-state): the
+mark, a label, and the time so far. The mark is the part of the block that says _now_, and
 it is replaced by a fact once the truth is available.
 
-| Prop        | Behaviour                                                                   |
-| ----------- | --------------------------------------------------------------------------- |
-| `streaming` | Live row, follows its own tail, and holds the finished count when it stops. |
-| `startedAt` | Epoch ms the pass began, so a remount does not restart the count.           |
-| `duration`  | Seconds, when the caller owns the number. Wins over the measurement.        |
-| `label`     | What the row says while it waits. Defaults to `Thinking`.                   |
-| `doneLabel` | What the finished pass is called. Defaults to `Thought`.                    |
+| Prop        | Behaviour                                                                           |
+| ----------- | ----------------------------------------------------------------------------------- |
+| `streaming` | Live row, follows its own tail, and holds the finished count when it stops.         |
+| `startedAt` | Epoch ms the pass began, so a remount does not restart the count.                   |
+| `duration`  | Seconds the pass took, when the caller owns the number. Wins in the finished label. |
+| `label`     | What the row says while it waits. Defaults to `Thinking`.                           |
+| `doneLabel` | What the finished pass is called. Defaults to `Thought`.                            |
 
 Under way the header reads **Thinking 4s**; afterwards it reads **Thought for 9s**. The
 count is captured off the falling edge of `streaming` rather than ticked in state — a

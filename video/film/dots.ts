@@ -76,7 +76,7 @@ export const point =
   (i) =>
     i === 0 ? { a: 1, r, x, y } : { ...HIDDEN, x, y };
 
-/** The agent indicator's 3x3 grid, with its opacity wave running diagonally through
+/** The loading mark's 3x3 grid, with its opacity wave running diagonally through
  *  it while `wave` is on. Every other dot hides behind one of the nine. */
 export const grid3 =
   (cx: number, cy: number, gap: number, r: number, wave = true): Form =>

@@ -10,40 +10,21 @@ import {
   useRef,
   useState,
 } from "react";
-import type { RefObject } from "react";
 import { Streamdown } from "streamdown";
 
 import { AgentDisclosure } from "@/components/ui/motif/agent-disclosure";
-import { AgentIndicator } from "@/components/ui/motif/agent-indicator";
+import {
+  LoadingState,
+  LoadingStateClock,
+  LoadingStateLabel,
+  LoadingStateMark,
+} from "@/components/ui/motif/loading-state";
 import { cn } from "@/lib/utils";
 
 // Motion tokens, kept in this file so it installs on its own.
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 
 const formatDuration = (total: number) => `${Math.max(0, Math.floor(total))}s`;
-
-const useClock = (
-  node: RefObject<HTMLSpanElement | null>,
-  startedAt?: number,
-  controlledElapsed?: number
-) => {
-  useEffect(() => {
-    const el = node.current;
-    if (!el || controlledElapsed !== undefined) {
-      return;
-    }
-
-    const origin = startedAt ?? Date.now();
-    let timeout = 0;
-    const tick = () => {
-      const passed = Date.now() - origin;
-      el.textContent = formatDuration(passed / 1000);
-      timeout = window.setTimeout(tick, 1000 - (passed % 1000));
-    };
-    tick();
-    return () => window.clearTimeout(timeout);
-  }, [controlledElapsed, node, startedAt]);
-};
 
 /* -- The window ---------------------------------------------------------------
  * Reasoning arrives longer than anyone wants to read it and slower than the answer
@@ -139,7 +120,7 @@ export interface ThinkingBlockProps {
   /** What to call a finished pass. Present tense for `label`, past for this. */
   doneLabel?: string;
   /** Seconds the pass took, when the caller owns the number. Otherwise the block
-   *  measures its own — the same count the row was already showing. */
+   *  measures its own, from `startedAt` to the moment streaming stops. */
   duration?: number;
   /** The window's height at most. A number is px. A thought shorter than this sits at
    *  its own height, so a finished two-line thought does not leave a windowful of
@@ -200,9 +181,6 @@ export const ThinkingBlock = ({
   }, [origin, streaming]);
 
   const seconds = duration ?? held;
-
-  const clockRef = useRef<HTMLSpanElement>(null);
-  useClock(clockRef, startedAt, duration !== undefined ? duration : undefined);
 
   const windowRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<HTMLDivElement>(null);
@@ -366,20 +344,11 @@ export const ThinkingBlock = ({
         type="button"
       >
         {streaming ? (
-          <span
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors group-hover/thinking:text-foreground"
-            role="status"
-          >
-            <AgentIndicator state="thinking" />
-            <span>{label}</span>
-            <span
-              aria-hidden="true"
-              className="text-muted-foreground tabular-nums"
-              ref={clockRef}
-            >
-              {formatDuration(0)}
-            </span>
-          </span>
+          <LoadingState className="transition-colors group-hover/thinking:text-foreground">
+            <LoadingStateMark />
+            <LoadingStateLabel>{label}</LoadingStateLabel>
+            <LoadingStateClock startedAt={origin} />
+          </LoadingState>
         ) : (
           <span className="text-muted-foreground text-sm transition-colors group-hover/thinking:text-foreground">
             {seconds === null

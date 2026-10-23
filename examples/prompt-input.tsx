@@ -2,7 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import { AgentIndicator } from "@/components/ui/motif/agent-indicator";
+import {
+  LoadingState,
+  LoadingStateLabel,
+  LoadingStateMark,
+} from "@/components/ui/motif/loading-state";
 import {
   ModelPicker,
   PromptInput,
@@ -151,13 +155,10 @@ export const PromptInputStreamingDemo = () => {
   return (
     <div className="flex w-full max-w-2xl flex-col gap-3">
       {streaming ? (
-        <span
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground"
-          role="status"
-        >
-          <AgentIndicator state="thinking" />
-          <span>Thinking</span>
-        </span>
+        <LoadingState>
+          <LoadingStateMark />
+          <LoadingStateLabel>Thinking</LoadingStateLabel>
+        </LoadingState>
       ) : null}
       <PromptInput
         onStop={() => setStreaming(false)}

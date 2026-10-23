@@ -35,3 +35,15 @@ _Avoid_: suggestion、chip、example row
 **Voice input**（语音输入）：
 composer 里的麦克风控件：按一下开始录音，整个 composer 变成录音条——左取消、中间电平、右结束。电平直写 DOM，不触发 React 重渲染。
 _Avoid_: recorder、mic button、dictation
+
+**Tool call**（工具调用）：
+agent 做的一次调用，在对话里画成一行：状态、名称、入参摘要，入参和结果收在行后的展开里。它是一行，不是卡。
+_Avoid_: tool card、tool block、action、function call
+
+**Tool call status**（调用状态）：
+一次 tool call 所处的位置，只有四个词：`queued` 没开始、`running` 在跑、`done` 回来了、`failed` 没回来。
+_Avoid_: pending、success、error、loading
+
+**Loading state**（等待态）：
+agent 在干活、还没有结果的那一行：点阵、一个词、一个计时。只有这一种，不按在想、调工具、出字分形状。
+_Avoid_: agent indicator、spinner、loader、status badge

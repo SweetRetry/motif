@@ -25,15 +25,15 @@ from the source below if you want it.
 The block adds no surfaces of its own. Every part of it is a component this registry
 already publishes, and `shadcn add` brings them along through the registry dependencies:
 
-| Surface           | What it does here                                                    |
-| ----------------- | -------------------------------------------------------------------- |
-| `conversation`    | The thread: the follow, and the way back to the newest turn          |
-| `message`         | A turn's anatomy — the body, and the actions under it                |
-| `thinking-block`  | The reasoning behind an answer, streaming in its own window          |
-| `agent-indicator` | The badge before the first token, when there is no reasoning to show |
-| `prompt-input`    | The composer, with its attach button and its model picker            |
-| `scroll-rail`     | The rail beside the thread: one tick per turn, the reading line lit  |
-| `attachment`      | The chips riding with a reader's turn, before and after it is sent   |
+| Surface          | What it does here                                                   |
+| ---------------- | ------------------------------------------------------------------- |
+| `conversation`   | The thread: the follow, and the way back to the newest turn         |
+| `message`        | A turn's anatomy — the body, and the actions under it               |
+| `thinking-block` | The reasoning behind an answer, streaming in its own window         |
+| `loading-state`  | The mark before the first token, when there is no reasoning to show |
+| `prompt-input`   | The composer, with its attach button and its model picker           |
+| `scroll-rail`    | The rail beside the thread: one tick per turn, the reading line lit |
+| `attachment`     | The chips riding with a reader's turn, before and after it is sent  |
 
 `chat-app.tsx` is the wiring: how they sit, and nothing else. Swap any one of them for
 your own and the rest does not move.
