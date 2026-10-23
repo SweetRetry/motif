@@ -3,7 +3,11 @@ title: Tool Call
 description: "One call, one row: the name, the gist of what it was given, where it stands, and the arguments and result behind a disclosure for the reader who doubts the line."
 ---
 
-import { ToolCallDemo, ToolCallLifecycleDemo } from "@/examples/tool-call";
+import {
+  ToolCallDemo,
+  ToolCallLifecycleDemo,
+  ToolCallRawDemo,
+} from "@/examples/tool-call";
 
 <ComponentPreview name="tool-call">
   <ToolCallDemo />
@@ -72,14 +76,15 @@ full input is a press away.
 
 ## Status
 
-Four words, because those are the four things a row can say:
+Five words, because those are the five things a row can say:
 
-| Status    | Draws                            |
-| --------- | -------------------------------- |
-| `queued`  | An empty ring; the row is dimmed |
-| `running` | The loading mark                 |
-| `done`    | A check, in `success`            |
-| `failed`  | A cross, in `destructive`        |
+| Status     | Draws                                      |
+| ---------- | ------------------------------------------ |
+| `queued`   | An empty ring; the row is dimmed           |
+| `approval` | An amber dot, in `warning`; waiting on you |
+| `running`  | The loading mark                           |
+| `done`     | A check, in `success`                      |
+| `failed`   | A cross, in `destructive`                  |
 
 A running call reuses the mark from [Loading State](/docs/agents/loading-state) rather than
 drawing a spinner. It already means _the agent is working_, and a second mark for the
@@ -91,6 +96,11 @@ from one to the next:
 <ComponentPreview name="tool-call" align="start">
   <ToolCallLifecycleDemo />
 </ComponentPreview>
+
+`approval` is a call a gate is holding. The model asked for it as usual, and the gate stopped
+it before it ran, so it is a state of the call, not a separate step. Put an
+[Approval Card](/docs/agents/approval-card) under the row while it lasts. Approved, the same
+row goes on to `running`; refused, it ends as `failed` with the reason as its error.
 
 Each status has a text name for a screen reader. Pass `label` to `ToolCallStatus` to
 translate it.
@@ -104,7 +114,37 @@ a plain row: no button, no chevron, nothing that does nothing when pressed.
 The content tells the root it is there as it mounts, before paint, so the chevron is in
 the first frame rather than a frame after the content that justifies it.
 
-## Sections
+## What the detail holds
+
+The detail is whatever the reader would want behind that call, and that depends on what the
+call was. A search is the results it found, one line each. A generation is the picture. The
+query and the prompt are already in the row as its summary, so the detail does not say them
+again.
+
+```tsx
+<ToolCallContent>
+  <ToolCallSection title="3 results">
+    <Sources sources={call.sources} />
+  </ToolCallSection>
+</ToolCallContent>
+
+<ToolCallContent>
+  <ToolCallSection>
+    <ImageGrid images={call.images} />
+  </ToolCallSection>
+</ToolCallContent>
+```
+
+The component does not ship those two bodies. They are your product's: what a picture
+opens. The tags a search found are [Source](/docs/agents/source). `ToolCallSection` draws a label and a column and takes
+whatever you put in it. Leave `title` out for a body that explains itself, a picture
+needs no caption saying it is a result.
+
+Raw arguments and output are the fallback, for a call that has nothing better to show:
+
+<ComponentPreview name="tool-call" align="start">
+  <ToolCallRawDemo />
+</ComponentPreview>
 
 A `ToolCallSection` with a string is set as preformatted text, so JSON keeps its
 indentation, and caps its height at twelve rem. Anything else is drawn as given, which is

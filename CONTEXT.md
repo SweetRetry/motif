@@ -44,9 +44,29 @@ _Avoid_: tool card、tool block、action、function call
 一次 tool call 所处的位置，只有四个词：`queued` 没开始、`running` 在跑、`done` 回来了、`failed` 没回来。
 _Avoid_: pending、success、error、loading
 
+**Agent activity**（运行活动）：
+一次运行的整块：头部一行，下面是它走过的步骤。运行中头部是等待态加计时，时间线展开；结束后头部收成一行"Worked for 42s"，时间线折起。读者按过头部之后，折叠归读者，运行结束不再动它。
+_Avoid_: run log、trace、timeline card、steps panel
+
+**Source**（来源）：
+agent 引用的一个外部页面，画成一枚小标：标记加主机名，整枚是链接，页面标题收在悬停里。它有字那么大，能嵌在句子里，也能排成一行。
+_Avoid_: citation、reference、result、link card、link preview、badge
+
 **Loading state**（等待态）：
 agent 在干活、还没有结果的那一行：点阵、一个词、一个计时。只有这一种，不按在想、调工具、出字分形状。
 _Avoid_: agent indicator、spinner、loader、status badge
+
+**Context window**（上下文窗口）：
+模型一次能读进去的 token 上限。context usage 里的"整体"就是它，空着的轨道就是还剩的部分。
+_Avoid_: context length、token limit、quota
+
+**Context usage**（上下文用量）：
+窗口被占了多少、被什么占的：一枚环给"多满"，一根条按系统提示、工具、文件、对话切开。它是 breakdown 以窗口为整体的用法，不是另一种图。
+_Avoid_: token meter、usage bar、context gauge
+
+**Context tone**（用量色调）：
+环所处的位置，只有三个词：`ok` 有余地、`near` 快满了、`full` 没有余地。色调是角色（`warning`、`destructive`），不是色相。
+_Avoid_: level、severity、threshold state
 
 **Mention**（提及）：
 草稿里用户从菜单挑出来的一个对象，画成一枚 chip。它是整体：光标进不去，退格整块删。消息把它当对象带走（`id`），不是拼出它的那几个字符。

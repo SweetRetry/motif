@@ -29,9 +29,15 @@ import { cn } from "@/lib/utils";
  * being a button.
  * --------------------------------------------------------------------------- */
 
-/** Where a call stands. Four words, because those are the four things a row can say:
- *  not yet started, in flight, came back, did not come back. */
-export type ToolCallStatusValue = "queued" | "running" | "done" | "failed";
+/** Where a call stands. Five words, because those are the five things a row can say: not
+ *  yet started, held at a gate for the reader's yes, in flight, came back, did not come
+ *  back. */
+export type ToolCallStatusValue =
+  | "queued"
+  | "approval"
+  | "running"
+  | "done"
+  | "failed";
 
 /** What a part reads from the root. Exported with `useToolCall`, so a caller can draw
  *  a part of their own — a retry button that only exists on a failure — from the same
@@ -76,8 +82,9 @@ export interface ToolCallSectionProps extends Omit<
   ComponentProps<"div">,
   "title"
 > {
-  /** `Input`, `Result`: what the block under it is. */
-  title: ReactNode;
+  /** `Input`, `3 results`: what the block under it is. Left out, the block has no label,
+   *  which is right for a detail that explains itself, like a picture. */
+  title?: ReactNode;
 }
 
 /** Nothing to draw: the shapes a conditional leaves behind. A slot with nothing in it
@@ -217,7 +224,7 @@ export const ToolCallHeader = ({
       <button
         aria-controls={contentId}
         aria-expanded={isOpen}
-        className="flex w-full min-w-0 cursor-pointer items-center gap-2 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex w-fit max-w-full min-w-0 cursor-pointer items-center gap-2 rounded-md text-left outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onClick={toggle}
         type="button"
       >
@@ -228,11 +235,12 @@ export const ToolCallHeader = ({
 };
 
 /**
- * Where the call stands, drawn as one thing in the same place for all four.
+ * Where the call stands, drawn as one thing in the same place for all five.
  *
  * A running call is the loading mark: it already means "the agent is working", and a
- * second spinner beside it would be the same word in two accents. The other three are still shapes: an empty ring has not started, a check came
- * back, a cross did not.
+ * second spinner beside it would be the same word in two accents. The other four are
+ * still shapes: an empty ring has not started, an amber dot is waiting on the reader, a
+ * check came back, a cross did not.
  */
 export const ToolCallStatus = ({
   className,
@@ -245,7 +253,7 @@ export const ToolCallStatus = ({
     <span
       {...props}
       className={cn(
-        "flex size-5 shrink-0 items-center justify-center",
+        "flex size-4 shrink-0 items-center justify-center",
         className
       )}
       data-slot="tool-call-status"
@@ -253,15 +261,20 @@ export const ToolCallStatus = ({
       {status === "queued" ? (
         <span
           aria-hidden="true"
-          className="size-3 rounded-full border border-muted-foreground/50"
+          className="size-2.5 rounded-full border border-muted-foreground/50"
         />
       ) : null}
-      {status === "running" ? <LoadingStateMark /> : null}
+      {status === "approval" ? (
+        <span aria-hidden="true" className="size-2.5 rounded-full bg-warning" />
+      ) : null}
+      {status === "running" ? (
+        <LoadingStateMark className="scale-[0.7]" />
+      ) : null}
       {status === "done" ? (
-        <Check aria-hidden="true" className="size-4 text-success" />
+        <Check aria-hidden="true" className="size-3.5 text-success" />
       ) : null}
       {status === "failed" ? (
-        <X aria-hidden="true" className="size-4 text-destructive" />
+        <X aria-hidden="true" className="size-3.5 text-destructive" />
       ) : null}
       <span className="sr-only">{label ?? status}</span>
     </span>
@@ -305,7 +318,7 @@ export const ToolCallSummary = ({
     <span
       {...props}
       className={cn(
-        "min-w-0 flex-1 truncate text-muted-foreground text-xs",
+        "min-w-0 truncate text-muted-foreground text-xs",
         className
       )}
       data-slot="tool-call-summary"
@@ -337,7 +350,7 @@ export const ToolCallContent = ({
       <div
         {...props}
         className={cn(
-          "ml-2.5 flex flex-col gap-3 border-border border-l py-3 pl-4",
+          "ml-2 flex flex-col gap-2 border-border border-l py-2 pl-4",
           className
         )}
         data-slot="tool-call-content"
@@ -371,9 +384,11 @@ export const ToolCallSection = ({
       className={cn("flex min-w-0 flex-col gap-1.5", className)}
       data-slot="tool-call-section"
     >
-      <span className="text-muted-foreground text-xs">{title}</span>
+      {isEmpty(title) ? null : (
+        <span className="text-muted-foreground text-xs">{title}</span>
+      )}
       {typeof children === "string" ? (
-        <pre className="max-h-48 overflow-auto rounded-md border border-border px-3 py-2 font-mono text-xs leading-relaxed whitespace-pre-wrap break-words">
+        <pre className="max-h-48 overflow-auto rounded-md border border-border px-3 py-2 font-mono text-xs leading-normal whitespace-pre-wrap break-words">
           {children}
         </pre>
       ) : (

@@ -17,7 +17,9 @@ export interface AgentDisclosureProps extends Omit<
   openHeight?: CSSProperties["height"];
 }
 
-/** Shared transform-only reveal for collapsible agent content. */
+/** Shared reveal for collapsible agent content. The height moves with it, both ways: a
+ *  height that snapped shut would drop whatever is below it the instant the header is
+ *  pressed, and the fade would play on a box that is already gone. */
 export function AgentDisclosure({
   open,
   openHeight = "auto",
@@ -36,9 +38,9 @@ export function AgentDisclosure({
       initial={false}
       animate={
         reduce
-          ? { opacity: open ? 1 : 0 }
+          ? { height: open ? openHeight : 0, opacity: open ? 1 : 0 }
           : {
-              clipPath: open ? "inset(0 0 0% 0)" : "inset(0 0 100% 0)",
+              height: open ? openHeight : 0,
               opacity: open ? 1 : 0,
               y: open ? 0 : -4,
             }
@@ -57,7 +59,6 @@ export function AgentDisclosure({
       className={cn("-mx-1 overflow-hidden px-1", className)}
       style={{
         ...style,
-        height: open ? openHeight : 0,
         pointerEvents: open ? undefined : "none",
         transformOrigin: "top",
       }}

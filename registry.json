@@ -357,6 +357,67 @@
       ]
     },
     {
+      "name": "agent-activity",
+      "type": "registry:ui",
+      "title": "Agent Activity",
+      "description": "A run as one thing: the wait while it goes, one line once it is over, and the steps it took folded behind that line for the reader who doubts the answer.",
+      "dependencies": ["lucide-react", "motion"],
+      "registryDependencies": [
+        "https://motif.sweetretry.com/r/loading-state.json"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/agents/agent-activity.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/motif/agent-activity.tsx"
+        },
+        {
+          "path": "components/ui/motif/agent-disclosure.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/motif/agent-disclosure.tsx"
+        }
+      ]
+    },
+    {
+      "name": "context-usage",
+      "type": "registry:ui",
+      "title": "Context Usage",
+      "description": "How much of the model's window is spent: a ring small enough for a composer, and behind it a bar cut by what fills the window, with the track left showing for what is still free.",
+      "registryDependencies": ["https://motif.sweetretry.com/r/breakdown.json"],
+      "cssVars": {
+        "theme": {
+          "color-warning": "var(--warning)"
+        },
+        "light": {
+          "warning": "oklch(0.666 0.179 58.318)"
+        },
+        "dark": {
+          "warning": "oklch(0.828 0.189 84.429)"
+        }
+      },
+      "files": [
+        {
+          "path": "registry/new-york/agents/context-usage.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/motif/context-usage.tsx"
+        }
+      ]
+    },
+    {
+      "name": "source",
+      "type": "registry:ui",
+      "title": "Source",
+      "description": "A page the agent leans on, as a small tag: a mark and the host it lives on, a link out, with the page's title on hover.",
+      "registryDependencies": ["tooltip"],
+      "files": [
+        {
+          "path": "registry/new-york/agents/source.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/motif/source.tsx"
+        }
+      ]
+    },
+    {
       "name": "tool-call",
       "type": "registry:ui",
       "title": "Tool Call",
@@ -367,13 +428,16 @@
       ],
       "cssVars": {
         "theme": {
-          "color-success": "var(--success)"
+          "color-success": "var(--success)",
+          "color-warning": "var(--warning)"
         },
         "light": {
-          "success": "oklch(0.535 0.179 155.331)"
+          "success": "oklch(0.535 0.179 155.331)",
+          "warning": "oklch(0.666 0.179 58.318)"
         },
         "dark": {
-          "success": "oklch(0.696 0.17 162.48)"
+          "success": "oklch(0.696 0.17 162.48)",
+          "warning": "oklch(0.828 0.189 84.429)"
         }
       },
       "files": [

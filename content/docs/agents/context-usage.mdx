@@ -1,0 +1,140 @@
+---
+title: Context Usage
+description: "How much of the model's window is spent: a ring small enough for a composer, and behind it a bar cut by what fills the window, with the track left showing for what is still free."
+---
+
+import {
+  ContextUsageDemo,
+  ContextUsagePanelDemo,
+  ContextUsageToneDemo,
+} from "@/examples/context-usage";
+
+<ComponentPreview name="context-usage">
+  <ContextUsageDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif.sweetretry.com/r/context-usage.json
+```
+
+It is built on [Breakdown](/docs/data/breakdown), which `shadcn add` brings along.
+
+## Usage
+
+```tsx
+import {
+  ContextUsage,
+  ContextUsageBar,
+  ContextUsageLegend,
+  ContextUsageRing,
+  ContextUsageSummary,
+} from "@/components/ui/motif/context-usage";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+export function ContextMeter({ usage }) {
+  return (
+    <ContextUsage items={usage.items} limit={usage.window}>
+      <Popover>
+        <PopoverTrigger asChild>
+          <button type="button">
+            <ContextUsageRing showPercent />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent>
+          <ContextUsageSummary />
+          <ContextUsageBar />
+          <ContextUsageLegend />
+        </PopoverContent>
+      </Popover>
+    </ContextUsage>
+  );
+}
+```
+
+`items` is what is in the window, in tokens, and `limit` is the window. The root works out
+the rest and draws nothing itself, so the parts can be moved, dropped, or put in a frame
+of your own.
+
+| Part                  | Draws                                                   |
+| --------------------- | ------------------------------------------------------- |
+| `ContextUsage`        | Nothing; it holds the window and what is in it          |
+| `ContextUsageRing`    | How full, as a ring, with the percentage if asked       |
+| `ContextUsageBar`     | One cut per item, the free space left as the bare track |
+| `ContextUsageLegend`  | Each item, its colour and its size in tokens            |
+| `ContextUsageSummary` | `48.2K of 200K`, the percentage, and what is left       |
+
+## The window is the whole
+
+The bar is a Breakdown whose `total` is the window. The parts are what the agent is
+carrying; the track showing through at the end is what it is not. There is no "free" slice
+to keep in sync with the others, because free space is not a thing in the window, it is the
+absence of one.
+
+<ComponentPreview name="context-usage" align="start">
+  <ContextUsagePanelDemo />
+</ComponentPreview>
+
+The order of `items` is the caller's and fixes each item's hue. Colours default to the
+theme's chart sequence, built from `items` before an empty one is dropped, so a category
+that is zero this turn and large the next keeps its colour. Pass `colors` to name them
+yourself.
+
+## Tone
+
+The ring has three things to say, so it has three tones: `ok` while there is room,
+`near` from 80% (`nearAt` moves it), `full` at 100%. The tone is a role, not a hue: the arc
+is `foreground`, then `warning`, then `destructive`, so a theme swap restyles it.
+
+<ComponentPreview name="context-usage">
+  <ContextUsageToneDemo />
+</ComponentPreview>
+
+The arc stops at one full turn however far over the window the agent is. The percentage,
+if shown, keeps counting, because 112% is information the arc cannot carry.
+
+## Your own part
+
+`useContextUsage` hands over the numbers the parts read.
+
+```tsx
+const CompactButton = () => {
+  const { percent, tone } = useContextUsage();
+
+  return tone === "ok" ? null : <button onClick={compact}>Compact</button>;
+};
+```
+
+| Field          | Is                                           |
+| -------------- | -------------------------------------------- |
+| `used`         | Tokens in the window                         |
+| `limit`        | The window                                   |
+| `remaining`    | Tokens left, never below zero                |
+| `percent`      | `used / limit`, 0–100 and unrounded          |
+| `tone`         | `ok`, `near` or `full`                       |
+| `formatTokens` | The formatter the other parts are drawn with |
+
+## Formatting
+
+`formatTokens` defaults to a compact `48.2K`, fixed to `en-US` so the server and the client
+write the same string. A used window under one percent prints `<1%` rather than `0%`,
+because `0%` says the agent is carrying nothing.
+
+## Accessibility
+
+The ring is a `role="meter"` with a value between 0 and 100, named `Context used`. The bar
+is an image whose label lists every item and its size. Put the ring in a real `button` to
+open the detail: the ring is a value, and opening something is the caller's decision.
+
+## Component source
+
+<ComponentSource
+  name="context-usage"
+  src="registry/new-york/agents/context-usage.tsx"
+  title="context-usage.tsx"
+/>

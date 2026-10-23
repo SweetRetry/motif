@@ -1,0 +1,131 @@
+---
+title: Source
+description: "A page the agent leans on, as a small tag: a mark and the host it lives on, a link out, with the page's title on hover."
+---
+
+import { SourceDemo, SourceInlineDemo } from "@/examples/source";
+
+<ComponentPreview name="source">
+  <SourceDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif.sweetretry.com/r/source.json
+```
+
+## Usage
+
+```tsx
+import {
+  Source,
+  SourceLabel,
+  SourceList,
+  SourceMark,
+} from "@/components/ui/motif/source";
+
+export function Sources({ sources }) {
+  return (
+    <SourceList>
+      {sources.map((source) => (
+        <Source href={source.url} key={source.url} title={source.title}>
+          <SourceMark />
+          <SourceLabel />
+        </Source>
+      ))}
+    </SourceList>
+  );
+}
+```
+
+A source answers "where is that from" with a word, not a row. It is a tag small enough to sit
+in a line of text or in a wrap of its siblings, it says the host, and it is a link. The title
+of the page is the second answer, and it waits in the tooltip: a tag that carried a title would
+stop being small, and the host on its own is what a reader uses to decide whether to go.
+
+| Part          | Draws                                                          |
+| ------------- | -------------------------------------------------------------- |
+| `Source`      | The tag: a link opening in a new tab, with the title on hover  |
+| `SourceMark`  | A small square: the site's icon if you pass one, else a letter |
+| `SourceLabel` | What the tag says, the host unless you pass something else     |
+| `SourceList`  | Tags side by side, wrapping                                    |
+| `useSource`   | The `href` and the host, for a part of your own                |
+
+## The host is read, not written
+
+`Source` works the host out from `href` once, so what `SourceLabel` prints and where the link
+goes cannot disagree. A leading `www.` is dropped. An `href` that will not parse is printed as
+it is, which is a report rather than a repair: a broken address should be visible.
+
+Pass children when the site has a better name than its domain.
+
+```tsx
+<SourceLabel>Example Docs</SourceLabel>
+```
+
+## In a line of text
+
+The tag is the size of a word, so it sits among them. A part you leave out is not drawn: a
+tag with no mark is just the label.
+
+<ComponentPreview name="source" align="start">
+  <SourceInlineDemo />
+</ComponentPreview>
+
+Without `title` there is no tooltip, and the tag is a plain link.
+
+## The mark
+
+The mark is the site's icon, which is what a reader finds a tag by. It defaults to the host's
+favicon from Google's favicon service, drawn at 14px and fetched at 32px so it is sharp on a
+dense screen.
+
+```tsx
+<SourceMark /> // the host's favicon
+<SourceMark src={source.icon} /> // an icon you serve yourself
+<SourceMark src={false} /> // the host's first letter, no request
+```
+
+That default tells the service the host of every page the agent read. It is the usual trade
+and the reason `src` exists: a product that minds serves its own icons, or passes `false`.
+
+When there is no icon to draw, because `src` is `false` or the image did not load, the mark is
+the host's first letter in a small square. A broken-image glyph inside a tag would be worse,
+and the letter is the same in both themes.
+
+## In a tool call
+
+A search is a [Tool Call](/docs/agents/tool-call) whose detail is the sources it found. The
+query is the row's summary, so the detail is only the tags.
+
+```tsx
+<ToolCall status="done">
+  <ToolCallHeader>
+    <ToolCallStatus />
+    <ToolCallName>web_search</ToolCallName>
+    <ToolCallSummary>{call.query}</ToolCallSummary>
+  </ToolCallHeader>
+  <ToolCallContent>
+    <ToolCallSection title={`${call.sources.length} results`}>
+      <Sources sources={call.sources} />
+    </ToolCallSection>
+  </ToolCallContent>
+</ToolCall>
+```
+
+## Accessibility
+
+`Source` is a real link, so it is a tab stop, shows a focus ring, and is announced by its text.
+The mark is `aria-hidden`: the label beside it carries the same information. The link opens in
+a new tab with `noreferrer noopener`, so the page it opens does not learn where the reader came
+from. The title is a tooltip, which is a pointer's affordance, so a source whose title matters
+to a screen reader should say it in the label.
+
+## Component source
+
+<ComponentSource
+  name="source"
+  src="registry/new-york/agents/source.tsx"
+  title="source.tsx"
+/>
