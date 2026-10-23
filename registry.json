@@ -95,17 +95,17 @@
       ]
     },
     {
-      "name": "audio-preview",
+      "name": "video-preview",
       "type": "registry:ui",
-      "title": "Audio Preview",
-      "description": "A recording you can read before you play it: the whole waveform on screen, the part you have heard lit, and a press anywhere on it to seek there.",
+      "title": "Video Preview",
+      "description": "A clip you can read before you play it: the whole length on screen as a row of frames, the part you have watched lit, and a press anywhere on it to seek there.",
       "dependencies": ["lucide-react"],
       "registryDependencies": ["button"],
       "files": [
         {
-          "path": "registry/new-york/audio-preview.tsx",
+          "path": "registry/new-york/video-preview.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/motif/audio-preview.tsx"
+          "target": "@components/ui/motif/video-preview.tsx"
         }
       ]
     },

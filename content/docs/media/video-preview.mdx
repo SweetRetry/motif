@@ -1,0 +1,152 @@
+---
+title: Video Preview
+description: "A clip you can read before you play it: the whole length on screen as a row of frames, the part you have watched lit, and a press anywhere on it to seek there."
+---
+
+import { VideoPreviewDemo } from "@/examples/video-preview";
+
+<ComponentPreview name="video-preview">
+  <VideoPreviewDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif.sweetretry.com/r/video-preview.json
+```
+
+## Usage
+
+```tsx
+import {
+  VideoPreview,
+  VideoPreviewFilmstrip,
+  VideoPreviewPlayOverlay,
+  VideoPreviewScreen,
+  VideoPreviewTime,
+} from "@/components/ui/motif/video-preview";
+
+export function Take() {
+  return (
+    <VideoPreview src="/take-3.mp4">
+      <VideoPreviewScreen>
+        <VideoPreviewPlayOverlay />
+      </VideoPreviewScreen>
+      <VideoPreviewFilmstrip label="Seek take 3">
+        <VideoPreviewTime className="absolute right-1.5 bottom-1.5 rounded-md bg-black/60 px-1.5 py-0.5 text-white" />
+      </VideoPreviewFilmstrip>
+    </VideoPreview>
+  );
+}
+```
+
+The root owns the clock and draws only the column the parts stack in. The parts read the
+clock and never speak to each other, so a caller can move one, drop one, or put a part of
+their own between them. There is no frame around the parts: the picture and the strip are
+each already their own shape, and a card around two shapes is a third.
+
+| Part                      | Draws                                                                         |
+| ------------------------- | ----------------------------------------------------------------------------- |
+| `VideoPreview`            | The clock, and the column the parts stack in                                  |
+| `VideoPreviewScreen`      | The `<video>` in its frame; its children draw over it                         |
+| `VideoPreviewPlayOverlay` | Play and pause, as a mark on the picture                                      |
+| `VideoPreviewFilmstrip`   | The frames, the playhead, and the seek surface; its children draw on the axis |
+| `VideoPreviewPlayButton`  | Play and pause, as an ordinary button                                         |
+| `VideoPreviewTime`        | `0:02.4 / 0:06.0`                                                             |
+| `useVideoPreview`         | The same state, for a part of your own                                        |
+
+## The filmstrip is the progress bar
+
+A generated clip is judged by what happens in it, and played it can only be read a second
+at a time. The strip puts the whole length on screen at once, a frame for each slice of
+it in order, so a cut, a stall or a drift in the subject is visible before anything plays.
+
+It is also the control. Frames left of the playhead are lit and frames right of it are
+dimmed, and a press or a drag anywhere on it seeks there. The picture of the clip and the
+control over it are one thing, so there is no second slider to read against it.
+
+## Where the frames come from
+
+The strip seeks a second, unseen `<video>` to the middle of each slice and draws it into
+a canvas, in order, so it fills in from the left. Nothing is uploaded and nothing is
+decoded ahead of time.
+
+The count follows the width. Each frame is a whole picture of the clip's own shape, so a
+wider strip gets more frames, not wider ones. The strip is drawn into and never read back,
+which is why a clip on another host needs no CORS header for its frames.
+
+Until they arrive, and for a file that cannot be seeked, the strip is an empty bordered
+track and still seeks. The frames are a reading of a control that works without them,
+and a failed picture does not turn it into an error.
+
+## The screen
+
+A press on the picture plays and pauses. The browser's own controls are never drawn, since
+the button and the strip are the controls. It loops, so a clip does not end on one still;
+pass `loop={false}` to stop it on the last frame.
+
+`className` sizes the frame the picture sits in, and its `children` are drawn over the
+picture. Anything else a `<video>` takes goes straight to the video, `muted` and `poster`
+among them.
+
+## Arranging the controls
+
+The demo above has two things and no control row: the play mark is on the picture and the
+readout is on the axis. Both are parts that go where you put them, so the other layouts
+are a rearrangement and not a prop.
+
+A row of controls under the strip, for a layout that wants one:
+
+```tsx
+<VideoPreviewScreen />
+<VideoPreviewFilmstrip />
+<div className="flex items-center gap-3">
+  <VideoPreviewPlayButton />
+  <VideoPreviewTime />
+</div>
+```
+
+A single row, the button beside the strip:
+
+```tsx
+<VideoPreviewScreen />
+<div className="flex items-center gap-3">
+  <VideoPreviewPlayButton />
+  <VideoPreviewFilmstrip className="flex-1" />
+</div>
+```
+
+The play overlay and the readout on the axis are literal scrims, `bg-black/50` and
+`bg-black/60` over white text. What they sit on is the clip, not the theme, and no theme
+colour is legible on every frame of every video.
+
+A press on the strip seeks, and what you draw on the axis never takes the press. It is
+laid over the frames with `pointer-events-none`, so the strip underneath stays the surface.
+
+It is not muted by default. A press is the gesture the browser wants before it will play
+with sound, and a clip that has sound should have it.
+
+## Clock
+
+`m:ss.d`, fixed. A clip is seconds long, and a clock that ticks once a second would sit
+still for most of a drag. Tenths are what let the readout follow a finger. A caller who
+wants frames, or a countdown, reads `currentTime` and `duration` from the hook and draws
+their own part.
+
+## Accessibility
+
+The strip is a `role="slider"`, labelled by `label` and valued in seconds. Arrow keys move
+it one second, Shift and an arrow move it five, Home and End go to either end. Nothing is
+bound to Space or Enter: play and pause belong to the button and the screen, and a surface
+that grabs the space bar steals it from the page.
+
+The labels are props, not hard-coded: `playLabel` and `pauseLabel` on the button, `label`
+on the strip.
+
+## Component source
+
+<ComponentSource
+  name="video-preview"
+  src="registry/new-york/video-preview.tsx"
+  title="video-preview.tsx"
+/>

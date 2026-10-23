@@ -84,6 +84,14 @@ _Avoid_: token meter、usage bar、context gauge
 环所处的位置，只有三个词：`ok` 有余地、`near` 快满了、`full` 没有余地。色调是角色（`warning`、`destructive`），不是色相。
 _Avoid_: level、severity、threshold state
 
+**Video preview**（视频预览）：
+一条生成出来的视频在播放前就能读：画面、帧条，播放键盖在画面上，读数放在帧条的轴上。根不画外框，几个部分各是各的形状。
+_Avoid_: video player、video card、media preview
+
+**Filmstrip**（帧条）：
+把整条视频按时间顺序抽成一排帧，同时是进度条：已播的亮，未播的暗，点哪里就跳到哪里。帧数跟着宽度走，每一帧都是整幅画面。
+_Avoid_: timeline、scrubber、thumbnails、sprite
+
 **Mention**（提及）：
 草稿里用户从菜单挑出来的一个对象，画成一枚 chip。它是整体：光标进不去，退格整块删。消息把它当对象带走（`id`），不是拼出它的那几个字符。
 _Avoid_: tag、token、pill、entity
