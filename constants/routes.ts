@@ -14,6 +14,7 @@ export const ROUTES = {
   MCP: "/mcp",
   OG: "/og",
   OPENAPI: "/openapi.json",
+  PLAYGROUND: "/playground",
   REGISTRY: "/r/registry.json",
   ROBOTS: "/robots.txt",
   RSS: "/rss.xml",
