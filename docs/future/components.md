@@ -35,7 +35,6 @@ Agents 覆盖了"人说话"（输入框、语音、附件）和"agent 想"（思
 | Generation Queue | 任务列表：进度、取消、重试         | 优先。`generation-canvas` 多节点同时跑时需要总览    |
 | Reference Slot   | 图生图、图生视频的参考图位，带强度 | `attachment` 是聊天里的小方块，不是参数面板里的槽位 |
 | Cost Chip        | 生成按钮旁的"约 12 积分"           | 小件，但几乎每个产品都要                            |
-| Compare          | 前后对比滑块，用于放大和重绘       |                                                     |
 | Video Preview    | 视频的时间线预览                   | `audio-preview` 已有同样思路的波形版                |
 
 ## 不做

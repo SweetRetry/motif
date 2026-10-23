@@ -1,0 +1,149 @@
+---
+title: Compare
+description: "A before and after in one frame: a divider you drag across two pictures of the same place, so the eye sees what changed instead of remembering it."
+---
+
+import { CompareDemo, CompareToggleDemo } from "@/examples/compare";
+
+<ComponentPreview name="compare">
+  <CompareDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif.sweetretry.com/r/compare.json
+```
+
+## Usage
+
+```tsx
+import {
+  Compare,
+  CompareAfter,
+  CompareBefore,
+  CompareHandle,
+  CompareLabel,
+} from "@/components/ui/motif/compare";
+
+export function Upscale() {
+  return (
+    <Compare className="aspect-[3/4] max-w-xs">
+      <CompareAfter>
+        <img
+          alt="Upscaled"
+          className="size-full object-cover"
+          src="/after.webp"
+        />
+        <CompareLabel>Upscaled</CompareLabel>
+      </CompareAfter>
+      <CompareBefore>
+        <img
+          alt="Original"
+          className="size-full object-cover"
+          src="/before.webp"
+        />
+        <CompareLabel>Original</CompareLabel>
+      </CompareBefore>
+      <CompareHandle label="Compare original and upscaled" />
+    </Compare>
+  );
+}
+```
+
+The root owns the divider and draws the frame. The parts read the position and never
+speak to each other, so a caller can drop one, or add a part of their own, and the rest
+carry on.
+
+| Part            | Draws                                                  |
+| --------------- | ------------------------------------------------------ |
+| `Compare`       | The frame, the drag, and the position behind it        |
+| `CompareBefore` | The layer left of the divider                          |
+| `CompareAfter`  | The layer right of the divider, under the other one    |
+| `CompareLabel`  | A name for a side, in the corner of the layer it is in |
+| `CompareHandle` | The line, the grip, and the keyboard                   |
+| `useCompare`    | The same position, for a part of your own              |
+
+## Why a divider
+
+The question a comparison answers is _what changed_, and that is answered by putting the
+two in one place and letting the eye cross between them. Two pictures side by side make
+the eye carry the detail it was looking at across a gutter, and give each half the size.
+
+## Layers are the whole frame
+
+Both layers fill the frame. The before layer is cut off at the divider rather than
+squeezed into the space left of it. A layer that resized would show a different part of
+the picture at every position, and the two halves would stop being the same place at two
+moments.
+
+It follows that the two pictures should share an aspect ratio, and that the frame's shape
+is the shape of the pictures: `className` on the root replaces the default `aspect-video`.
+
+A layer is whatever the caller puts in it. An image, a video or a canvas compare the same
+way.
+
+## Press anywhere
+
+A press on the frame moves the divider there and keeps following the pointer until it
+lifts. The handle marks where the divider is; it is not the only place to grab it. That
+matters on a phone, where a 32px grip is a small target and the whole picture is not.
+
+Pointer capture keeps the drag going when the pointer leaves the frame, and `touch-action:
+pan-y` hands vertical scrolling back to the page, so a thumb swiping up a tall image still
+scrolls.
+
+## Labels
+
+A label goes inside the layer it names:
+
+```tsx
+<CompareBefore>
+  <img … />
+  <CompareLabel>Original</CompareLabel>
+</CompareBefore>
+```
+
+The layer is already cut at the divider, so the tag slides under the other picture on its
+own. Nothing has to work out when the divider has reached it. A before label sits at the
+top left and an after label at the top right.
+
+## Without a handle
+
+The handle is a part. A caller who sets the position from a button, or wants a plain
+before and after with no grip to explain, leaves it out and reads the position from the
+hook. The frame is still draggable.
+
+<ComponentPreview name="compare" align="start">
+  <CompareToggleDemo />
+</ComponentPreview>
+
+Without the handle there is no keyboard control, so a caller who leaves it out provides one.
+
+## Colour
+
+The grip is a floating control and takes the floating level: `popover` with
+`border-border`. The divider line and the label scrim are literal white and black. Both
+cross user artwork, which the theme knows nothing about, and a themed line would vanish on
+half the pictures it is laid over.
+
+## Accessibility
+
+The handle is a `role="slider"` valued in percent, so a screen reader hears how much of
+the frame the before layer holds:
+
+```tsx
+<CompareHandle label="Compare original and upscaled" />
+```
+
+Arrow keys move it a percent, Shift and an arrow move it a tenth, Home and End go to
+either edge. Pictures need their own `alt`; the slider says where the divider is, not what
+is in the frame.
+
+## Component source
+
+<ComponentSource
+  name="compare"
+  src="registry/new-york/compare.tsx"
+  title="compare.tsx"
+/>

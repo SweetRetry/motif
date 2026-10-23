@@ -109,6 +109,20 @@
       ]
     },
     {
+      "name": "compare",
+      "type": "registry:ui",
+      "title": "Compare",
+      "description": "A before and after in one frame: a divider you drag across two pictures of the same place, so the eye sees what changed instead of remembering it.",
+      "dependencies": ["lucide-react"],
+      "files": [
+        {
+          "path": "registry/new-york/compare.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/motif/compare.tsx"
+        }
+      ]
+    },
+    {
       "name": "breakdown",
       "type": "registry:ui",
       "title": "Breakdown",
