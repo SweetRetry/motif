@@ -5,167 +5,114 @@ import {
   canConnect,
   canRun,
   createNode,
-  depthOf,
-  inputsOf,
   jobOf,
+  referenceOf,
   starterGraph,
 } from "../registry/new-york/blocks/generation-canvas/generation-canvas-graph.ts";
-import type {
-  CanvasNode,
-  ResultNode,
-} from "../registry/new-york/blocks/generation-canvas/generation-canvas-graph.ts";
+import type { CanvasNode } from "../registry/new-york/blocks/generation-canvas/generation-canvas-graph.ts";
 
 const { edges, nodes } = starterGraph({
-  imageSrc: "image.png",
-  videoSrc: "clip.mp4",
+  images: [
+    { prompt: "a raven on a payphone", src: "image.png" },
+    { prompt: "" },
+  ],
+  video: { prompt: "the camera pushes in", src: "clip.mp4" },
 });
-const without = (id: string) => edges.filter((edge) => edge.id !== id);
 const node = (id: string) => nodes.find((n) => n.id === id) as CanvasNode;
 
 test("the starter graph is connected the way its rules allow", () => {
   for (const edge of edges) {
     assert.equal(
-      canConnect(edge, nodes, without(edge.id)),
-      true,
-      `${edge.id} should be a legal edge`
+      canConnect(
+        edge,
+        nodes,
+        edges.filter((other) => other.id !== edge.id)
+      ),
+      true
     );
   }
 });
 
-test("work only flows from an input or a result into a result", () => {
+test("only an image can be started from, so a clip has no way out", () => {
   assert.equal(
-    canConnect({ source: "video", target: "image" }, nodes, []),
+    canConnect({ source: "video", target: "image-2" }, nodes, edges),
     false
   );
   assert.equal(
-    canConnect({ source: "image", target: "prompt" }, nodes, []),
-    false
-  );
-  assert.equal(
-    canConnect({ source: "prompt", target: "settings" }, nodes, []),
-    false
-  );
-  assert.equal(
-    canConnect({ source: "prompt", target: "image" }, nodes, []),
+    canConnect({ source: "image", target: "image-2" }, nodes, edges),
     true
   );
 });
 
-test("a node takes one input of each kind, which also forbids a doubled edge", () => {
+test("a frame starts from one picture, which also forbids a doubled edge", () => {
   assert.equal(
-    canConnect({ source: "prompt", target: "image" }, nodes, edges),
+    canConnect({ source: "image", target: "video" }, nodes, edges),
     false
   );
   assert.equal(
-    canConnect({ source: "motion", target: "image" }, nodes, edges),
+    canConnect({ source: "image-2", target: "video" }, nodes, edges),
     false
-  );
-  assert.equal(
-    canConnect(
-      { source: "motion", target: "image" },
-      nodes,
-      without("e-prompt-image")
-    ),
-    true
   );
 });
 
 test("an edge that would close a loop is refused, however far round", () => {
   const chain = [
     ...edges,
-    { id: "extra", source: "image", target: "image2", type: "flow" },
+    { id: "e2", source: "image-2", target: "image", type: "flow" },
   ];
-  const more = [
-    ...nodes,
-    { ...node("image"), id: "image2", position: { x: 0, y: 0 } },
-  ] as CanvasNode[];
-
   assert.equal(
-    canConnect({ source: "image", target: "image" }, more, chain),
+    canConnect({ source: "image", target: "image" }, nodes, edges),
     false
   );
   assert.equal(
-    canConnect({ source: "image2", target: "image" }, more, chain),
-    false
-  );
-  assert.equal(
-    canConnect({ source: "video", target: "image" }, more, chain),
+    canConnect({ source: "image", target: "image-2" }, nodes, chain),
     false
   );
 });
 
-test("a node is fed by what the edges into it say", () => {
-  const image = inputsOf("image", nodes, edges);
-  assert.equal(image.prompt, "a raven on a payphone at dusk, 35mm");
-  assert.equal(image.settings.aspect, "16:9");
-  assert.equal(image.reference, undefined);
-
-  const video = inputsOf("video", nodes, edges);
-  assert.equal(video.prompt, "the camera pushes in slowly, the phone swings");
-  assert.equal(video.reference?.id, "image");
+test("a frame starts from the picture the edge into it names", () => {
+  assert.equal(referenceOf("video", nodes, edges)?.id, "image");
+  assert.equal(referenceOf("image", nodes, edges), undefined);
 });
 
-test("a node with no settings runs on the defaults, and one with no prompt does not run", () => {
-  const bare = inputsOf("image", nodes, without("e-settings-image"));
-  assert.deepEqual(bare.settings, {
-    aspect: "16:9",
-    resolution: "2K",
-    strength: "Medium",
-  });
-
-  const noPrompt = without("e-prompt-image");
-  assert.equal(canRun(node("image"), nodes, noPrompt), false);
-  assert.equal(jobOf(node("image") as ResultNode, nodes, noPrompt), null);
-  assert.equal(canRun(node("image"), nodes, edges), true);
-});
-
-test("a blank prompt is no prompt, and a node already running cannot be run again", () => {
-  const blanked = nodes.map((n) =>
-    n.id === "prompt" ? { ...n, data: { text: "   " } } : n
-  ) as CanvasNode[];
-  assert.equal(inputsOf("image", blanked, edges).prompt, undefined);
-
-  const busy = nodes.map((n) =>
-    n.id === "image" ? { ...n, data: { ...n.data, status: "pending" } } : n
-  ) as CanvasNode[];
+test("a frame with no prompt does not run, and neither does one already running", () => {
+  assert.equal(canRun(node("image")), true);
+  assert.equal(canRun(node("image-2")), false);
   assert.equal(
-    canRun(busy.find((n) => n.id === "image") as CanvasNode, busy, edges),
+    canRun({
+      ...node("image"),
+      data: { ...node("image").data, prompt: "   " },
+    }),
+    false
+  );
+  assert.equal(
+    canRun({
+      ...node("image"),
+      data: { ...node("image").data, status: "pending" },
+    }),
     false
   );
 });
 
-test("a job carries the node's seed, its settings and the picture a video starts from", () => {
-  const job = jobOf(node("video") as ResultNode, nodes, edges);
-  assert.deepEqual(job, {
+test("a job carries the frame's own brief and the picture a clip starts from", () => {
+  assert.deepEqual(jobOf(node("video") as never, nodes, edges), {
     aspect: "16:9",
     kind: "video",
-    prompt: "the camera pushes in slowly, the phone swings",
+    model: undefined,
+    prompt: "the camera pushes in",
     reference: "image.png",
     resolution: "2K",
     seed: 1,
     strength: "Medium",
   });
+  assert.equal(jobOf(node("image-2") as never, nodes, edges), null);
 });
 
-test("a prompt and settings are not results, so neither can be run", () => {
-  assert.equal(canRun(node("prompt"), nodes, edges), false);
-  assert.equal(canRun(node("settings"), nodes, edges), false);
-});
-
-test("results are ordered so that what a node starts from runs before it", () => {
-  assert.equal(depthOf("image", nodes, edges), 0);
-  assert.equal(depthOf("video", nodes, edges), 1);
-  assert.equal(depthOf("video", nodes, without("e-image-video")), 0);
-});
-
-test("a new node is blank, draggable by its header and of the kind asked for", () => {
-  const made = createNode("video", "v2", { x: 4, y: 8 });
+test("a new frame is blank, of the kind asked for, and carries the brief it was given", () => {
+  const made = createNode("video", "v2", { x: 4, y: 8 }, { prompt: "a tide" });
   assert.equal(made.type, "video");
   assert.deepEqual(made.position, { x: 4, y: 8 });
-  assert.equal(made.dragHandle, ".canvas-node-drag");
-  assert.equal((made.data as { status: string }).status, "idle");
-  assert.equal(
-    (createNode("prompt", "p2", { x: 0, y: 0 }).data as { text: string }).text,
-    ""
-  );
+  assert.equal(made.data.status, "idle");
+  assert.equal(made.data.prompt, "a tide");
+  assert.equal(made.data.aspect, "16:9");
 });

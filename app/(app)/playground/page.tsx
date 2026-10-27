@@ -25,7 +25,7 @@ const SECTIONS = [
   {
     demo: <GenerationCanvasDemo />,
     description:
-      "A graph you can pan, zoom and rewire: prompts and settings feeding an image, that image feeding a clip, and light on the edges while a result is on its way.",
+      "Bare picture and clip frames you can pan, drag and extend with a plus, and a composer that writes to whichever one is selected, with light on the edges while a result is on its way.",
     title: "Canvas app",
   },
 ];

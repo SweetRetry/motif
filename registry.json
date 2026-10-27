@@ -680,17 +680,19 @@
       "name": "generation-canvas",
       "type": "registry:block",
       "title": "Generation Canvas",
-      "description": "A canvas you can work in: nodes that hold a prompt, its settings or a result, edges you drag between them that carry light while a result is on its way, a clip you can read before you play it, and a dock that adds and runs nodes. Built on @xyflow/react; what a run does is a function you pass.",
+      "description": "A canvas you can work in: bare picture and clip frames with a plus at each side, edges that say which frame starts from which and carry light while a result is on its way, and a composer under the plane that writes the prompt and settings of whichever frame is selected. Built on @xyflow/react; what a run does is a function you pass.",
       "dependencies": ["@xyflow/react", "lucide-react"],
       "registryDependencies": [
         "button",
         "https://motif.sweetretry.com/r/aspect-ratio-picker.json",
         "https://motif.sweetretry.com/r/flow-edge.json",
         "https://motif.sweetretry.com/r/generation-overlay.json",
+        "https://motif.sweetretry.com/r/model-select.json",
+        "https://motif.sweetretry.com/r/prompt-input.json",
         "https://motif.sweetretry.com/r/resolution-segmented.json",
         "https://motif.sweetretry.com/r/strength-select.json",
         "https://motif.sweetretry.com/r/video-preview.json",
-        "tooltip"
+        "popover"
       ],
       "files": [
         {

@@ -2,7 +2,6 @@
 
 import "@xyflow/react/dist/base.css";
 import {
-  addEdge,
   Background,
   BackgroundVariant,
   BaseEdge,
@@ -29,13 +28,8 @@ import type {
 import {
   Clapperboard,
   Image as ImageIcon,
-  Maximize,
-  MessageSquareText,
-  Play,
-  RotateCcw,
+  Plus,
   SlidersHorizontal,
-  Sparkles,
-  Trash2,
 } from "lucide-react";
 import type { CSSProperties, ReactNode } from "react";
 import {
@@ -52,93 +46,95 @@ import { Button } from "@/components/ui/button";
 import { AspectRatioPicker } from "@/components/ui/motif/aspect-ratio-picker";
 import { FlowEdge } from "@/components/ui/motif/flow-edge";
 import { GenerationOverlay } from "@/components/ui/motif/generation-overlay";
+import {
+  ModelSelect,
+  ModelSelectContent,
+  ModelSelectIndex,
+  ModelSelectList,
+  ModelSelectSearch,
+  ModelSelectTrigger,
+} from "@/components/ui/motif/model-select";
+import type {
+  ModelSelectModel,
+  ModelSelectProvider,
+} from "@/components/ui/motif/model-select";
+import {
+  PromptInput,
+  PromptInputFooter,
+  PromptInputSubmit,
+  PromptInputTextarea,
+} from "@/components/ui/motif/prompt-input";
 import { ResolutionSegmented } from "@/components/ui/motif/resolution-segmented";
 import { StrengthSelect } from "@/components/ui/motif/strength-select";
 import {
   VideoPreview,
-  VideoPreviewFilmstrip,
   VideoPreviewPlayOverlay,
   VideoPreviewScreen,
-  VideoPreviewTime,
 } from "@/components/ui/motif/video-preview";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 
 import {
   canConnect,
-  canRun,
   createNode,
-  depthOf,
-  inputsOf,
-  isResult,
+  DEFAULT_BRIEF,
   jobOf,
+  referenceOf,
   starterGraph,
 } from "./generation-canvas-graph";
 import type {
+  Brief,
   CanvasEdge,
   CanvasNode,
   Generate,
-  ImageNode,
   NodeKind,
-  PromptNode,
-  SettingsNode,
-  VideoNode,
+  ResultNode,
 } from "./generation-canvas-graph";
 
 /* -- The plane ---------------------------------------------------------------
- * A generation canvas is a graph you can work in: nodes that hold a prompt, its
- * settings or a result, edges that say which work feeds which and carry light while the
- * result is on its way, and a dock above the plane that adds nodes and runs them.
+ * A generation canvas is a plane of frames. A frame is the picture or the clip and
+ * nothing else: no header, no card round a card, only a name above it and a plus at each
+ * side to reach for the next one. What a frame is asked to be, its prompt and its
+ * settings, is written in the composer under the plane, on whichever frame is selected,
+ * or on a new one when nothing is.
  *
  * Three things are kept apart, and each is a file. What a graph may be, which edges are
- * legal, what a node is fed by, whether it can run, is `generation-canvas-graph`, with no
- * React in it. What a model is, is `Generate`, a function you pass: the canvas owns when
- * to call it, the function owns what it means. And what this file owns is the rest: the
- * viewport, the nodes' faces, and the one place a run is started, held and stopped.
+ * legal, what a frame starts from, whether it can run, is `generation-canvas-graph`, with
+ * no React in it. What a model is, is `Generate`, a function you pass: the canvas owns
+ * when to call it, the function owns what it means. And what this file owns is the rest:
+ * the viewport, the frames' faces, the composer, and the one place a run is started, held
+ * and stopped.
  *
- * The viewport is `@xyflow/react`. The nodes are its custom nodes and the edge is its
+ * The viewport is `@xyflow/react`. The frames are its custom nodes and the edge is its
  * custom edge, so panning, zooming, dragging, selecting and connecting are the library's
  * and nothing here re-implements them.
  * --------------------------------------------------------------------------- */
 
-/** Where a port sits from the top of its node: the middle of the 40px header, so the
- *  line meets the node at the same height whatever the node holds. */
-const PORT_OFFSET = 20;
+const FRAME_WIDTH: Record<NodeKind, number> = { image: 288, video: 360 };
 
-const HANDLE =
-  "size-2! min-h-0! min-w-0! rounded-full! border! border-border! bg-card! after:absolute after:-inset-2.5 after:content-['']";
+/** How far the plus stands off the frame it belongs to. */
+const PLUS_OFFSET = 20;
 
-const NODE_WIDTH: Record<NodeKind, number> = {
-  image: 240,
-  prompt: 216,
-  settings: 216,
-  video: 320,
-};
-
-/** Three seats, because the settings node is narrow and five labels would not fit. */
-const STRENGTHS = ["Low", "Medium", "High"];
+const PLUS =
+  "flex! size-6! items-center! justify-center! min-h-0! min-w-0! rounded-full! border! border-border! bg-background! text-muted-foreground! transition-colors hover:border-ring! hover:text-foreground! after:absolute after:-inset-2 after:content-['']";
 
 const LABEL = "mb-2 font-medium text-muted-foreground text-xs";
 
-const FIELD =
-  "nodrag nopan nowheel h-20 w-full resize-none rounded-lg border border-border bg-transparent p-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50";
-
-/** What a node reads from the canvas it is on: which results can be run now, and how to
- *  run one. Held in a context because the nodes are the library's to render, and the
- *  library hands them props of its own. */
-interface RunContextValue {
-  run: (id: string) => void;
-  runnable: ReadonlySet<string>;
+/** What a frame reads from the canvas it is on: how to put a new frame beside it. Held
+ *  in a context because the nodes are the library's to render, and the library hands
+ *  them props of its own. */
+interface CanvasContextValue {
+  extend: (id: string, side: "before" | "after") => void;
 }
 
-const RunContext = createContext<RunContextValue | null>(null);
+const CanvasContext = createContext<CanvasContextValue | null>(null);
 
-const useRun = () => {
-  const context = useContext(RunContext);
+const useCanvas = () => {
+  const context = useContext(CanvasContext);
   if (!context) {
     throw new Error("A canvas node must be drawn inside a GenerationCanvas.");
   }
@@ -146,289 +142,116 @@ const useRun = () => {
   return context;
 };
 
-/* -- Nodes ---------------------------------------------------------------------
- * Every node is the same card: a header that drags it, and a body. The header is the
- * only place a press moves the node, so the body can hold a text field, a picker or a
- * clip's strip without any of them having to ask not to be dragged.
+/* -- Frame ---------------------------------------------------------------------
+ * The whole frame drags, because there is nothing in it to be typed into: the only
+ * controls a frame has are the plus at each side and, on a clip, its play mark.
  * --------------------------------------------------------------------------- */
-
-interface NodeFrameProps {
-  actions?: ReactNode;
-  children?: ReactNode;
-  selected: boolean;
-  title: string;
-  width: number;
-}
-
-const NodeFrame = ({
-  actions,
-  children,
-  selected,
-  title,
-  width,
-}: NodeFrameProps) => (
-  <section
-    className={cn(
-      "rounded-xl border bg-card text-card-foreground",
-      selected ? "border-ring" : "border-border"
-    )}
-    style={{ width }}
-  >
-    <header className="canvas-node-drag flex h-10 cursor-grab items-center justify-between gap-2 px-3 active:cursor-grabbing">
-      <span className="font-medium text-muted-foreground text-xs">{title}</span>
-      {actions ? <div className="nodrag">{actions}</div> : null}
-    </header>
-    {children}
-  </section>
-);
-
-const portStyle: CSSProperties = { top: PORT_OFFSET };
-
-const PromptNodeView = memo(({ data, id, selected }: NodeProps<PromptNode>) => {
-  const { updateNodeData } = useReactFlow();
-
-  return (
-    <NodeFrame selected={selected} title="Prompt" width={NODE_WIDTH.prompt}>
-      <div className="px-3 pb-3">
-        <textarea
-          aria-label="Prompt"
-          className={FIELD}
-          onChange={(event) => updateNodeData(id, { text: event.target.value })}
-          placeholder="Describe what to make"
-          value={data.text}
-        />
-      </div>
-      <Handle
-        className={HANDLE}
-        position={Position.Right}
-        style={portStyle}
-        type="source"
-      />
-    </NodeFrame>
-  );
-});
-
-const SettingsNodeView = memo(
-  ({ data, id, selected }: NodeProps<SettingsNode>) => {
-    const { updateNodeData } = useReactFlow();
-
-    return (
-      <NodeFrame
-        selected={selected}
-        title="Settings"
-        width={NODE_WIDTH.settings}
-      >
-        <div className="nodrag nopan flex flex-col gap-4 px-3 pb-3">
-          <div>
-            <div className={LABEL}>Aspect ratio</div>
-            <AspectRatioPicker
-              aria-label="Aspect ratio"
-              onChange={(aspect) => updateNodeData(id, { aspect })}
-              value={data.aspect}
-            />
-          </div>
-          <div>
-            <div className={LABEL}>Resolution</div>
-            <ResolutionSegmented
-              aria-label="Resolution"
-              onChange={(resolution) => updateNodeData(id, { resolution })}
-              value={data.resolution}
-            />
-          </div>
-          <div>
-            <div className={LABEL}>Strength</div>
-            <StrengthSelect
-              aria-label="Strength"
-              onChange={(strength) => updateNodeData(id, { strength })}
-              options={STRENGTHS}
-              value={data.strength}
-            />
-          </div>
-        </div>
-        <Handle
-          className={HANDLE}
-          position={Position.Right}
-          style={portStyle}
-          type="source"
-        />
-      </NodeFrame>
-    );
-  }
-);
 
 const ratio = (aspect: string) => aspect.replace(":", " / ");
 
-/** A clip, once it exists: the picture with its play mark on it, and the whole length
- *  under it as a strip with the clock on the axis. Pressing it must not pan the plane, so
- *  it says so. */
-const Clip = ({ aspect, src }: { aspect: string; src: string }) => (
-  <VideoPreview className="nodrag nopan gap-2" src={src}>
-    <div style={{ aspectRatio: ratio(aspect) }}>
-      <VideoPreviewScreen className="aspect-auto h-full rounded-lg">
-        <VideoPreviewPlayOverlay />
-      </VideoPreviewScreen>
-    </div>
-    <VideoPreviewFilmstrip label="Seek the clip">
-      <VideoPreviewTime className="absolute right-1.5 bottom-1.5 rounded-md bg-black/60 px-1.5 py-0.5 text-white" />
-    </VideoPreviewFilmstrip>
-  </VideoPreview>
-);
-
-/**
- * One action in the dock: a glyph that names itself in a tooltip. The one action the
- * dock exists for carries its name in the row as well, through `text`.
- */
-const DockButton = ({
-  disabled,
-  icon,
+/** A plus beside a frame. Dragging from it draws an edge, the library's own; pressing it
+ *  puts a new frame there and draws the edge for you. */
+const FramePlus = ({
   label,
-  onClick,
-  text,
+  onPress,
+  side,
 }: {
-  disabled?: boolean;
-  icon: ReactNode;
   label: string;
-  onClick: () => void;
-  text?: string;
+  onPress: () => void;
+  side: "left" | "right";
 }) => (
-  <Tooltip>
-    <TooltipTrigger asChild>
-      <Button
-        aria-label={label}
-        className={cn(
-          "rounded-full text-muted-foreground hover:text-foreground [&_svg]:size-4.5",
-          text && "w-auto gap-1.5 pr-3.5 pl-2.5 font-medium"
-        )}
-        disabled={disabled}
-        onClick={onClick}
-        size="icon"
-        variant="ghost"
-      >
-        {icon}
-        {text}
-      </Button>
-    </TooltipTrigger>
-    <TooltipContent side="top" sideOffset={10}>
-      {label}
-    </TooltipContent>
-  </Tooltip>
-);
-
-const DockSeparator = () => (
-  <span aria-hidden="true" className="mx-0.5 h-5 w-px shrink-0 bg-border" />
-);
-
-/** What the empty frame says. Not a status badge: an empty frame has one thing to tell
- *  you, and it is what to do next. */
-const Say = ({ children, tone }: { children: ReactNode; tone?: "error" }) => (
-  <p
-    className={cn(
-      "absolute inset-0 flex items-center justify-center p-4 text-center text-xs",
-      tone === "error" ? "text-destructive" : "text-muted-foreground"
-    )}
-    role={tone === "error" ? "alert" : undefined}
+  <Handle
+    aria-label={label}
+    className={PLUS}
+    onClick={onPress}
+    position={side === "left" ? Position.Left : Position.Right}
+    style={side === "left" ? { left: -PLUS_OFFSET } : { right: -PLUS_OFFSET }}
+    type={side === "left" ? "target" : "source"}
   >
-    {children}
-  </p>
+    <Plus className="pointer-events-none size-3.5" />
+  </Handle>
 );
 
-const ResultNodeView = memo(
-  ({ data, id, selected, type }: NodeProps<ImageNode | VideoNode>) => {
-    const { run, runnable } = useRun();
-    const { getEdges, getNodes } = useReactFlow<CanvasNode, CanvasEdge>();
-
+const FrameView = memo(
+  ({ data, id, selected, type }: NodeProps<ResultNode>) => {
+    const { extend } = useCanvas();
     const isVideo = type === "video";
     const pending = data.status === "pending";
-    const canRunNow = runnable.has(id);
-    // Read when the node draws, which a run does by changing its data; the echo under
-    // the flow is for the wait, and a prompt typed during one is the next run's.
-    const prompt = pending
-      ? inputsOf(id, getNodes(), getEdges()).prompt
-      : undefined;
+    const Icon = isVideo ? Clapperboard : ImageIcon;
 
     let overlay: ReactNode;
     if (data.status === "failed") {
-      overlay = <Say tone="error">{data.error ?? "It did not finish."}</Say>;
+      overlay = (
+        <p
+          className="absolute inset-0 flex items-center justify-center p-4 text-center text-destructive text-xs"
+          role="alert"
+        >
+          {data.error ?? "It did not finish."}
+        </p>
+      );
     } else if (data.status === "idle") {
       overlay = (
-        <Say>{canRunNow ? "Run to generate" : "Connect a prompt to run"}</Say>
+        <Icon
+          aria-hidden="true"
+          className="absolute top-1/2 left-1/2 size-9 -translate-x-1/2 -translate-y-1/2 text-muted-foreground/50"
+          strokeWidth={1.25}
+        />
       );
     }
 
-    let label = isVideo ? "Generate video" : "Generate image";
-    if (data.status === "done") {
-      label = "Run again";
-    } else if (data.status === "failed") {
-      label = "Retry";
-    }
-
     return (
-      <NodeFrame
-        actions={
-          <Button
-            aria-label={label}
-            className="size-7"
-            disabled={!canRunNow}
-            onClick={() => run(id)}
-            size="icon"
-            type="button"
-            variant="ghost"
-          >
-            {data.status === "done" || data.status === "failed" ? (
-              <RotateCcw className="size-3.5" />
-            ) : (
-              <Sparkles className="size-3.5" />
+      <div style={{ width: FRAME_WIDTH[type] }}>
+        <div className="mb-2 flex items-center gap-1.5 px-0.5 text-muted-foreground text-sm">
+          <Icon aria-hidden="true" className="size-4" />
+          {isVideo ? "Video" : "Image"}
+        </div>
+        <div className="relative">
+          <div
+            className={cn(
+              "relative overflow-hidden rounded-2xl border bg-card",
+              selected ? "border-ring" : "border-border"
             )}
-          </Button>
-        }
-        selected={selected}
-        title={isVideo ? "Video" : "Image"}
-        width={NODE_WIDTH[isVideo ? "video" : "image"]}
-      >
-        <div className="flex flex-col gap-2 px-3 pb-3">
-          {isVideo && data.status === "done" && data.src ? (
-            <Clip aspect={data.aspect} src={data.src} />
-          ) : (
-            <div
-              className="relative w-full overflow-hidden rounded-lg border border-border"
-              style={{ aspectRatio: ratio(data.aspect) }}
-            >
+            style={{ aspectRatio: ratio(data.aspect) }}
+          >
+            {isVideo && data.status === "done" && data.src ? (
+              <VideoPreview className="absolute inset-0" src={data.src}>
+                <VideoPreviewScreen className="aspect-auto h-full rounded-none">
+                  <VideoPreviewPlayOverlay />
+                </VideoPreviewScreen>
+              </VideoPreview>
+            ) : (
               <GenerationOverlay
                 mediaSrc={isVideo ? undefined : data.src}
                 overlay={overlay}
                 pending={pending}
-                prompt={prompt}
+                prompt={pending ? data.prompt : undefined}
                 seed={`${id}-${data.seed}`}
               >
                 {!isVideo && data.src ? (
                   <img
-                    alt="Generated result"
+                    alt={data.prompt || "Generated result"}
                     className="h-full w-full object-cover"
+                    draggable={false}
                     src={data.src}
                   />
                 ) : null}
               </GenerationOverlay>
-            </div>
-          )}
-          <p className="font-mono text-muted-foreground text-xs">
-            seed {data.seed} · {data.aspect} · {data.resolution}
-          </p>
-        </div>
-        <Handle
-          className={HANDLE}
-          position={Position.Left}
-          style={portStyle}
-          type="target"
-        />
-        {isVideo ? null : (
-          <Handle
-            className={HANDLE}
-            position={Position.Right}
-            style={portStyle}
-            type="source"
+            )}
+          </div>
+          <FramePlus
+            label="Start this frame from a new image"
+            onPress={() => extend(id, "before")}
+            side="left"
           />
-        )}
-      </NodeFrame>
+          {isVideo ? null : (
+            <FramePlus
+              label="Make a video from this image"
+              onPress={() => extend(id, "after")}
+              side="right"
+            />
+          )}
+        </div>
+      </div>
     );
   }
 );
@@ -436,10 +259,8 @@ const ResultNodeView = memo(
 // Module-level, so the maps keep one identity for the life of the page: a new object
 // every render would make the library unmount and remount every node.
 const nodeTypes = {
-  image: ResultNodeView,
-  prompt: PromptNodeView,
-  settings: SettingsNodeView,
-  video: ResultNodeView,
+  image: FrameView,
+  video: FrameView,
 } as unknown as NodeTypes;
 
 /* -- Edge ----------------------------------------------------------------------
@@ -453,6 +274,7 @@ const TRACK = { "--edge-track": "var(--muted-foreground)" } as CSSProperties;
 
 const FlowCanvasEdge = memo(
   ({
+    data: edgeData,
     id,
     selected,
     sourcePosition,
@@ -463,11 +285,10 @@ const FlowCanvasEdge = memo(
     targetX,
     targetY,
   }: EdgeProps) => {
-    // Light travels while the node it arrives at is waiting on a result.
+    // Light travels while the node it arrives at is waiting on a result, or always on an
+    // edge that carries `data.active`.
     const data = useNodesData<CanvasNode>(target)?.data;
-    const active = Boolean(
-      data && "status" in data && data.status === "pending"
-    );
+    const active = edgeData?.active === true || data?.status === "pending";
 
     const [path] = getBezierPath({
       sourcePosition,
@@ -508,7 +329,7 @@ const FlowCanvasEdge = memo(
               className="text-primary"
               d={path}
               glow={2}
-              strokeWidth={2}
+              strokeWidth={1.5}
               style={TRACK}
               viewBox={`${left} ${top} ${width} ${height}`}
             />
@@ -530,21 +351,42 @@ const THEME = {
   "--xy-background-color": "var(--background)",
   "--xy-background-pattern-dots-color": "var(--border)",
   "--xy-connectionline-stroke": "var(--muted-foreground)",
-  "--xy-connectionline-stroke-width": "2",
+  "--xy-connectionline-stroke-width": "1.5",
   "--xy-selection-background-color":
     "color-mix(in oklab, var(--ring) 10%, transparent)",
   "--xy-selection-border": "1px solid var(--ring)",
 } as CSSProperties;
 
 const DELETE_KEYS = ["Backspace", "Delete"];
-const FIT = { maxZoom: 1, padding: 0.2 };
+const FIT = { maxZoom: 1, padding: 0.25 };
+
+/** What the composer can make each kind with, and who makes it. */
+export interface Catalogue {
+  models: Record<NodeKind, ModelSelectModel[]>;
+  providers: ModelSelectProvider[];
+}
+
+/** The model a frame runs on: the one it names if the catalogue still has it, else the
+ *  first of its kind. */
+const modelFor = (
+  catalogue: Catalogue | undefined,
+  kind: NodeKind,
+  id: string | undefined
+) => {
+  const options = catalogue?.models[kind] ?? [];
+
+  return options.some((model) => model.id === id) ? id : options[0]?.id;
+};
 
 export interface GenerationCanvasProps {
+  /** The models to offer, per kind. Omitted, the composer draws no model picker and a run
+   *  carries no model. */
+  catalogue?: Catalogue;
   className?: string;
   /** What a run asks. Resolves with where the result is; rejects to fail the node. */
   generate: Generate;
-  /** The graph the canvas opens with, and goes back to on reset. Read once. Defaults to
-   *  the starter with nothing made yet. */
+  /** The graph the canvas opens with. Read once. Defaults to the starter with nothing
+   *  made yet. */
   initial?: { edges: CanvasEdge[]; nodes: CanvasNode[] };
   /**
    * Whether the wheel zooms the plane. `true` on a page that is the canvas. On a page
@@ -560,7 +402,16 @@ const newId = (kind: NodeKind) => `${kind}-${crypto.randomUUID().slice(0, 8)}`;
 const messageOf = (error: unknown) =>
   error instanceof Error ? error.message : "It did not finish.";
 
+/** What the composer holds when no frame is selected: the brief of the next one, and
+ *  which kind it will be. */
+interface Draft extends Brief {
+  kind: NodeKind;
+}
+
+const STRENGTHS = ["Low", "Medium", "High"];
+
 const Canvas = ({
+  catalogue,
   className,
   generate,
   initial,
@@ -575,12 +426,16 @@ const Canvas = ({
   );
   const flow = useReactFlow<CanvasNode, CanvasEdge>();
   const frame = useRef<HTMLDivElement>(null);
-  const [selection, setSelection] = useState(0);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [draft, setDraft] = useState<Draft>({
+    ...DEFAULT_BRIEF,
+    kind: "image",
+  });
 
   useOnSelectionChange({
     onChange: useCallback(
-      ({ edges: picked, nodes: held }: { edges: Edge[]; nodes: unknown[] }) =>
-        setSelection(picked.length + held.length),
+      ({ nodes: held }: { nodes: Edge[] | { id: string }[] }) =>
+        setSelectedId(held.length === 1 ? held[0].id : null),
       []
     ),
   });
@@ -588,8 +443,9 @@ const Canvas = ({
   /* -- Running -------------------------------------------------------------------
    * One place starts a run, so one place can stop it. A run is a promise kept by node
    * id: asking for a node that is already running hands back the run in flight, which
-   * is what makes "run all" safe when one node is the reference for another. Each run
-   * holds an `AbortController`, and deleting a node or resetting the canvas aborts it.
+   * is what makes a clip safe to run while the picture it starts from is still being
+   * made. Each run holds an `AbortController`, and deleting a node or stopping it aborts
+   * it.
    * --------------------------------------------------------------------------- */
   const inflight = useRef(new Map<string, Promise<void>>());
   const controllers = useRef(new Map<string, AbortController>());
@@ -602,7 +458,7 @@ const Canvas = ({
       }
 
       const first = flow.getNode(id);
-      if (!(first && isResult(first))) {
+      if (!first) {
         return Promise.resolve();
       }
 
@@ -610,8 +466,8 @@ const Canvas = ({
       controllers.current.set(id, controller);
 
       const task = (async () => {
-        // Pending before anything is waited for, so the lines into this node light up
-        // at once, including while the result it starts from is still being made.
+        // Pending before anything is waited for, so the line into this node lights up
+        // at once, including while the picture it starts from is still being made.
         flow.updateNodeData(id, {
           error: undefined,
           seed: first.data.seed + 1,
@@ -620,7 +476,7 @@ const Canvas = ({
         });
 
         try {
-          const { reference } = inputsOf(id, flow.getNodes(), flow.getEdges());
+          const reference = referenceOf(id, flow.getNodes(), flow.getEdges());
           if (reference && reference.data.status !== "done") {
             await runNode(reference.id);
           }
@@ -631,22 +487,20 @@ const Canvas = ({
           const nodesNow = flow.getNodes();
           const edgesNow = flow.getEdges();
           const node = nodesNow.find((candidate) => candidate.id === id);
-          const job =
-            node && isResult(node) ? jobOf(node, nodesNow, edgesNow) : null;
+          const job = node ? jobOf(node, nodesNow, edgesNow) : null;
           if (!job) {
-            throw new Error("Connect a prompt to run this.");
+            throw new Error("Write a prompt to run this.");
           }
 
-          const started = inputsOf(id, nodesNow, edgesNow).reference;
+          const started = referenceOf(id, nodesNow, edgesNow);
           if (started && started.data.status !== "done") {
             throw new Error("The image it starts from did not finish.");
           }
 
-          flow.updateNodeData(id, {
-            aspect: job.aspect,
-            resolution: job.resolution,
-          });
-          const { src } = await generate(job, controller.signal);
+          const { src } = await generate(
+            { ...job, model: modelFor(catalogue, job.kind, job.model) },
+            controller.signal
+          );
           if (!controller.signal.aborted) {
             flow.updateNodeData(id, { src, status: "done" });
           }
@@ -667,29 +521,18 @@ const Canvas = ({
 
       return task;
     },
-    [flow, generate]
+    [catalogue, flow, generate]
   );
 
-  const runAll = useCallback(() => {
-    const all = flow.getNodes();
-    const current = flow.getEdges();
-    const ids = all
-      .filter((node) => canRun(node, all, current))
-      .toSorted(
-        (a, b) => depthOf(a.id, all, current) - depthOf(b.id, all, current)
-      )
-      .map((node) => node.id);
-
-    return Promise.all(ids.map(run));
-  }, [flow, run]);
-
-  const stopAll = useCallback(() => {
-    for (const controller of controllers.current.values()) {
-      controller.abort();
-    }
-    controllers.current.clear();
-    inflight.current.clear();
-  }, []);
+  const stop = useCallback(
+    (id: string) => {
+      controllers.current.get(id)?.abort();
+      controllers.current.delete(id);
+      inflight.current.delete(id);
+      flow.updateNodeData(id, { status: "idle" });
+    },
+    [flow]
+  );
 
   // A node that is deleted mid-run stops its run, and the run's result is dropped.
   const onNodesDelete = useCallback((gone: CanvasNode[]) => {
@@ -698,29 +541,17 @@ const Canvas = ({
     }
   }, []);
 
-  const runnableKey = useMemo(
-    () =>
-      nodes
-        .filter((node) => canRun(node, nodes, edges))
-        .map((node) => node.id)
-        .join(","),
-    [edges, nodes]
-  );
-  const runContext = useMemo<RunContextValue>(
-    () => ({
-      run: (id) => {
-        void run(id);
-      },
-      // Keyed by its contents, so a node being dragged does not hand every node a new
-      // set to re-render against.
-      runnable: new Set(runnableKey ? runnableKey.split(",") : []),
-    }),
-    [run, runnableKey]
-  );
-
   const onConnect = useCallback(
     (connection: Connection) =>
-      setEdges((current) => addEdge({ ...connection, type: "flow" }, current)),
+      setEdges((current) => [
+        ...current,
+        {
+          id: `e-${connection.source}-${connection.target}`,
+          source: connection.source,
+          target: connection.target,
+          type: "flow",
+        },
+      ]),
     [setEdges]
   );
 
@@ -730,50 +561,130 @@ const Canvas = ({
     [flow]
   );
 
-  const add = useCallback(
-    (kind: NodeKind) => {
-      const box = frame.current?.getBoundingClientRect();
-      const middle = box
-        ? flow.screenToFlowPosition({
-            x: box.left + box.width / 2,
-            y: box.top + box.height / 2,
-          })
-        : { x: 0, y: 0 };
-      // Stepped, so a second node added without moving the first is not on top of it.
-      const step = (flow.getNodes().length % 5) * 24;
-      const node = createNode(kind, newId(kind), {
-        x: middle.x - NODE_WIDTH[kind] / 2 + step,
-        y: middle.y - 80 + step,
-      });
-
+  /** Puts a node on the plane and selects it, so the composer is already on it. A run
+   *  waits a frame, because the library's own copy of the graph is updated by a render. */
+  const place = useCallback(
+    (node: CanvasNode, link?: CanvasEdge) => {
       setNodes((current) => [
         ...current.map((other) =>
           other.selected ? { ...other, selected: false } : other
         ),
         { ...node, selected: true },
       ]);
+      if (link) {
+        setEdges((current) => [...current, link]);
+      }
     },
-    [flow, setNodes]
+    [setEdges, setNodes]
   );
 
-  const removeSelected = useCallback(() => {
-    void flow.deleteElements({
-      edges: flow.getEdges().filter((edge) => edge.selected),
-      nodes: flow.getNodes().filter((node) => node.selected),
-    });
-  }, [flow]);
+  // A new frame beside one: an image before it, a video after it. The line between them is
+  // drawn, because that is why the plus was pressed.
+  const extend = useCallback(
+    (id: string, side: "before" | "after") => {
+      const from = flow.getNode(id);
+      if (!from) {
+        return;
+      }
 
-  const reset = useCallback(() => {
-    stopAll();
-    setNodes(start.nodes);
-    setEdges(start.edges);
-    requestAnimationFrame(() => flow.fitView(FIT));
-  }, [flow, setEdges, setNodes, start, stopAll]);
+      const before = side === "before";
+      if (before && referenceOf(id, flow.getNodes(), flow.getEdges())) {
+        return;
+      }
+
+      const kind: NodeKind = before ? "image" : "video";
+      const width = FRAME_WIDTH[before ? "image" : from.type];
+      const node = createNode(
+        kind,
+        newId(kind),
+        {
+          x:
+            from.position.x +
+            (before ? -(width + 140) : FRAME_WIDTH[from.type] + 140),
+          y: from.position.y,
+        },
+        { aspect: from.data.aspect }
+      );
+      place(
+        node,
+        before
+          ? {
+              id: `e-${node.id}-${id}`,
+              source: node.id,
+              target: id,
+              type: "flow",
+            }
+          : {
+              id: `e-${id}-${node.id}`,
+              source: id,
+              target: node.id,
+              type: "flow",
+            }
+      );
+    },
+    [flow, place]
+  );
+
+  const canvasContext = useMemo<CanvasContextValue>(
+    () => ({ extend }),
+    [extend]
+  );
+
+  /* -- The composer --------------------------------------------------------------
+   * One box, two meanings. With a frame selected it edits that frame's brief and runs
+   * it. With none, it holds the brief of the next frame, and sending makes the frame and
+   * runs it.
+   * --------------------------------------------------------------------------- */
+  const target = nodes.find((node) => node.id === selectedId);
+  const brief: Brief = target ? target.data : draft;
+  const kind = target ? target.type : draft.kind;
+  const pending = target?.data.status === "pending";
+  const models = catalogue?.models[kind] ?? [];
+
+  const edit = (patch: Partial<Brief>) => {
+    if (target) {
+      flow.updateNodeData(target.id, patch);
+    } else {
+      setDraft((current) => ({ ...current, ...patch }));
+    }
+  };
+
+  const send = () => {
+    if (target) {
+      void run(target.id);
+      return;
+    }
+
+    const box = frame.current?.getBoundingClientRect();
+    const middle = box
+      ? flow.screenToFlowPosition({
+          x: box.left + box.width / 2,
+          y: box.top + box.height / 2,
+        })
+      : { x: 0, y: 0 };
+    // Stepped, so a second frame made without moving the first is not on top of it.
+    const step = (nodes.length % 5) * 24;
+    const node = createNode(
+      draft.kind,
+      newId(draft.kind),
+      {
+        x: middle.x - FRAME_WIDTH[draft.kind] / 2 + step,
+        y: middle.y - 120 + step,
+      },
+      draft
+    );
+    place(node);
+    setDraft((current) => ({ ...current, prompt: "" }));
+    requestAnimationFrame(() => {
+      void run(node.id);
+    });
+  };
 
   return (
-    <RunContext.Provider value={runContext}>
+    <CanvasContext.Provider value={canvasContext}>
       <div className={cn("relative isolate size-full", className)} ref={frame}>
         <ReactFlow
+          connectOnClick={false}
           deleteKeyCode={DELETE_KEYS}
           edges={edges}
           edgeTypes={edgeTypes}
@@ -782,6 +693,7 @@ const Canvas = ({
           isValidConnection={isValidConnection}
           maxZoom={1.5}
           minZoom={0.3}
+          nodeDragThreshold={4}
           nodes={nodes}
           nodeTypes={nodeTypes}
           onConnect={onConnect}
@@ -792,71 +704,116 @@ const Canvas = ({
           style={THEME}
           zoomActivationKeyCode={["Meta", "Control"]}
         >
-          <Background gap={20} size={1} variant={BackgroundVariant.Dots} />
+          <Background gap={24} size={1} variant={BackgroundVariant.Dots} />
           <Panel position="bottom-center">
-            <div
-              aria-label="Canvas"
-              className="flex items-center gap-0.5 rounded-full border border-border bg-popover p-1.5 shadow-lg"
-              role="toolbar"
+            <PromptInput
+              aria-label="Describe what to make"
+              className="nodrag nopan nowheel w-[min(40rem,calc(100vw-2rem))] shadow-lg"
+              onStop={() => target && stop(target.id)}
+              onSubmit={send}
+              onValueChange={(prompt) => edit({ prompt })}
+              streaming={pending}
+              value={brief.prompt}
             >
-              <DockButton
-                icon={<MessageSquareText />}
-                label="Add a prompt"
-                onClick={() => add("prompt")}
+              <PromptInputTextarea
+                placeholder={
+                  kind === "video"
+                    ? "Describe the clip you want"
+                    : "Describe the picture you want"
+                }
               />
-              <DockButton
-                icon={<SlidersHorizontal />}
-                label="Add settings"
-                onClick={() => add("settings")}
-              />
-              <DockButton
-                icon={<ImageIcon />}
-                label="Add an image"
-                onClick={() => add("image")}
-              />
-              <DockButton
-                icon={<Clapperboard />}
-                label="Add a video"
-                onClick={() => add("video")}
-              />
-              <DockSeparator />
-              <DockButton
-                disabled={runnableKey === ""}
-                icon={<Play />}
-                label="Run every node that can run"
-                onClick={() => {
-                  runAll();
-                }}
-                text="Run all"
-              />
-              <DockSeparator />
-              <DockButton
-                icon={<Maximize />}
-                label="Fit the graph in view"
-                onClick={() => flow.fitView(FIT)}
-              />
-              <DockButton
-                disabled={selection === 0}
-                icon={<Trash2 />}
-                label="Delete the selection"
-                onClick={removeSelected}
-              />
-              <DockButton
-                icon={<RotateCcw />}
-                label="Reset the canvas"
-                onClick={reset}
-              />
-            </div>
+              <PromptInputFooter>
+                {target ? null : (
+                  <Button
+                    className="rounded-full text-muted-foreground"
+                    onClick={() =>
+                      setDraft((current) => ({
+                        ...current,
+                        kind: current.kind === "image" ? "video" : "image",
+                        model: undefined,
+                      }))
+                    }
+                    type="button"
+                    variant="ghost"
+                  >
+                    {draft.kind === "image" ? <ImageIcon /> : <Clapperboard />}
+                    {draft.kind === "image" ? "Image" : "Video"}
+                  </Button>
+                )}
+                {models.length > 0 && catalogue ? (
+                  <ModelSelect
+                    models={models}
+                    onValueChange={(next) => edit({ model: next })}
+                    providers={catalogue.providers}
+                    value={modelFor(catalogue, kind, brief.model)}
+                  >
+                    <ModelSelectTrigger />
+                    <ModelSelectContent>
+                      <ModelSelectSearch />
+                      <div className="flex min-h-0 flex-1">
+                        <ModelSelectIndex />
+                        <ModelSelectList />
+                      </div>
+                    </ModelSelectContent>
+                  </ModelSelect>
+                ) : null}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      className="rounded-full font-mono text-muted-foreground text-xs"
+                      type="button"
+                      variant="ghost"
+                    >
+                      <SlidersHorizontal />
+                      {brief.aspect} · {brief.resolution} · {brief.strength}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent
+                    align="start"
+                    className="nodrag nopan nowheel flex w-72 flex-col gap-4"
+                    side="top"
+                  >
+                    <div>
+                      <div className={LABEL}>Aspect ratio</div>
+                      <AspectRatioPicker
+                        aria-label="Aspect ratio"
+                        onChange={(aspect) => edit({ aspect })}
+                        value={brief.aspect}
+                      />
+                    </div>
+                    <div>
+                      <div className={LABEL}>Resolution</div>
+                      <ResolutionSegmented
+                        aria-label="Resolution"
+                        onChange={(resolution) => edit({ resolution })}
+                        value={brief.resolution}
+                      />
+                    </div>
+                    <div>
+                      <div className={LABEL}>Strength</div>
+                      <StrengthSelect
+                        aria-label="Strength"
+                        onChange={(strength) => edit({ strength })}
+                        options={STRENGTHS}
+                        value={brief.strength}
+                      />
+                    </div>
+                  </PopoverContent>
+                </Popover>
+                <PromptInputSubmit />
+              </PromptInputFooter>
+            </PromptInput>
           </Panel>
         </ReactFlow>
       </div>
-    </RunContext.Provider>
+    </CanvasContext.Provider>
   );
 };
 
 /**
- * The block: a plane you can pan, zoom and work in, with a dock for adding and running
- * nodes. It takes the size its parent gives it, so the parent has to give it one.
+ * The block: a plane you can pan, zoom and work in, with a composer under it that writes
+ * to the selected frame. It takes the size its parent gives it, so the parent has to give
+ * it one.
  */
 export const GenerationCanvas = (props: GenerationCanvasProps) => (
   <ReactFlowProvider>

@@ -86,7 +86,7 @@ export const AgentRunDemo = () => {
 
   return (
     <div
-      className="h-[38rem] w-full overflow-hidden rounded-xl border border-border"
+      className="h-[50rem] w-full overflow-hidden rounded-xl border border-border"
       ref={frame}
     >
       <AgentRun {...run} onReset={replay} title="Agent" />

@@ -7,7 +7,9 @@
  * resolvable without keeping a second copy of the source.
  */
 export {
-  artFor,
+  DEMO_MODELS,
+  DEMO_PROVIDERS,
+  pictureFor,
   DEMO_CLIP,
   demoGenerate,
   demoGraph,

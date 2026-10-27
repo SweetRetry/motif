@@ -52,9 +52,9 @@ const CURVE_VIEW_BOX = "0 0 1000 239";
  *
  *  The rest is what makes this read as a pulse entering a line rather than a stripe
  *  scrolling through one: a light that never leaves is furniture, and the eye stops
- *  following it. A quarter of the cycle is long enough to register as a gap and short
+ *  following it. About 400ms is long enough to register as a gap and short
  *  enough that a line that is doing work never looks stalled. */
-const PASS_MS = 2600;
+const PASS_MS = 1400;
 const REST = 0.28;
 
 /** How much of the viewBox width the light spans — the length of the pulse, as a
