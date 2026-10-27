@@ -11,23 +11,25 @@ const on = (beats: number) => beats * BEAT;
 
 /** When each scene begins, in seconds. A scene runs until the next one begins. */
 export const CUE = {
-  approve: on(14),
-  assemble: on(45),
-  attach: on(31),
+  approve: on(17),
+  assemble: on(58),
+  attach: on(30),
   burst: on(6),
-  compose: on(37),
-  end: on(66),
-  explode: on(40),
-  flow: on(24),
-  install: on(50),
-  outro: on(58),
-  own: on(47),
-  render: on(26),
+  compare: on(26),
+  compose: on(42),
+  end: on(79),
+  explode: on(53),
+  install: on(63),
+  outro: on(71),
+  own: on(60),
   seed: 0,
-  settings: on(18),
+  settings: on(20),
   split: on(1),
+  surface: on(50),
   think: on(7),
   title: on(3),
+  tools: on(12),
+  wall: on(36),
 } as const;
 
 export const LENGTH = CUE.end;
@@ -38,46 +40,61 @@ export const LENGTH = CUE.end;
  *  dots that drew it land. */
 export const AT = {
   address: CUE.outro + on(4),
-  /** The card confirms the pick a beat after it is made. */
-  approveAnswer: CUE.approve + on(3),
-  /** The agent's proposal is picked. */
-  approveSelect: CUE.approve + on(2),
+  /** The approval is pressed; the card holds while the render is queued. */
+  approvePress: CUE.approve + on(2),
   approveShown: CUE.approve + on(1),
-  /** Each installed part's check, first to last. */
-  check: (index: number) => CUE.install + on(3.5 + index / 2),
+  /** The clip the canvas was asking for arrives in its frame. */
+  canvasDone: CUE.compose + on(5),
+  canvasShown: CUE.compose + on(1),
+  /** The installed parts roll past on one line, first to last. */
+  check: (index: number) => CUE.install + on(3.25 + index / 5),
   /** The image lands in the composer as an attachment. */
   chipShown: CUE.attach + on(1),
+  compareShown: CUE.compare + on(1),
+  /** The divider walks the frame between these: original on the left, upscale on the
+   *  right. */
+  divideFrom: CUE.compare + on(1.5),
+  divideTo: CUE.compare + on(3.5),
   /** The duration slider walks 3 → 6 over one beat from here. */
   duration: CUE.settings + on(4),
-  flowShown: CUE.flow + on(1),
-  /** The image shrinks from the frame into the composer. */
+  /** The second call starts once the search is in, and returns a beat later. */
+  estimateDone: CUE.tools + on(3.5),
+  estimateFrom: CUE.tools + on(2.5),
+  /** The upscale shrinks from the frame into the composer. */
   fly: CUE.attach,
-  inRepo: CUE.install + on(5.5),
+  inRepo: CUE.install + on(6),
   /** Each layer's label in the exploded view, deepest first. */
   label: (depth: number) => CUE.explode + on(1 + depth / 2),
   /** The exploded view folds back flat and lands on the third chapter. */
   landed: CUE.own,
   promptShown: CUE.attach + on(0.5),
   ratio: CUE.settings + on(2),
-  rendered: CUE.render + on(4),
   resolution: CUE.settings + on(3),
+  searchDone: CUE.tools + on(2),
   settingsShown: CUE.settings + on(1),
   /** The thinking block streams its passage between these. */
   streamFrom: CUE.think + on(1),
-  streamTo: CUE.approve - on(1),
-  surfaceShown: CUE.compose + on(1),
+  streamTo: CUE.tools - on(1),
+  surfaceShown: CUE.surface + on(1),
   sweepIn: CUE.own + on(1),
   sweepOut: CUE.own + on(2.4),
   tagline: CUE.outro + on(3),
   termShown: CUE.install + on(1),
   thinkShown: CUE.think + on(1),
+  /** Each tile of the wall, in the order it lands. */
+  tile: (index: number) => CUE.wall + on(1 + index / 2),
+  toolsShown: CUE.tools + on(1),
   /** The upload ring steps every half beat from the chip, and is done here. */
   uploadDone: CUE.attach + on(4),
+  wallShown: CUE.wall + on(1),
   wave: CUE.outro + on(6),
   wordmark: CUE.outro + on(2),
 } as const;
 
 export const SWEEP = { in: 0.6, out: 0.5 } as const;
+
+/** How many parts the registry ships, which the wall counts up to. */
+export const PARTS = 33;
 
 /** Text the picture types, a character at a time. */
 export const TYPING = {
@@ -94,7 +111,7 @@ export const TYPING = {
 } as const;
 
 /** The thinking block's passage, streamed a word at a time. */
-export const PASSAGE = `A six second portrait in raven feathers, dusk light. The feathers spread past the shoulders, so a wide frame: 16:9. Skin and feather detail want 2K. Six seconds holds one slow turn of the head. Confirm before rendering.`;
+export const PASSAGE = `A six second portrait in raven feathers, dusk light. The feathers spread past the shoulders, so a wide frame: 16:9. Skin and feather detail want 2K. Look up how raven plumage takes low light, then price the render before asking.`;
 export const WORDS = PASSAGE.split(" ");
 
 /** What the score plays and when. `pluck` marks something arriving, `tick` a control
@@ -117,36 +134,44 @@ export const HITS: Hit[] = [
 
   { at: CUE.think, kind: "thump" },
   { at: AT.thinkShown, kind: "pluck", note: 5 },
+  { at: AT.toolsShown, kind: "pluck", note: 3 },
+  { at: AT.searchDone, kind: "tick" },
   { at: AT.approveShown, kind: "pluck", note: 2 },
-  { at: AT.approveSelect, kind: "tick" },
+  { at: AT.approvePress, kind: "tick" },
   { at: AT.settingsShown, kind: "pluck", note: 3 },
   { at: AT.ratio, kind: "tick" },
   { at: AT.resolution, kind: "tick" },
-  { at: AT.flowShown, kind: "pluck", note: 4 },
-  { at: AT.rendered, kind: "pluck", note: 9 },
+  { at: AT.compareShown, kind: "pluck", note: 7 },
   { at: AT.chipShown, kind: "pluck", note: 5 },
   { at: AT.uploadDone, kind: "tick" },
+  { at: AT.wallShown, kind: "pluck", note: 9 },
 
   { at: CUE.compose, kind: "thump" },
+  { at: AT.canvasShown, kind: "pluck", note: 4 },
+  { at: AT.canvasDone, kind: "pluck", note: 9 },
   { at: AT.label(0), kind: "pluck", note: 7 },
   { at: AT.landed, kind: "thump" },
   { at: AT.sweepIn, dur: SWEEP.in, kind: "swoosh", pan: [-0.8, 0.8] },
   { at: AT.termShown, kind: "pluck", note: 2 },
-  { at: AT.inRepo, kind: "pluck", note: 9 },
+  { at: AT.inRepo, kind: "pluck", note: 7 },
 
   { at: CUE.outro - on(2), kind: "rise" },
   { at: CUE.outro, kind: "thump" },
-  { at: AT.wordmark, kind: "pluck", note: 7 },
-  { at: AT.address, kind: "pluck", note: 12 },
+  { at: AT.wordmark, kind: "pluck", note: 5 },
+  { at: AT.address, kind: "pluck", note: 9 },
 ];
 
 /** The pad underneath, one chord per stretch of the film, as semitones above A2. */
 export const CHORDS: { at: number; notes: number[] }[] = [
   { at: 0, notes: [0, 7, 15, 22] },
   { at: CUE.think, notes: [-4, 3, 10, 19] },
+  { at: CUE.approve, notes: [-2, 5, 14, 21] },
   { at: CUE.settings, notes: [3, 10, 15, 22] },
-  { at: CUE.render, notes: [-2, 5, 14, 21] },
+  { at: CUE.compare, notes: [-2, 5, 14, 21] },
+  { at: CUE.attach, notes: [-4, 3, 10, 19] },
+  { at: CUE.wall, notes: [5, 12, 17, 24] },
   { at: CUE.compose, notes: [0, 7, 14, 19] },
+  { at: CUE.surface, notes: [-2, 5, 14, 21] },
   { at: CUE.own, notes: [-4, 3, 10, 19] },
   { at: CUE.outro, notes: [0, 7, 15, 24] },
 ];

@@ -160,6 +160,22 @@ export const split =
   (i, t) =>
     i < count ? head(i, t) : tail(i - count, t);
 
+/** A matrix per rectangle, the swarm shared out by area, so a wall of tiles reads
+ *  at one density. */
+export const tiles = (rects: Rect[], a = 0.5): Form => {
+  let area = 0;
+  for (const { h, w } of rects) {
+    area += w * h;
+  }
+  const count = ({ h, w }: Rect) => Math.floor((N * w * h) / area);
+  const [last, ...rest] = rects.toReversed();
+  let form = matrix(last, a, count(last));
+  for (const rect of rest) {
+    form = split(count(rect), matrix(rect, a, count(rect)), form);
+  }
+  return form;
+};
+
 /** Rasterises `text` and keeps one point per `step` px where it is inked. Runs in the
  *  page, after the face has loaded, so the points follow the real letterforms. */
 export const sampleText = (

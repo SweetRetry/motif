@@ -83,8 +83,10 @@ for (let beat = CUE.think; beat < CUE.outro - 1e-6; beat += BEAT) {
 /* -- Hits ------------------------------------------------------------------ */
 
 const PENTATONIC = [0, 3, 5, 7, 10];
+// An octave under where it first sat: the top notes were near 1.8 kHz, which is where
+// a long listen starts to sting.
 const pluckHz = (degree: number) =>
-  hz(24 + 12 * Math.floor(degree / 5) + PENTATONIC[degree % 5]);
+  hz(12 + 12 * Math.floor(degree / 5) + PENTATONIC[degree % 5]);
 
 const pluck = (start: number, degree: number) => {
   const f = pluckHz(degree);
@@ -98,28 +100,27 @@ const pluck = (start: number, degree: number) => {
     const from = Math.floor((start + delay) * RATE);
     for (let i = 0; i < 1.4 * RATE; i += 1) {
       const t = i / RATE;
-      const attack = Math.min(1, t / 0.004);
+      // A rounded onset and a quiet octave: a felt mallet rather than a plucked wire.
+      const attack = Math.min(1, t / 0.012);
       const tone =
         Math.sin(TAU * f * t) +
-        0.35 * Math.exp(-t * 9) * Math.sin(TAU * 2 * f * t);
+        0.12 * Math.exp(-t * 12) * Math.sin(TAU * 2 * f * t);
       add(from + i, 0.11 * gain * attack * Math.exp(-t * 3.4) * tone, side);
     }
   }
 };
 
+/** A control settling: a short low tock with no noise in it, so a run of them reads as
+ *  touch rather than as clicks. */
 const tick = (start: number) => {
   const from = Math.floor(start * RATE);
-  let last = 0;
-  for (let i = 0; i < 0.05 * RATE; i += 1) {
+  for (let i = 0; i < 0.08 * RATE; i += 1) {
     const t = i / RATE;
-    const raw = noise();
-    // A first difference is a crude high-pass: it leaves the click and drops the hiss.
-    const bright = raw - last;
-    last = raw;
-    const env = Math.exp(-t * 140);
+    const attack = Math.min(1, t / 0.002);
+    const env = attack * Math.exp(-t * 55);
     add(
       from + i,
-      0.05 * env * bright + 0.025 * env * Math.sin(TAU * 2400 * t),
+      0.05 * env * (Math.sin(TAU * 660 * t) + 0.4 * Math.sin(TAU * 990 * t)),
       0.2
     );
   }
@@ -161,9 +162,9 @@ const swoosh = (
     const p = i / length;
     const env = Math.sin(Math.PI * p) ** 2;
     const raw = noise();
-    fast += (0.05 + 0.25 * env) * (raw - fast);
+    fast += (0.03 + 0.1 * env) * (raw - fast);
     slow += 0.01 * (raw - slow);
-    add(from + i, 0.16 * env * (fast - slow), lerp(panFrom, panTo, p));
+    add(from + i, 0.14 * env * (fast - slow), lerp(panFrom, panTo, p));
   }
 };
 
@@ -183,16 +184,24 @@ for (const hit of HITS) {
 
 /* -- Master ---------------------------------------------------------------- */
 
+// Two gentle low-passes in series take the edge off everything above a few kHz, and
+// the saturation is left light, so nothing is squeezed into a wall of loudness.
+const ROLLOFF = 1 - Math.exp((-TAU * 4500) / RATE);
 const fadeFrom = (LENGTH - 1.5) * RATE;
+const lows = [0, 0, 0, 0];
 let peak = 0;
 for (let i = 0; i < frames; i += 1) {
   const fade =
     i > fadeFrom ? Math.max(0, 1 - (i - fadeFrom) / (1.5 * RATE)) : 1;
-  left[i] = Math.tanh(left[i] * 1.2) * fade;
-  right[i] = Math.tanh(right[i] * 1.2) * fade;
+  lows[0] += ROLLOFF * (left[i] - lows[0]);
+  lows[1] += ROLLOFF * (lows[0] - lows[1]);
+  lows[2] += ROLLOFF * (right[i] - lows[2]);
+  lows[3] += ROLLOFF * (lows[2] - lows[3]);
+  left[i] = Math.tanh(lows[1]) * fade;
+  right[i] = Math.tanh(lows[3]) * fade;
   peak = Math.max(peak, Math.abs(left[i]), Math.abs(right[i]));
 }
-const gain = 10 ** (-1 / 20) / peak;
+const gain = 10 ** (-3 / 20) / peak;
 
 const data = Buffer.alloc(frames * 4);
 for (let i = 0; i < frames; i += 1) {

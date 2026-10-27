@@ -37,8 +37,8 @@ if (!process.argv.includes("--cuts")) {
   run("node", ["score.mts"]);
 }
 
-// -14 LUFS is where X, YouTube and most feeds normalise to, so the film is neither
-// turned down nor left quiet next to its neighbours.
+// -16 LUFS sits a little under where X and YouTube normalise to (-14): a feed turns
+// the film up a touch rather than down, and a listen through on headphones stays soft.
 ffmpeg(
   "-i",
   out("film.mp4"),
@@ -51,7 +51,7 @@ ffmpeg(
   "-c:v",
   "copy",
   "-af",
-  "loudnorm=I=-14:TP=-1.5:LRA=7",
+  "loudnorm=I=-16:TP=-2:LRA=9",
   "-c:a",
   "aac",
   "-b:a",
