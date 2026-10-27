@@ -17,6 +17,12 @@
  * straight into ffmpeg, never written to disk. Writes out/<shot>.mp4 and
  * out/<shot>.sha1, one hash per frame, so two runs can be diffed to prove it. `seconds` cuts the shot short for a trial run.
  *
+ *   STILLS=12.5,30 pnpm capture <shot>
+ *
+ * walks the same clock but keeps only the frames at those seconds, as
+ * out/stills/<seconds>.png, and stops after the last: a look at a moment without
+ * encoding the film.
+ *
  * This shares a laptop with whoever is using it. It refuses to start while the system
  * is under memory pressure, keeps ffmpeg to two threads, gives every browser call a
  * deadline, and closes the browser on any exit.
@@ -42,6 +48,12 @@ const DEADLINE_MS = 15_000;
 const here = import.meta.dirname;
 const [shot, cut] = process.argv.slice(2);
 const theme = process.env.THEME === "light" ? "light" : "dark";
+const stills = new Map(
+  (process.env.STILLS ?? "")
+    .split(",")
+    .filter(Boolean)
+    .map((seconds) => [Math.round(Number(seconds) * FPS), seconds])
+);
 if (!shot) {
   throw new Error("usage: node capture.mts <shot> [seconds]");
 }
@@ -74,6 +86,7 @@ const TYPES: Record<string, string> = {
   ".jpg": "image/jpeg",
   ".js": "text/javascript",
   ".m4a": "audio/mp4",
+  ".mp4": "video/mp4",
   ".png": "image/png",
   ".svg": "image/svg+xml",
   ".webp": "image/webp",
@@ -103,7 +116,8 @@ const { port } = server.address() as AddressInfo;
 // comes out a few pixels different depending on what was drawn before. Full raster
 // makes a frame depend on nothing but its own state.
 const browser = await chromium.launch({ args: ["--disable-partial-raster"] });
-mkdirSync(join(here, "out"), { recursive: true });
+mkdirSync(join(here, "out", "stills"), { recursive: true });
+// Stills never feed the encoder, so it is started on nothing and left to exit quietly.
 const ffmpeg = spawn(
   "ffmpeg",
   [
@@ -130,9 +144,9 @@ const ffmpeg = spawn(
     "yuv420p",
     "-x264-params",
     "threads=2",
-    join(here, "out", `${shot}.mp4`),
+    join(here, "out", stills.size > 0 ? "stills/unused.mp4" : `${shot}.mp4`),
   ],
-  { stdio: ["pipe", "inherit", "inherit"] }
+  { stdio: ["pipe", "inherit", stills.size > 0 ? "ignore" : "inherit"] }
 );
 
 const teardown = () => {
@@ -159,6 +173,23 @@ try {
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
   await page.clock.install({ time: 0 });
+  // `motion` hands opacity and transform to WAAPI, which runs on real time from the
+  // call that starts it. A screenshot takes real seconds, so a short one is born and
+  // finished between two frames, before the loop below sees it, and `motion` is left
+  // holding a half-committed style. It only reaches for WAAPI when `Element.prototype`
+  // owns `animate`, so the method moves one level down: every element still has it,
+  // and `motion` draws those values in its own frame loop, on the fake clock.
+  await page.addInitScript(() => {
+    const { animate } = Element.prototype;
+    for (const proto of [HTMLElement.prototype, SVGElement.prototype]) {
+      Object.defineProperty(proto, "animate", {
+        configurable: true,
+        value: animate,
+        writable: true,
+      });
+    }
+    delete (Element.prototype as Partial<Element>).animate;
+  });
 
   const stage = new URL(`http://127.0.0.1:${port}/`);
   stage.hash = shot;
@@ -203,7 +234,10 @@ try {
   await page.evaluate(() => window.__shot?.start());
   await settle();
 
-  const total = Math.round(seconds * FPS);
+  const total =
+    stills.size > 0
+      ? Math.max(...stills.keys()) + 1
+      : Math.round(seconds * FPS);
   const hashes: string[] = [];
   let elapsed = 0;
   for (let frame = 0; frame < total; frame += 1) {
@@ -252,6 +286,9 @@ try {
       }
     }, elapsed);
 
+    if (stills.size > 0 && !stills.has(frame + 1)) {
+      continue;
+    }
     const { data } = await within(
       // CDP draws at 1x unless the clip says otherwise, whatever the device ratio.
       cdp.send("Page.captureScreenshot", {
@@ -261,6 +298,13 @@ try {
       `frame ${frame}`
     );
     const png = Buffer.from(data, "base64");
+    if (stills.size > 0) {
+      writeFileSync(
+        join(here, "out", "stills", `${stills.get(frame + 1)}.png`),
+        png
+      );
+      continue;
+    }
     hashes.push(createHash("sha1").update(png).digest("hex"));
     if (!ffmpeg.stdin.write(png)) {
       await once(ffmpeg.stdin, "drain");
@@ -269,8 +313,12 @@ try {
 
   ffmpeg.stdin.end();
   await once(ffmpeg, "close");
-  writeFileSync(join(here, "out", `${shot}.sha1`), `${hashes.join("\n")}\n`);
-  console.log(`${shot}: ${total} frames → out/${shot}.mp4`);
+  if (stills.size > 0) {
+    console.log(`${shot}: ${stills.size} stills → out/stills/`);
+  } else {
+    writeFileSync(join(here, "out", `${shot}.sha1`), `${hashes.join("\n")}\n`);
+    console.log(`${shot}: ${total} frames → out/${shot}.mp4`);
+  }
 } finally {
   ffmpeg.kill("SIGKILL");
   server.close();

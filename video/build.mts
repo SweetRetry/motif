@@ -7,7 +7,14 @@
  * few hundred megabytes. The site's Next server is never started. Capture opens
  * dist/index.html straight off disk.
  */
-import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { join, resolve } from "node:path";
 
 import tailwind from "@tailwindcss/postcss";
@@ -35,12 +42,17 @@ await build({
   tsconfig: join(repo, "tsconfig.json"),
 });
 
+// esbuild writes the CSS the bundle imports (React Flow's base sheet) beside the
+// script, under the same name the site stylesheet goes to. It is read first and kept
+// ahead of the site's, so the site's utilities still win where the two meet.
+const imported = join(dist, "stage.css");
+const bundled = existsSync(imported) ? readFileSync(imported, "utf-8") : "";
 const from = join(here, "stage/stage.css");
 const css = await postcss([tailwind({ base: repo })]).process(
   readFileSync(from, "utf-8"),
-  { from, to: join(dist, "stage.css") }
+  { from, to: imported }
 );
-writeFileSync(join(dist, "stage.css"), css.css);
+writeFileSync(imported, `${bundled}\n${css.css}`);
 
 const fonts = join(here, "node_modules/geist/dist/fonts");
 for (const file of [
@@ -49,6 +61,27 @@ for (const file of [
 ]) {
   copyFileSync(join(fonts, file), join(dist, "fonts", file.split("/")[1]));
 }
+
+// The loop the film's canvas makes: the portrait cropped wide, pushed in slowly. Cut
+// here from the picture the film already shows, so it is one asset and not two.
+execFileSync("ffmpeg", [
+  "-y",
+  "-loglevel",
+  "error",
+  "-loop",
+  "1",
+  "-i",
+  join(repo, "public/attachment-demo.jpg"),
+  "-vf",
+  "scale=1280:-2,crop=1280:720,zoompan=z='1+0.0006*on':d=1:s=1280x720:fps=30",
+  "-t",
+  "4",
+  "-c:v",
+  "libx264",
+  "-pix_fmt",
+  "yuv420p",
+  join(dist, "raven-loop.mp4"),
+]);
 
 writeFileSync(
   join(dist, "index.html"),
