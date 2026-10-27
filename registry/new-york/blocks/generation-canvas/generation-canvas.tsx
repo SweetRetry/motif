@@ -55,17 +55,17 @@ import { GenerationOverlay } from "@/components/ui/motif/generation-overlay";
 import { ResolutionSegmented } from "@/components/ui/motif/resolution-segmented";
 import { StrengthSelect } from "@/components/ui/motif/strength-select";
 import {
-  Toolbar,
-  ToolbarItem,
-  ToolbarSeparator,
-} from "@/components/ui/motif/toolbar";
-import {
   VideoPreview,
   VideoPreviewFilmstrip,
   VideoPreviewPlayOverlay,
   VideoPreviewScreen,
   VideoPreviewTime,
 } from "@/components/ui/motif/video-preview";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 import {
@@ -272,6 +272,50 @@ const Clip = ({ aspect, src }: { aspect: string; src: string }) => (
       <VideoPreviewTime className="absolute right-1.5 bottom-1.5 rounded-md bg-black/60 px-1.5 py-0.5 text-white" />
     </VideoPreviewFilmstrip>
   </VideoPreview>
+);
+
+/**
+ * One action in the dock: a glyph that names itself in a tooltip. The one action the
+ * dock exists for carries its name in the row as well, through `text`.
+ */
+const DockButton = ({
+  disabled,
+  icon,
+  label,
+  onClick,
+  text,
+}: {
+  disabled?: boolean;
+  icon: ReactNode;
+  label: string;
+  onClick: () => void;
+  text?: string;
+}) => (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <Button
+        aria-label={label}
+        className={cn(
+          "rounded-full text-muted-foreground hover:text-foreground [&_svg]:size-4.5",
+          text && "w-auto gap-1.5 pr-3.5 pl-2.5 font-medium"
+        )}
+        disabled={disabled}
+        onClick={onClick}
+        size="icon"
+        variant="ghost"
+      >
+        {icon}
+        {text}
+      </Button>
+    </TooltipTrigger>
+    <TooltipContent side="top" sideOffset={10}>
+      {label}
+    </TooltipContent>
+  </Tooltip>
+);
+
+const DockSeparator = () => (
+  <span aria-hidden="true" className="mx-0.5 h-5 w-px shrink-0 bg-border" />
 );
 
 /** What the empty frame says. Not a status badge: an empty frame has one thing to tell
@@ -750,55 +794,59 @@ const Canvas = ({
         >
           <Background gap={20} size={1} variant={BackgroundVariant.Dots} />
           <Panel position="bottom-center">
-            <Toolbar aria-label="Canvas">
-              <ToolbarItem
+            <div
+              aria-label="Canvas"
+              className="flex items-center gap-0.5 rounded-full border border-border bg-popover p-1.5 shadow-lg"
+              role="toolbar"
+            >
+              <DockButton
                 icon={<MessageSquareText />}
                 label="Add a prompt"
-                onSelect={() => add("prompt")}
+                onClick={() => add("prompt")}
               />
-              <ToolbarItem
+              <DockButton
                 icon={<SlidersHorizontal />}
                 label="Add settings"
-                onSelect={() => add("settings")}
+                onClick={() => add("settings")}
               />
-              <ToolbarItem
+              <DockButton
                 icon={<ImageIcon />}
                 label="Add an image"
-                onSelect={() => add("image")}
+                onClick={() => add("image")}
               />
-              <ToolbarItem
+              <DockButton
                 icon={<Clapperboard />}
                 label="Add a video"
-                onSelect={() => add("video")}
+                onClick={() => add("video")}
               />
-              <ToolbarSeparator />
-              <ToolbarItem
+              <DockSeparator />
+              <DockButton
                 disabled={runnableKey === ""}
                 icon={<Play />}
                 label="Run every node that can run"
-                onSelect={() => {
+                onClick={() => {
                   runAll();
                 }}
-                pinnedLabel="Run all"
+                text="Run all"
               />
-              <ToolbarSeparator />
-              <ToolbarItem
+              <DockSeparator />
+              <DockButton
                 icon={<Maximize />}
                 label="Fit the graph in view"
-                onSelect={() => flow.fitView(FIT)}
+                onClick={() => flow.fitView(FIT)}
               />
-              <ToolbarItem
+              <DockButton
                 disabled={selection === 0}
                 icon={<Trash2 />}
                 label="Delete the selection"
-                onSelect={removeSelected}
+                onClick={removeSelected}
               />
-              <ToolbarItem
+              <DockButton
                 icon={<RotateCcw />}
                 label="Reset the canvas"
-                onSelect={reset}
+                onClick={reset}
               />
-            </Toolbar>
+            </div>
           </Panel>
         </ReactFlow>
       </div>

@@ -511,25 +511,6 @@
       ]
     },
     {
-      "name": "toolbar",
-      "type": "registry:ui",
-      "title": "Toolbar",
-      "description": "A floating dock of glyphs that names itself on approach: the icon under the pointer swells and its label arrives above it, while the bar itself never moves. Items that earn the width can pin their label into the row.",
-      "dependencies": ["motion"],
-      "registryDependencies": ["tooltip"],
-      "files": [
-        {
-          "path": "registry/new-york/toolbar.tsx",
-          "type": "registry:ui",
-          "target": "@components/ui/motif/toolbar.tsx"
-        },
-        {
-          "path": "hooks/use-hover-capable.ts",
-          "type": "registry:hook"
-        }
-      ]
-    },
-    {
       "name": "settings-dialog",
       "type": "registry:ui",
       "title": "Settings Dialog",
@@ -727,8 +708,8 @@
         "https://motif.sweetretry.com/r/generation-overlay.json",
         "https://motif.sweetretry.com/r/resolution-segmented.json",
         "https://motif.sweetretry.com/r/strength-select.json",
-        "https://motif.sweetretry.com/r/toolbar.json",
-        "https://motif.sweetretry.com/r/video-preview.json"
+        "https://motif.sweetretry.com/r/video-preview.json",
+        "tooltip"
       ],
       "files": [
         {
