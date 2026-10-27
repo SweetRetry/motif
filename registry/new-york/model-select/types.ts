@@ -62,7 +62,7 @@ export interface ModelSelectProps {
   /** Explains what "recommended" means for this run, e.g. `"Fits your 30s · audio
    *  setup"`. Omit it and the heading carries no hint. */
   recommendedHint?: string;
-  /** Drawn at the head of the recommended section and in the rail. Defaults to a target:
+  /** Drawn at the head of the recommended section and in the rail. Defaults to a sparkle:
    *  these are the models that fit what is being made. */
   recommendedIcon?: ReactNode;
   /** Heading over the recommended models. */

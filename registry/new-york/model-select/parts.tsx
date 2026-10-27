@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronDown, Info, Target } from "lucide-react";
+import { Check, ChevronDown, Info } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 import {
   createContext,
@@ -97,6 +97,22 @@ export const ProviderGlyph = ({
     </span>
   );
 };
+
+/**
+ * The recommended section's default mark: a large sparkle with a small one beside it.
+ * It is filled so it carries the same weight as the maker marks around it in the rail.
+ */
+const RecommendedGlyph = () => (
+  <svg
+    aria-hidden="true"
+    className="size-4.5 shrink-0"
+    fill="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path d="M10 5.5Q11.2 12.3 18.5 13.5Q11.2 14.7 10 21.5Q8.8 14.7 1.5 13.5Q8.8 12.3 10 5.5Z" />
+    <path d="M18.5 2Q19 5 22 5.5Q19 6 18.5 9Q18 6 15 5.5Q18 5 18.5 2Z" />
+  </svg>
+);
 
 export type ModelSelectContentProps = ComponentProps<typeof PopoverContent>;
 
@@ -259,7 +275,7 @@ export const ModelSelectIndex = ({
             {section.provider ? (
               <ProviderGlyph provider={section.provider} />
             ) : (
-              (section.icon ?? <Target className="size-4.5" />)
+              (section.icon ?? <RecommendedGlyph />)
             )}
           </button>
         );
@@ -374,7 +390,7 @@ export const ModelSelectSection = ({
         {section.provider ? (
           <ProviderGlyph provider={section.provider} />
         ) : (
-          (section.icon ?? <Target className="size-4.5" />)
+          (section.icon ?? <RecommendedGlyph />)
         )}
         {section.label}
         {section.hint ? (
