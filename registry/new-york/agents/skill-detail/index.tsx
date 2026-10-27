@@ -13,17 +13,12 @@ import {
   X,
 } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { Tabs as TabsPrimitive } from "radix-ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent, ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import {
-  LineTabs,
-  LineTabsContent,
-  LineTabsList,
-  LineTabsTrigger,
-} from "@/components/ui/motif/line-tabs";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +30,11 @@ import type {
   SkillDetailProps,
   SkillFile,
 } from "./types";
+
+/** A tab is a word with a 2px line under it when selected. The line is an inset shadow in
+ *  the text's own colour, so it reads as the header's rule thickening under one word. */
+const TAB_TRIGGER =
+  "inline-flex h-12 cursor-pointer items-center text-sm whitespace-nowrap text-muted-foreground outline-none transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring data-[state=active]:text-foreground data-[state=active]:shadow-[inset_0_-2px_0_currentColor]";
 
 export type {
   SkillAuthor,
@@ -321,9 +321,12 @@ const Panel = ({
   value: PanelTab;
 }) =>
   tabbed ? (
-    <LineTabsContent className={className} value={value}>
+    <TabsPrimitive.Content
+      className={cn("outline-none", className)}
+      value={value}
+    >
       {children}
-    </LineTabsContent>
+    </TabsPrimitive.Content>
   ) : (
     <div className={className}>{children}</div>
   );
@@ -792,8 +795,8 @@ export const SkillDetail = ({
           </div>
         </div>
 
-        <LineTabs
-          className="min-h-0 min-w-0"
+        <TabsPrimitive.Root
+          className="flex min-h-0 min-w-0 flex-col"
           onValueChange={(next) => setTab(next as PanelTab)}
           value={activeTab}
         >
@@ -810,17 +813,23 @@ export const SkillDetail = ({
             // underneath the controls and there is no translucent corner to get wrong.
             <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border/60 pr-3 pl-5 @3xl:pl-6">
               {showTabs ? (
-                <LineTabsList aria-label="Skill sections">
-                  <LineTabsTrigger value="overview">
+                <TabsPrimitive.List
+                  aria-label="Skill sections"
+                  className="flex items-stretch gap-5"
+                >
+                  <TabsPrimitive.Trigger
+                    className={TAB_TRIGGER}
+                    value="overview"
+                  >
                     {resultsLabel}
-                  </LineTabsTrigger>
-                  <LineTabsTrigger value="files">
+                  </TabsPrimitive.Trigger>
+                  <TabsPrimitive.Trigger className={TAB_TRIGGER} value="files">
                     Files
                     <span className="ml-1.5 font-mono text-xs tabular-nums">
                       {list.length}
                     </span>
-                  </LineTabsTrigger>
-                </LineTabsList>
+                  </TabsPrimitive.Trigger>
+                </TabsPrimitive.List>
               ) : (
                 <span />
               )}
@@ -999,7 +1008,7 @@ export const SkillDetail = ({
               </Panel>
             ) : null}
           </div>
-        </LineTabs>
+        </TabsPrimitive.Root>
       </div>
     </div>
   );

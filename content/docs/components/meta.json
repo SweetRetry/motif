@@ -1,4 +1,4 @@
 {
   "title": "Components",
-  "pages": ["index", "line-tabs", "settings-dialog"]
+  "pages": ["index", "settings-dialog"]
 }

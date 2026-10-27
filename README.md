@@ -18,7 +18,7 @@
   `prompt-input`, `voice-input`, `attachment`, `scroll-rail`, `approval-card`,
   `question-card`, `skill-detail`
 - 🎛️ **Components** — `aspect-ratio-picker`, `resolution-segmented`, `duration-slider`,
-  `generation-overlay`, `cover-fan`, `flow-edge`, `line-tabs`, `settings-dialog`,
+  `generation-overlay`, `cover-fan`, `flow-edge`, `settings-dialog`,
   `activity-heatmap`
 - 🏗️ **Blocks** — whole surfaces assembled from the parts, starting with `agent-run`
 
