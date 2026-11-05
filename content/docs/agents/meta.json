@@ -12,6 +12,7 @@
     "queue",
     "scroll-rail",
     "prompt-input",
+    "chat-model-menu",
     "voice-input",
     "attachment",
     "approval-card",
