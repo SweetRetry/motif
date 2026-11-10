@@ -339,9 +339,10 @@ export const AgentActivitySummary = ({
 /**
  * The timeline: the steps, in the order they were given, behind the header.
  *
- * It hangs under the title with a rule on the left, so a run reads as a header with its
- * steps attached rather than as a list that happens to have a heading. The steps keep
- * their own rows, so a Tool Call inside it still opens its own detail.
+ * It is indented under the title and draws no rule. The indent is what attaches the steps
+ * to their header; a rule on top of it is one more line beside every row, and the rows
+ * already carry their own icons. The steps keep their own rows, so a Tool Call inside it
+ * still opens its own detail.
  */
 export const AgentActivityContent = ({
   children,
@@ -358,10 +359,7 @@ export const AgentActivityContent = ({
     <AgentDisclosure id={contentId} open={isOpen}>
       <div
         {...props}
-        className={cn(
-          "ml-2.5 flex flex-col gap-3 border-border border-l py-3 pl-4",
-          className
-        )}
+        className={cn("flex flex-col gap-3 py-3 pl-4", className)}
         data-slot="agent-activity-content"
       >
         {children}
