@@ -1,0 +1,131 @@
+---
+title: Gradient Cover
+description: "Generated cover art for the things that never get art of their own: blurred colour fields, a hairline pattern and grain, drawn from a seed so the same id always gets the same cover."
+---
+
+import {
+  GradientCoverDemo,
+  GradientCoverFanDemo,
+  GradientCoverMatrixDemo,
+  GradientCoverSeedDemo,
+} from "@/examples/gradient-cover";
+
+<ComponentPreview name="gradient-cover">
+  <GradientCoverDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif.sweetretry.com/r/gradient-cover.json
+```
+
+## Usage
+
+```tsx
+import {
+  GradientCover,
+  GradientCoverTitle,
+} from "@/components/ui/motif/gradient-cover";
+
+export function CollectionCard({ collection }) {
+  return (
+    <GradientCover seed={collection.id}>
+      <GradientCoverTitle>{collection.name}</GradientCoverTitle>
+    </GradientCover>
+  );
+}
+```
+
+`seed` is the only required prop. It is what the cover is for, an id or a title, and the
+same seed always draws the same art: on the server, on the client and next week. Leave
+`palette` and `pattern` out and the seed picks both.
+
+## Where it fits
+
+Anything that wants a cover and will not get one uploaded.
+
+- Collections, playlists, newsletters, courses. The grid above.
+- Projects, workspaces, channels. A 40px square in a list row, where a coloured initial
+  would otherwise go.
+- Starting points in an empty state. The art feeds a [Cover Fan](/docs/agents/cover-fan)
+  through `gradientCoverUrl`.
+- A placeholder while real art loads, or for the items whose art never arrives.
+- Social and Open Graph images, from the same string on the server.
+
+## Variants
+
+Two axes, chosen independently. Three palettes set the colour: warm, cool and violet. Four patterns set the line
+work over it. `plain` is colour and grain alone.
+
+<GradientCoverMatrixDemo />
+
+Every pattern draws the same white hairline under the same fade, so swapping one for
+another changes the drawing and never the weight of the cover. A row of mixed patterns
+still reads as one set.
+
+| Pattern  | Draws                                                      |
+| -------- | ---------------------------------------------------------- |
+| `plain`  | Nothing. Colour and grain                                  |
+| `waves`  | Near-parallel lines whose swell grows down the cover       |
+| `dots`   | A fixed grid of dots                                       |
+| `petals` | Leaf outlines scattered across the cover and off its edges |
+
+## Seeds
+
+The seed moves the colour fields, and the point the line work fades
+from. A grid of one palette and one pattern still reads as different things.
+
+<GradientCoverSeedDemo />
+
+Both picks are drawn from the seed even when the caller fixes them. Naming a palette does
+not shift every later random number, so fixing one axis never redraws the other.
+
+## As an image source
+
+`gradientCoverUrl` returns the cover as a `data:` URI, for anything that takes a `src`.
+`gradientCoverSvg` returns the SVG document itself.
+
+```tsx
+import { gradientCoverUrl } from "@/components/ui/motif/gradient-cover";
+
+const items = starters.map((starter) => ({
+  id: starter.id,
+  title: starter.title,
+  src: gradientCoverUrl({ seed: starter.id, palette: "lagoon" }),
+}));
+
+<CoverFan items={items} onSelect={start} />;
+```
+
+<GradientCoverFanDemo />
+
+## Anatomy
+
+| Part                 | Renders                                                     |
+| -------------------- | ----------------------------------------------------------- |
+| `GradientCover`      | The art filling the box, and its children centred on top    |
+| `GradientCoverTitle` | White type set on the art, sized to the cover through `cqw` |
+
+The root is square and `rounded-xl` by default. A class decides any other shape, and the
+art crops to fill it: `className="aspect-video"` for a banner, `size-10` for an avatar.
+With no children it is the art alone.
+
+The art is one SVG. Five colour fields under one blur, the pattern faded from a seeded
+point, and grain over everything, line work included, so the lines sit in the print rather
+than on it. It is decorative: the art is `aria-hidden`, and the title names the cover.
+
+## Colour
+
+The palettes are literal hex, not theme tokens. A cover is artwork measured against
+itself, and it should look the same in dark mode as in light. The title is literal white
+for the same reason, with a soft shadow that keeps it legible over the palettes' light
+corners.
+
+## Component source
+
+<ComponentSource
+  name="gradient-cover"
+  src="registry/new-york/gradient-cover.tsx"
+  title="gradient-cover.tsx"
+/>

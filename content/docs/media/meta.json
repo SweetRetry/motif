@@ -10,6 +10,7 @@
     "generation-overlay",
     "flow-edge",
     "video-preview",
-    "compare"
+    "compare",
+    "gradient-cover"
   ]
 }

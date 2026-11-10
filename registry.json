@@ -643,6 +643,19 @@
       ]
     },
     {
+      "name": "gradient-cover",
+      "type": "registry:ui",
+      "title": "Gradient Cover",
+      "description": "Generated cover art for the things that never get art of their own: blurred colour fields, a hairline pattern and grain, drawn from a seed so the same id always gets the same cover.",
+      "files": [
+        {
+          "path": "registry/new-york/gradient-cover.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/motif/gradient-cover.tsx"
+        }
+      ]
+    },
+    {
       "name": "skill-detail",
       "type": "registry:ui",
       "title": "Skill Detail",
