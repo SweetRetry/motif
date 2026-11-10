@@ -70,7 +70,7 @@
       "name": "loading-state",
       "type": "registry:ui",
       "title": "Loading State",
-      "description": "A wait, said once: a 3×3 mark with a diagonal wave, a word for what the agent is doing, and a count of how long it has been.",
+      "description": "A wait, said once: a 3\u00d73 mark with a diagonal wave, a word for what the agent is doing, and a count of how long it has been.",
       "dependencies": ["motion"],
       "files": [
         {
@@ -483,6 +483,36 @@
       ]
     },
     {
+      "name": "diff",
+      "type": "registry:ui",
+      "title": "Diff",
+      "description": "One file's change, read the way a reviewer reads it: from a patch or from the text before and after, added lines in success, removed in destructive, the words an edited line changed marked within it.",
+      "dependencies": ["diff"],
+      "files": [
+        {
+          "path": "registry/new-york/agents/diff/index.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/motif/diff/index.tsx"
+        },
+        {
+          "path": "registry/new-york/agents/diff/read.ts",
+          "type": "registry:ui",
+          "target": "@components/ui/motif/diff/read.ts"
+        }
+      ],
+      "cssVars": {
+        "theme": {
+          "color-success": "var(--success)"
+        },
+        "light": {
+          "success": "oklch(0.535 0.179 155.331)"
+        },
+        "dark": {
+          "success": "oklch(0.696 0.17 162.48)"
+        }
+      }
+    },
+    {
       "name": "generation-overlay",
       "type": "registry:ui",
       "title": "Generation Overlay",
@@ -500,7 +530,7 @@
       "name": "flow-edge",
       "type": "registry:ui",
       "title": "Flow Edge",
-      "description": "A bezier connector that carries a pulse of light from one end to the other while work is in flight — bright in the middle, faded at both ends — and rests as a plain line when it is not.",
+      "description": "A bezier connector that carries a pulse of light from one end to the other while work is in flight \u2014 bright in the middle, faded at both ends \u2014 and rests as a plain line when it is not.",
       "dependencies": ["motion"],
       "files": [
         {
@@ -659,7 +689,7 @@
       "name": "skill-detail",
       "type": "registry:ui",
       "title": "Skill Detail",
-      "description": "A skill's detail surface: a card that opens it, and a panel that says what it is, what it is for, and what is inside it. A cover rail with the name and the one action over it, then a workspace of what the skill makes and a file tree whose preview is your renderer — with only the toolbar controls you wired up.",
+      "description": "A skill's detail surface: a card that opens it, and a panel that says what it is, what it is for, and what is inside it. A cover rail with the name and the one action over it, then a workspace of what the skill makes and a file tree whose preview is your renderer \u2014 with only the toolbar controls you wired up.",
       "dependencies": ["lucide-react", "motion", "radix-ui"],
       "registryDependencies": ["button", "dialog", "switch"],
       "files": [
@@ -694,7 +724,7 @@
       "name": "agent-run",
       "type": "registry:block",
       "title": "Agent Run",
-      "description": "A whole agent run for a page: a thread that follows its own tail, turns that carry reasoning, tool calls and approvals, and a composer that holds files and a model. Assembled from conversation, message, agent-activity, tool-call, source, approval-card, question-card, loading-state, context-usage and prompt-input.",
+      "description": "A whole agent run for a page: a thread that follows its own tail, turns that carry reasoning, tool calls and approvals, and a composer that holds files and a model. Assembled from conversation, message, agent-activity, tool-call, diff, source, approval-card, question-card, loading-state, context-usage and prompt-input.",
       "dependencies": ["lucide-react", "streamdown"],
       "registryDependencies": [
         "button",
@@ -712,6 +742,7 @@
         "https://motif.sweetretry.com/r/prompt-input.json",
         "https://motif.sweetretry.com/r/scroll-rail.json",
         "https://motif.sweetretry.com/r/tool-call.json",
+        "https://motif.sweetretry.com/r/diff.json",
         "https://motif.sweetretry.com/r/loading-state.json"
       ],
       "files": [

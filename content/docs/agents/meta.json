@@ -5,6 +5,7 @@
     "message",
     "thinking-block",
     "tool-call",
+    "diff",
     "source",
     "agent-activity",
     "loading-state",

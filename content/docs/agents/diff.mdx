@@ -1,0 +1,170 @@
+---
+title: Diff
+description: "One file's change, read the way a reviewer reads it: added lines in success, removed in destructive, the context as it was, with the path and a +/− count above."
+---
+
+import {
+  DiffDemo,
+  DiffFilesDemo,
+  DiffProseDemo,
+  DiffToolCallDemo,
+} from "@/examples/diff";
+
+<ComponentPreview name="diff">
+  <DiffDemo />
+</ComponentPreview>
+
+## Installation
+
+```bash
+npx shadcn@latest add https://motif.sweetretry.com/r/diff.json
+```
+
+## Usage
+
+```tsx
+import {
+  Diff,
+  DiffContent,
+  DiffFile,
+  DiffHeader,
+  DiffStat,
+} from "@/components/ui/motif/diff";
+
+export function FileChange({ patch }) {
+  return (
+    <Diff patch={patch}>
+      <DiffHeader>
+        <DiffFile />
+        <DiffStat />
+      </DiffHeader>
+      <DiffContent />
+    </Diff>
+  );
+}
+```
+
+A diff is what an edit amounts to, and the reader reads it to decide whether to let it stand.
+So it is drawn the way a reviewer reads one: what went in, what came out, and the lines
+around them as they were. It takes the change in either shape agent tools hand it over in, a
+patch or the text before and after.
+
+| Part           | Draws                                                                         |
+| -------------- | ----------------------------------------------------------------------------- |
+| `Diff`         | The frame, a border and no fill. Reads `patch`, or `before` and `after`, once |
+| `DiffHeader`   | The row above the lines. Nothing while it holds nothing                       |
+| `DiffFile`     | The path, from the patch's `+++` line or the `file` prop                      |
+| `DiffStat`     | `+4 −1`. A side with nothing on it is left out                                |
+| `DiffContent`  | The lines: number, marker, text                                               |
+| `useDiff`      | The parsed lines, the counts and the path, for a part of your own             |
+| `parsePatch`   | The same read of a patch without the drawing, for a list that sums them       |
+| `compareTexts` | The same for a before and after                                               |
+
+## Two inputs
+
+Pass one or the other, never both.
+
+```tsx
+<Diff patch={call.patch}>…</Diff>
+
+<Diff before={call.old_string} after={call.new_string} firstLine={call.line}>
+  …
+</Diff>
+```
+
+`before` and `after` are what most edit tools take, the text they found and the text they put
+in its place. The diff is worked out with [jsdiff](https://github.com/kpdecker/jsdiff), which
+the item installs. Unchanged stretches longer than three lines either side of a change fold to
+a marker row, so a one-line edit in a long file is a few lines to read.
+
+`firstLine` is where `before` starts in its file. Without it the lines are not numbered,
+because an edit tool's snippet counts from its own first line and the file does not. Pass `1`
+when `before` is the whole file.
+
+## The patch is text
+
+`patch` is unified diff text, the format `git diff` writes and the one agent edit tools hand
+back. Nothing has to be converted first.
+
+- A file header (`diff --git`, `index`, `--- a/…`, `+++ b/…`) is read for the path and is not
+  drawn. To anything counting first characters it looks like one removal and one addition, and
+  the count would be wrong by two on every file.
+- A hunk header with numbers, `@@ -12,8 +12,13 @@`, gives each line its number. A patch without
+  one draws no gutter rather than a column of guesses.
+- A bare run of `+`, `-` and space-led lines is a patch too. That is what most edit tools return.
+- `\ No newline at end of file` is about the bytes, not the code, and is dropped.
+
+The marker is drawn in a column of its own and cannot be selected, so a line copied out of the
+diff is code, not patch.
+
+## Words within a line
+
+A removal followed by an addition is usually one line edited, not two unrelated lines. Each
+removed line is paired with the added line in the same place after it, and when the pair
+shares at least half its text, the words that changed are marked on a stronger tint. A pair
+that shares less is drawn whole, since marking nearly every word marks nothing.
+
+This is what makes the diff readable on prose. A Markdown paragraph is one line, and without
+it a single changed word turns the whole paragraph red and then green.
+
+<ComponentPreview name="diff" align="start">
+  <DiffProseDemo />
+</ComponentPreview>
+
+It works the same for a patch and for a before and after, and for any text file: code,
+Markdown, JSON, config.
+
+## In a tool call
+
+The row of a [Tool Call](/docs/agents/tool-call) already names the file, so the detail behind
+it is the lines alone.
+
+<ComponentPreview name="diff" align="start">
+  <DiffToolCallDemo />
+</ComponentPreview>
+
+```tsx
+<ToolCallContent>
+  <Diff after={call.new_string} before={call.old_string}>
+    <DiffContent />
+  </Diff>
+</ToolCallContent>
+```
+
+The [Agent Run](/agent-run) block draws its `edit_file` rows this way. A host that names its
+edit tool differently passes the same detail through `tools`.
+
+## A list of files
+
+A list of what changed is the header alone, once per patch. Leave the lines out and they are
+not drawn.
+
+<ComponentPreview name="diff" align="start">
+  <DiffFilesDemo />
+</ComponentPreview>
+
+## Colour
+
+Added lines are `success` and removed lines are `destructive`, each over a tenth of its own
+colour, and a changed word over a quarter, so a theme that changes either changes the diff. `success` is not in the default shadcn
+theme, so the item adds it to `:root`, `.dark` and `@theme` when you install it.
+
+## Accessibility
+
+The lines are a `pre`, so a screen reader reads them as text. The `+` and `-` markers are read
+with each line, because colour alone does not say which side a line is on. Line numbers are
+hidden from assistive tech. `DiffStat` is labelled in words, "4 added, 1 removed".
+
+## Component source
+
+<ComponentSource
+  name="diff"
+  src="registry/new-york/agents/diff/index.tsx"
+  title="index.tsx"
+/>
+
+<ComponentSource
+  name="diff"
+  src="registry/new-york/agents/diff/read.ts"
+  title="read.ts"
+/>

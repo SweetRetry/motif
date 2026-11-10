@@ -44,6 +44,10 @@ _Avoid_: tool card、tool block、action、function call
 一次 tool call 所处的位置，只有四个词：`queued` 没开始、`running` 在跑、`done` 回来了、`failed` 没回来。
 _Avoid_: pending、success、error、loading
 
+**Diff**（差异）：
+一个文件的一次改动，画成审阅者读它的样子：加的行是 `success`，删的行是 `destructive`，上下文原样。它读的输入叫 patch，即 unified diff 文本。
+_Avoid_: patch view、code change、changeset（那是一组文件的改动，见路线图的 Changes）
+
 **Agent activity**（运行活动）：
 一次运行的整块：头部一行，下面是它走过的步骤。运行中头部是等待态加计时，时间线展开；结束后头部收成一行"Worked for 42s"，时间线折起。读者按过头部之后，折叠归读者，运行结束不再动它。
 _Avoid_: run log、trace、timeline card、steps panel

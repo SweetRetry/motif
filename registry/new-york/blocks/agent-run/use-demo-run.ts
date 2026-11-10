@@ -85,7 +85,9 @@ const CITED: RunSource[] = [FOUND[0], FOUND[2]];
 
 const ANSWER_REJECTED = `Understood, I left \`thread.tsx\` alone. The reads are in the log above if you want to look at what I found before I try another way.`;
 
-const EDIT_PATCH = `@@ components/thread.tsx @@
+const EDIT_PATCH = `--- a/components/thread.tsx
++++ b/components/thread.tsx
+@@ -18,3 +18,6 @@ export const Thread = () => {
    useLayoutEffect(() => {
 -    end.current?.scrollIntoView({ behavior: "smooth" });
 +    const viewport = scroller.current;

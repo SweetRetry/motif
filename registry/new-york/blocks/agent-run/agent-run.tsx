@@ -40,6 +40,7 @@ import {
   ConversationScrollButton,
   useConversation,
 } from "@/components/ui/motif/conversation";
+import { Diff, DiffContent } from "@/components/ui/motif/diff";
 import {
   LoadingState,
   LoadingStateLabel,
@@ -428,28 +429,6 @@ const Sources = ({
   </SourceList>
 );
 
-/** A patch, line by line: what it adds in `success`, what it takes out in
- *  `destructive`, the context as it was. */
-const Patch = ({ text }: { text: string }) => (
-  <pre className="max-h-64 overflow-auto rounded-md border border-border py-2 font-mono text-xs leading-normal">
-    {text.split("\n").map((line, index) => (
-      <span
-        className={cn(
-          "block px-3 whitespace-pre-wrap break-words",
-          line.startsWith("+") && "bg-success/10 text-success",
-          line.startsWith("-") && "bg-destructive/10 text-destructive",
-          line.startsWith("@@") && "text-muted-foreground"
-        )}
-        // Lines of a patch repeat, and they never move: the index is their identity.
-        // oxlint-disable-next-line react/no-array-index-key
-        key={index}
-      >
-        {line || " "}
-      </span>
-    ))}
-  </pre>
-);
-
 /* -- What a step is called, and what it shows ----------------------------------
  * A finished timeline is almost all "done". A check on every row repeats the one thing
  * the reader already knows, so a done row carries the kind of thing it was, a file, a
@@ -488,7 +467,12 @@ export interface RunTool {
 export const RUN_TOOLS: Record<string, RunTool> = {
   edit_file: {
     base: "edit",
-    detail: (step) => (step.input ? <Patch text={step.input} /> : null),
+    detail: (step) =>
+      step.input ? (
+        <Diff patch={step.input}>
+          <DiffContent />
+        </Diff>
+      ) : null,
     icon: Pencil,
     past: "Edited",
     present: "Editing",
