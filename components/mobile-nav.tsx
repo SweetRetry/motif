@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
+import { NewBadge } from "@/components/new-badge";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -56,7 +57,7 @@ const MobileNavGroup = ({
   setOpen,
 }: {
   label: React.ReactNode;
-  pages: { url: string; name: React.ReactNode }[];
+  pages: { url: string; name: React.ReactNode; isNew?: true }[];
   setOpen: (open: boolean) => void;
 }) => {
   if (pages.length === 0) {
@@ -67,8 +68,14 @@ const MobileNavGroup = ({
       <div className="text-muted-foreground text-sm font-medium">{label}</div>
       <div className="flex flex-col gap-3">
         {pages.map((page) => (
-          <MobileLink key={page.url} href={page.url} onOpenChange={setOpen}>
+          <MobileLink
+            className="flex items-center gap-2"
+            key={page.url}
+            href={page.url}
+            onOpenChange={setOpen}
+          >
             {page.name}
+            {page.isNew && <NewBadge />}
           </MobileLink>
         ))}
       </div>

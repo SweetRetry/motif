@@ -5,6 +5,7 @@ import {
   metaSchema,
 } from "fumadocs-mdx/config";
 import { rehypePrettyCode } from "rehype-pretty-code";
+import { z } from "zod";
 
 import { DOCS_DIR } from "@/lib/docs";
 import { transformers } from "@/lib/highlight-code";
@@ -35,7 +36,10 @@ export const docs = defineDocs({
     postprocess: {
       includeProcessedMarkdown: true,
     },
-    schema: frontmatterSchema,
+    /* `added` is the day the page first shipped. The sidebar flags a page as new
+     * for a while after it, so the flag expires on its own instead of being
+     * remembered and removed by hand. */
+    schema: frontmatterSchema.extend({ added: z.iso.date() }),
   },
   meta: {
     schema: metaSchema,

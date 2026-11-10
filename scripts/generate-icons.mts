@@ -4,10 +4,12 @@
  *
  *   pnpm icons
  *
- * The SVG favicons are the bare mark, one per tab theme. Every raster fallback puts it
- * on a dark tile instead: a PNG cannot follow the tab's theme, and a bare mark in
- * either colour vanishes on a tab of the same colour. The rasters are drawn by
- * `next/og`, the renderer the OG images use, and the ICO wraps them as PNG entries.
+ * Every favicon puts the mark on a dark tile. A bare mark has to guess the tab's
+ * colour, and `prefers-color-scheme` is the OS's scheme, not the tab strip's: a dark
+ * OS with a light browser theme drew the light mark on a white tab, where it
+ * vanished. The tile carries its own background, so it reads on any tab. The
+ * rasters are drawn by `next/og`, the renderer the OG images use, and the ICO wraps
+ * them as PNG entries.
  */
 
 import { writeFileSync } from "node:fs";
@@ -16,7 +18,7 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og.js";
 import { createElement } from "react";
 
-import { LOGO_DOTS, LOGO_SIZE, logoMarkSvg } from "../constants/logo-mark.ts";
+import { LOGO_DOTS, LOGO_SIZE } from "../constants/logo-mark.ts";
 
 const PUBLIC = join(import.meta.dirname, "..", "public");
 
@@ -71,18 +73,10 @@ const write = (file: string, data: Buffer | string) => {
   console.log(`icons: public/${file}`);
 };
 
-// The light favicon also follows the theme itself, for browsers that skip `media`.
-write(
-  "favicon.svg",
-  logoMarkSvg(INK).replace(
-    "<circle",
-    `<style>svg{fill:${INK}}@media (prefers-color-scheme:dark){svg{fill:${PAPER}}}</style><circle`
-  )
-);
-write("favicon-dark.svg", logoMarkSvg(PAPER));
-
 const SMALL = tile({ radius: 0.22, scale: 0.78 });
 const LARGE = tile({ radius: 0.22, scale: 0.62 });
+
+write("favicon.svg", SMALL);
 
 const small = await Promise.all(
   [16, 32, 48].map(async (size) => ({ data: await png(SMALL, size), size }))

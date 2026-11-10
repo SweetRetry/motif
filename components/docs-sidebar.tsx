@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 
+import { NewBadge } from "@/components/new-badge";
 import {
   Sidebar,
   SidebarContent,
@@ -33,6 +34,7 @@ const MENU_BUTTON_CLS =
 interface SidebarLink {
   url: string;
   name: React.ReactNode;
+  isNew?: true;
 }
 
 type TransitionTypesByUrl = Map<string, string[]>;
@@ -120,6 +122,7 @@ const SidebarPageGroup = ({
                 >
                   <span className="absolute inset-0 flex w-(--sidebar-menu-width) bg-transparent" />
                   {page.name}
+                  {page.isNew && <NewBadge />}
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

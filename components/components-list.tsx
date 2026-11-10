@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { NewBadge } from "@/components/new-badge";
 import { ROUTES } from "@/constants/routes";
 import { isComponentsFolder } from "@/lib/docs";
 import type { PageTreeFolder, PageTreePage } from "@/lib/page-tree";
@@ -24,6 +25,7 @@ const ComponentGrid = ({ pages }: { pages: PageTreePage[] }) => (
         transitionTypes={["nav-forward"]}
       >
         {component.name}
+        {component.isNew && <NewBadge />}
       </Link>
     ))}
   </div>
