@@ -12,7 +12,7 @@ import {
   Wrench,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Streamdown } from "streamdown";
 
@@ -160,14 +160,16 @@ export interface RunToolStep {
   answers?: RunAnswers;
   /** What it failed with. Drawn in the detail, so a failed row can be opened. */
   error?: string;
-  /** The arguments, as text. */
+  /** The arguments, as the tool took them. For an edit, the patch it applies. */
   input?: string;
+  /** What came back, in a few words, written at the end of the row: `212 lines`,
+   *  `12 passed`, `+9 −5`. The one thing about the result most readers want. */
+  outcome?: string;
   /** What the agent is asking. Makes the step a question. */
   questions?: RunQuestion[];
-  /** The result, as text. */
+  /** What came back, in full, as the tool returned it. */
   result?: string;
-  /** The pages a search found. When there are any they are the detail, as tags, in place
-   *  of the raw input and result. */
+  /** The pages a search found. */
   sources?: RunSource[];
   status: ToolCallStatusValue;
   /** The gist of the input, one line. */
@@ -234,6 +236,11 @@ export interface AgentRunProps {
   /** A run is in flight: the composer swaps send for stop and blocks Enter. */
   streaming?: boolean;
   title?: string;
+  /** How to present tools, by name, laid over `RUN_TOOLS` field by field: the verbs a
+   *  row is written in and what it opens onto. Leave it out and the shipped table
+   *  decides; a tool neither knows reads `Ran <name>` and opens onto its raw input and
+   *  result. */
+  tools?: Record<string, Partial<RunTool>>;
   turns: RunTurn[];
   /** What is in the window. Omit it and the composer draws no ring. */
   usage?: RunUsage;
@@ -421,41 +428,29 @@ const Sources = ({
   </SourceList>
 );
 
-/** What sits behind a call's row: the pages it found, or the raw arguments and result. */
-const ToolDetail = ({ step }: { step: RunToolStep }) => {
-  const found = step.sources?.length ?? 0;
-  const empty = !(found || step.input || step.result || step.error);
+/** A patch, line by line: what it adds in `success`, what it takes out in
+ *  `destructive`, the context as it was. */
+const Patch = ({ text }: { text: string }) => (
+  <pre className="max-h-64 overflow-auto rounded-md border border-border py-2 font-mono text-xs leading-normal">
+    {text.split("\n").map((line, index) => (
+      <span
+        className={cn(
+          "block px-3 whitespace-pre-wrap break-words",
+          line.startsWith("+") && "bg-success/10 text-success",
+          line.startsWith("-") && "bg-destructive/10 text-destructive",
+          line.startsWith("@@") && "text-muted-foreground"
+        )}
+        // Lines of a patch repeat, and they never move: the index is their identity.
+        // oxlint-disable-next-line react/no-array-index-key
+        key={index}
+      >
+        {line || " "}
+      </span>
+    ))}
+  </pre>
+);
 
-  if (empty) {
-    return null;
-  }
-
-  // What the call produced is the detail when it has a shape of its own: a search is the
-  // pages. The raw arguments are the fallback.
-  const body = found ? (
-    <ToolCallSection title={`${found} results`}>
-      <Sources sources={step.sources ?? []} />
-    </ToolCallSection>
-  ) : (
-    <>
-      <ToolCallSection title="Input">{step.input}</ToolCallSection>
-      <ToolCallSection title="Result">{step.result}</ToolCallSection>
-    </>
-  );
-
-  return (
-    <ToolCallContent>
-      {body}
-      {step.error ? (
-        <ToolCallSection title="Error">
-          <p className="text-destructive text-xs">{step.error}</p>
-        </ToolCallSection>
-      ) : null}
-    </ToolCallContent>
-  );
-};
-
-/* -- What a step is called -----------------------------------------------------
+/* -- What a step is called, and what it shows ----------------------------------
  * A finished timeline is almost all "done". A check on every row repeats the one thing
  * the reader already knows, so a done row carries the kind of thing it was, a file, a
  * search, an edit, and the tense of its verb says the rest. The status shape is kept for
@@ -465,11 +460,23 @@ const ToolDetail = ({ step }: { step: RunToolStep }) => {
  * a sentence. `Read 2 files` and `Searched 1 query` are what a batch of calls amounts
  * to, and the same table writes them. A tool the table has not heard of reads as `Ran`
  * with its own name, so a new tool is legible before it is dressed.
+ *
+ * The same table decides what a row opens onto, because what is worth reading depends on
+ * the kind of call, not on whether there is data. The agent read a file: the file is the
+ * reader's own, so the row says how long it was and opens onto nothing. It searched: the
+ * matches are the point. It edited: the patch is what the reader approves. It ran the
+ * tests: the count is enough unless they failed. The raw arguments and result are what
+ * a tool the table does not know falls back to, since then there is nothing better.
  * --------------------------------------------------------------------------- */
 
-interface Verb {
+/** How the run presents one kind of tool: the words its row is written in, and what
+ *  the row opens onto. */
+export interface RunTool {
   /** The infinitive, for a call that failed: `Failed to read`. */
   base: string;
+  /** What the row opens onto, picked for the reader from the step's data. `null` when
+   *  nothing is worth opening, and the row draws no chevron. */
+  detail: (step: RunToolStep) => ReactNode;
   icon: LucideIcon;
   past: string;
   present: string;
@@ -477,9 +484,11 @@ interface Verb {
   unit: [string, string];
 }
 
-const VERBS: Record<string, Verb> = {
+/** The tools the run knows out of the box. A host lays its own over them with `tools`. */
+export const RUN_TOOLS: Record<string, RunTool> = {
   edit_file: {
     base: "edit",
+    detail: (step) => (step.input ? <Patch text={step.input} /> : null),
     icon: Pencil,
     past: "Edited",
     present: "Editing",
@@ -487,6 +496,8 @@ const VERBS: Record<string, Verb> = {
   },
   grep: {
     base: "search",
+    detail: (step) =>
+      step.result ? <ToolCallSection>{step.result}</ToolCallSection> : null,
     icon: Search,
     past: "Searched",
     present: "Searching",
@@ -494,6 +505,7 @@ const VERBS: Record<string, Verb> = {
   },
   read_file: {
     base: "read",
+    detail: () => null,
     icon: FileText,
     past: "Read",
     present: "Reading",
@@ -501,6 +513,10 @@ const VERBS: Record<string, Verb> = {
   },
   run_tests: {
     base: "run",
+    detail: (step) =>
+      step.status === "failed" && step.result ? (
+        <ToolCallSection>{step.result}</ToolCallSection>
+      ) : null,
     icon: Terminal,
     past: "Ran",
     present: "Running",
@@ -508,6 +524,8 @@ const VERBS: Record<string, Verb> = {
   },
   web_search: {
     base: "search",
+    detail: (step) =>
+      step.sources?.length ? <Sources sources={step.sources} /> : null,
     icon: Search,
     past: "Searched",
     present: "Searching",
@@ -515,21 +533,69 @@ const VERBS: Record<string, Verb> = {
   },
 };
 
-const FALLBACK: Verb = {
+const FALLBACK: RunTool = {
   base: "run",
+  detail: (step) =>
+    step.input || step.result ? (
+      <>
+        <ToolCallSection title="Input">{step.input}</ToolCallSection>
+        <ToolCallSection title="Result">{step.result}</ToolCallSection>
+      </>
+    ) : null,
   icon: Wrench,
   past: "Ran",
   present: "Running",
   unit: ["call", "calls"],
 };
 
-const verbOf = (step: RunToolStep) => VERBS[step.name] ?? FALLBACK;
+/** No overrides, as one object, so the provider's value does not change every render. */
+const NO_TOOLS: Record<string, Partial<RunTool>> = {};
+
+/** What the host laid over the shipped table, by tool name. */
+const ToolsContext = createContext<Record<string, Partial<RunTool>>>({});
+
+/** Looks a tool up: the host's entry over the shipped one over the fallback, field by
+ *  field, so a host can change only what a row opens onto and keep its words. `known`
+ *  says whether anyone described the tool, which decides whether its row needs the raw
+ *  name to be legible. */
+const useToolOf = () => {
+  const overrides = useContext(ToolsContext);
+
+  return (name: string) => {
+    const shipped = RUN_TOOLS[name];
+    const override = overrides[name];
+
+    return {
+      known: Boolean(shipped ?? override),
+      tool: { ...(shipped ?? FALLBACK), ...override } as RunTool,
+    };
+  };
+};
 
 const isNote = (step: RunStep): step is RunNote => "note" in step;
 
+/** What sits behind a call's row: what that kind of call picked to show, and why it
+ *  failed when it did. Nothing picked and nothing failed, the row has no detail and
+ *  draws no chevron. */
+const ToolDetail = ({ step }: { step: RunToolStep }) => {
+  const shown = useToolOf()(step.name).tool.detail(step);
+
+  if (!(shown || step.error)) {
+    return null;
+  }
+
+  return (
+    <ToolCallContent>
+      {shown}
+      {step.error ? (
+        <p className="text-destructive text-xs">{step.error}</p>
+      ) : null}
+    </ToolCallContent>
+  );
+};
+
 /** The verb a row opens with, in the tense its status is in. */
-const phraseOf = (step: RunToolStep) => {
-  const verb = verbOf(step);
+const phraseOf = (step: RunToolStep, verb: RunTool) => {
   if (step.status === "done") {
     return verb.past;
   }
@@ -558,8 +624,7 @@ const Lead = ({
 
 /** One call, as a sentence: `Read  components/conversation.tsx`. */
 const StepRow = ({ step }: { step: RunToolStep }) => {
-  const verb = verbOf(step);
-  const known = step.name in VERBS;
+  const { known, tool: verb } = useToolOf()(step.name);
 
   return (
     <ToolCall status={step.status}>
@@ -570,11 +635,16 @@ const StepRow = ({ step }: { step: RunToolStep }) => {
           word={step.status === "approval" ? "Waiting for approval" : undefined}
         />
         <ToolCallName className="font-normal font-sans text-muted-foreground text-sm">
-          {phraseOf(step)}
+          {phraseOf(step, verb)}
         </ToolCallName>
         <ToolCallSummary className="text-sm">
           {step.summary ?? (known ? undefined : step.name)}
         </ToolCallSummary>
+        {step.outcome ? (
+          <span className="shrink-0 text-muted-foreground/70 text-xs tabular-nums">
+            {step.outcome}
+          </span>
+        ) : null}
       </ToolCallHeader>
       <ToolDetail step={step} />
     </ToolCall>
@@ -584,9 +654,13 @@ const StepRow = ({ step }: { step: RunToolStep }) => {
 /** A settled batch of calls as one line: `Read 2 files, searched 1 query`. Closed, because
  *  the line is the point; the calls are there for the reader who doubts it. */
 const Batch = ({ steps }: { steps: RunToolStep[] }) => {
-  const counts = new Map<string, { n: number; verb: Verb }>();
+  const toolOf = useToolOf();
+  const counts = new Map<string, { n: number; verb: RunTool }>();
   for (const step of steps) {
-    const entry = counts.get(step.name) ?? { n: 0, verb: verbOf(step) };
+    const entry = counts.get(step.name) ?? {
+      n: 0,
+      verb: toolOf(step.name).tool,
+    };
     entry.n += 1;
     counts.set(step.name, entry);
   }
@@ -606,7 +680,7 @@ const Batch = ({ steps }: { steps: RunToolStep[] }) => {
       status="done"
     >
       <ToolCallHeader>
-        <Lead icon={verbOf(steps[0]).icon} status="done" />
+        <Lead icon={toolOf(steps[0].name).tool.icon} status="done" />
         <ToolCallName className="font-normal font-sans text-muted-foreground text-sm">
           {line}
         </ToolCallName>
@@ -1001,6 +1075,7 @@ export const AgentRun = ({
   onStop,
   streaming = false,
   title = "Agent run",
+  tools,
   turns,
   usage,
 }: AgentRunProps) => {
@@ -1059,80 +1134,82 @@ export const AgentRun = ({
   };
 
   return (
-    <div
-      className={cn("flex h-full min-h-0 flex-col bg-background", className)}
-      data-slot="agent-run"
-    >
-      <header className="flex h-14 shrink-0 items-center gap-4 border-b border-border px-4">
-        <h1 className="truncate text-sm font-medium">{title}</h1>
-        {onReset ? (
-          <Button
-            className="ml-auto"
-            onClick={onReset}
-            size="sm"
-            type="button"
-            variant="ghost"
-          >
-            New run
-          </Button>
-        ) : null}
-      </header>
-
-      <Conversation>
-        <Thread empty={empty} onRetry={onRetry} turns={turns} />
-      </Conversation>
-
-      <div className="shrink-0 px-4 pb-4">
-        <div className="mx-auto w-full max-w-3xl">
-          {blocked && held ? (
-            <Gate
-              onAnswer={onAnswer}
-              onDecide={onDecide}
-              onStop={onStop}
-              step={held}
-            />
+    <ToolsContext.Provider value={tools ?? NO_TOOLS}>
+      <div
+        className={cn("flex h-full min-h-0 flex-col bg-background", className)}
+        data-slot="agent-run"
+      >
+        <header className="flex h-14 shrink-0 items-center gap-4 border-b border-border px-4">
+          <h1 className="truncate text-sm font-medium">{title}</h1>
+          {onReset ? (
+            <Button
+              className="ml-auto"
+              onClick={onReset}
+              size="sm"
+              type="button"
+              variant="ghost"
+            >
+              New run
+            </Button>
           ) : null}
+        </header>
 
-          {/* Covered, not unmounted: what the reader had typed is still there when the gate
+        <Conversation>
+          <Thread empty={empty} onRetry={onRetry} turns={turns} />
+        </Conversation>
+
+        <div className="shrink-0 px-4 pb-4">
+          <div className="mx-auto w-full max-w-3xl">
+            {blocked && held ? (
+              <Gate
+                onAnswer={onAnswer}
+                onDecide={onDecide}
+                onStop={onStop}
+                step={held}
+              />
+            ) : null}
+
+            {/* Covered, not unmounted: what the reader had typed is still there when the gate
               is answered. `inert` takes it out of the tab order and away from assistive
               tech along with the pointer, which is what blocking means. */}
-          <div hidden={blocked} inert={blocked}>
-            <PromptInput
-              onStop={onStop}
-              onSubmit={submit}
-              streaming={streaming}
-            >
-              <PromptInputHeader>
-                {files.map(({ id, ...chip }) => (
-                  <PromptInputAttachment
-                    key={id}
-                    {...chip}
-                    onRemove={() => remove(id)}
+            <div hidden={blocked} inert={blocked}>
+              <PromptInput
+                onStop={onStop}
+                onSubmit={submit}
+                streaming={streaming}
+              >
+                <PromptInputHeader>
+                  {files.map(({ id, ...chip }) => (
+                    <PromptInputAttachment
+                      key={id}
+                      {...chip}
+                      onRemove={() => remove(id)}
+                    />
+                  ))}
+                </PromptInputHeader>
+
+                <PromptInputTextarea placeholder="Give the agent a task, or drop in a file." />
+
+                <PromptInputFooter>
+                  <PromptInputAttach onFiles={pick} />
+                  <ModelPicker
+                    models={models}
+                    onValueChange={onModelChange}
+                    value={model}
                   />
-                ))}
-              </PromptInputHeader>
-
-              <PromptInputTextarea placeholder="Give the agent a task, or drop in a file." />
-
-              <PromptInputFooter>
-                <PromptInputAttach onFiles={pick} />
-                <ModelPicker
-                  models={models}
-                  onValueChange={onModelChange}
-                  value={model}
-                />
-                {/* The ring and the send button are one group at the right edge; the
+                  {/* The ring and the send button are one group at the right edge; the
                   submit's own auto margin would otherwise leave the ring beside the
                   picker. */}
-                <div className="ml-auto flex items-center gap-1">
-                  {usage ? <Usage usage={usage} /> : null}
-                  <PromptInputSubmit className="ml-0" />
-                </div>
-              </PromptInputFooter>
-            </PromptInput>
+                  <div className="ml-auto flex items-center gap-1">
+                    {usage ? <Usage usage={usage} /> : null}
+                    <PromptInputSubmit className="ml-0" />
+                  </div>
+                </PromptInputFooter>
+              </PromptInput>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ToolsContext.Provider>
   );
 };

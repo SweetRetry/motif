@@ -85,9 +85,14 @@ const CITED: RunSource[] = [FOUND[0], FOUND[2]];
 
 const ANSWER_REJECTED = `Understood, I left \`thread.tsx\` alone. The reads are in the log above if you want to look at what I found before I try another way.`;
 
-const EDIT_INPUT = `{
-  "path": "components/thread.tsx"
-}`;
+const EDIT_PATCH = `@@ components/thread.tsx @@
+   useLayoutEffect(() => {
+-    end.current?.scrollIntoView({ behavior: "smooth" });
++    const viewport = scroller.current;
++    if (viewport && pinned.current) {
++      viewport.scrollTop = viewport.scrollHeight;
++    }
+   }, [turns]);`;
 
 const NOTE_MS = 40;
 const ANSWER_MS = 55;
@@ -144,14 +149,14 @@ const patchStep = (
   ),
 });
 
-/** A call that goes in running and comes back done. */
+/** A call that goes in running and comes back done, with its outcome in a few words and,
+ *  for the calls that have one, the full result. */
 const call = (
   id: string,
   name: string,
   summary: string,
-  input: string,
-  result: string,
-  found?: RunSource[]
+  outcome: string,
+  { found, result }: { found?: RunSource[]; result?: string } = {}
 ): Beat[] => [
   {
     apply: (turn) => withStep(turn, { id, name, status: "running", summary }),
@@ -159,7 +164,12 @@ const call = (
   },
   {
     apply: (turn) =>
-      patchStep(turn, id, { input, result, sources: found, status: "done" }),
+      patchStep(turn, id, {
+        outcome,
+        result,
+        sources: found,
+        status: "done",
+      }),
     ms: 250,
   },
 ];
@@ -234,23 +244,20 @@ const script = (id: string): Beat[] => [
     `${id}-read`,
     "read_file",
     "components/conversation.tsx",
-    `{ "path": "components/conversation.tsx" }`,
-    "212 lines. The viewport pins to the newest turn while the reader is at the end."
+    "212 lines"
   ),
   ...call(
     `${id}-read-thread`,
     "read_file",
     "components/thread.tsx",
-    `{ "path": "components/thread.tsx" }`,
-    "58 lines. Scrolls the newest turn into view on every change."
+    "58 lines"
   ),
   ...call(
     `${id}-search`,
     "web_search",
     "keep the newest message in view while it streams",
-    `{ "query": "keep the newest message in view while it streams" }`,
-    "3 results.",
-    FOUND
+    "3 results",
+    { found: FOUND }
   ),
   ...say(
     `${id}-n2`,
@@ -280,18 +287,14 @@ const afterAnswer = (id: string, answers: RunAnswers): Beat[] => [
     `${id}-n3`,
     "Thanks. Before I edit, let me see whether anything else scrolls the thread."
   ),
-  ...call(
-    `${id}-grep`,
-    "grep",
-    "scrollIntoView in components/",
-    `{ "pattern": "scrollIntoView", "path": "components/" }`,
-    "2 matches: thread.tsx:21, composer.tsx:44."
-  ),
+  ...call(`${id}-grep`, "grep", "scrollIntoView in components/", "2 matches", {
+    result: "components/thread.tsx:21\ncomponents/composer.tsx:44",
+  }),
   ...failing(
     `${id}-read-scroll`,
     "read_file",
     "components/thread-scroll.tsx",
-    "ENOENT: no such file or directory, open 'components/thread-scroll.tsx'"
+    "No such file."
   ),
   ...say(
     `${id}-n4`,
@@ -301,7 +304,7 @@ const afterAnswer = (id: string, answers: RunAnswers): Beat[] => [
     apply: (turn) =>
       withStep(turn, {
         id: `${id}-write`,
-        input: EDIT_INPUT,
+        input: EDIT_PATCH,
         name: "edit_file",
         status: "approval",
         summary: "components/thread.tsx",
@@ -329,7 +332,7 @@ const aftermath = (
         {
           apply: (turn) =>
             patchStep(turn, `${id}-write`, {
-              result: "Edited 1 file, +9 −5.",
+              outcome: "+4 −1",
               status: "done",
             }),
           ms: 250,
@@ -338,8 +341,7 @@ const aftermath = (
           `${id}-test`,
           "run_tests",
           "components/thread.test.tsx",
-          `{ "path": "components/thread.test.tsx" }`,
-          "12 passed."
+          "12 passed"
         ),
         finish(CITED),
         ...words(answerText(follow), ANSWER_MS, 1),

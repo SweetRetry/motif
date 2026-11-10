@@ -331,8 +331,10 @@ export const ToolCallSummary = ({
 /**
  * The detail: what the call was given and what came back, behind the row.
  *
- * It indents under the status with a rule on the left, so a stack of calls reads as rows
- * with detail hanging off them rather than as one block of text.
+ * It indents to where the name starts, past the status, and draws no rule of its own. A
+ * call usually sits inside something that already hangs from a rule (an activity's
+ * timeline, a batch of calls), and a rule per level stacks into a row of parallel lines
+ * that says nothing the indent does not.
  */
 export const ToolCallContent = ({
   children,
@@ -349,10 +351,7 @@ export const ToolCallContent = ({
     <AgentDisclosure id={contentId} open={isOpen}>
       <div
         {...props}
-        className={cn(
-          "ml-2 flex flex-col gap-2 border-border border-l py-2 pl-4",
-          className
-        )}
+        className={cn("flex flex-col gap-2 py-2 pl-6", className)}
         data-slot="tool-call-content"
       >
         {children}
