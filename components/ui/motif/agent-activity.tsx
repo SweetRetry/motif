@@ -10,7 +10,6 @@ export {
   AgentActivity,
   AgentActivityContent,
   AgentActivityHeader,
-  AgentActivitySummary,
   AgentActivityTitle,
   useAgentActivity,
 } from "@/registry/new-york/agents/agent-activity";

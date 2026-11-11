@@ -3,7 +3,7 @@
 import { Frame, Image, Music } from "lucide-react";
 import { useState } from "react";
 
-import { ProviderMark } from "@/components/ui/motif/provider-mark";
+import { ProviderLogo } from "@/components/ui/motif/provider-logo";
 import {
   ModelSelect,
   ModelSelectContent,
@@ -21,20 +21,20 @@ import type {
  *  these are the cuts LobeHub draws, sized by the slot they land in. */
 const PROVIDERS: ModelSelectProvider[] = [
   {
-    icon: <ProviderMark provider="bytedance" />,
+    icon: <ProviderLogo provider="bytedance" />,
     id: "bytedance",
     name: "ByteDance",
   },
-  { icon: <ProviderMark provider="minimax" />, id: "minimax", name: "MiniMax" },
-  { icon: <ProviderMark provider="google" />, id: "google", name: "Google" },
-  { icon: <ProviderMark provider="kling" />, id: "kling", name: "Kling" },
-  { icon: <ProviderMark provider="alibaba" />, id: "alibaba", name: "Alibaba" },
+  { icon: <ProviderLogo provider="minimax" />, id: "minimax", name: "MiniMax" },
+  { icon: <ProviderLogo provider="google" />, id: "google", name: "Google" },
+  { icon: <ProviderLogo provider="kling" />, id: "kling", name: "Kling" },
+  { icon: <ProviderLogo provider="alibaba" />, id: "alibaba", name: "Alibaba" },
   {
-    icon: <ProviderMark provider="bfl" />,
+    icon: <ProviderLogo provider="bfl" />,
     id: "bfl",
     name: "Black Forest Labs",
   },
-  { icon: <ProviderMark provider="runway" />, id: "runway", name: "Runway" },
+  { icon: <ProviderLogo provider="runway" />, id: "runway", name: "Runway" },
 ];
 
 /** What a model can do, as glyphs. The caller's own vocabulary: the picker only knows
@@ -239,17 +239,17 @@ const CHAT_MODELS: ModelSelectModel[] = [
 
 const CHAT_PROVIDERS: ModelSelectProvider[] = [
   {
-    icon: <ProviderMark provider="anthropic" />,
+    icon: <ProviderLogo provider="anthropic" />,
     id: "anthropic",
     name: "Anthropic",
   },
-  { icon: <ProviderMark provider="openai" />, id: "openai", name: "OpenAI" },
+  { icon: <ProviderLogo provider="openai" />, id: "openai", name: "OpenAI" },
   {
-    icon: <ProviderMark provider="deepseek" />,
+    icon: <ProviderLogo provider="deepseek" />,
     id: "deepseek",
     name: "DeepSeek",
   },
-  { icon: <ProviderMark provider="ollama" />, id: "ollama", name: "Ollama" },
+  { icon: <ProviderLogo provider="ollama" />, id: "ollama", name: "Ollama" },
 ];
 
 export const ModelSelectShortDemo = () => (

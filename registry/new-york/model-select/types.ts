@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 /** One maker a model can come from. `icon` is a mark drawn at 18px in `currentColor`
- *  (see `ProviderMark`); without one the rail and the rows fall back to the maker's
+ *  (see `ProviderLogo`); without one the rail and the rows fall back to the maker's
  *  initial, because a slot that draws nothing is a control with nothing to aim at. */
 export interface ModelSelectProvider {
   id: string;

@@ -92,16 +92,7 @@ export interface AgentActivityTitleProps extends Omit<
   label?: string;
 }
 
-export type AgentActivitySummaryProps = ComponentProps<"span">;
 export type AgentActivityContentProps = ComponentProps<"div">;
-
-/** Nothing to draw: the shapes a conditional leaves behind. A slot with nothing in it
- *  draws nothing, and an empty string is one of those. */
-const isEmpty = (children: ReactNode) =>
-  children === null ||
-  children === undefined ||
-  children === false ||
-  children === "";
 
 /** `42s`, then `1m 05s`. Whole seconds: a run that took minutes has no use for a tenth. */
 const formatDuration = (seconds: number) => {
@@ -213,7 +204,7 @@ export const AgentActivity = ({
 };
 
 /**
- * The row: the title, the summary, and whatever else the caller puts in it.
+ * The row: the title, and whatever else the caller puts in it.
  *
  * It is the control that opens the timeline, but only while there are steps to show. A
  * chevron that pointed at nothing, on a row that did nothing when pressed, would be a
@@ -306,32 +297,6 @@ export const AgentActivityTitle = ({
       {duration === undefined
         ? doneLabel
         : `${doneLabel} for ${formatDuration(duration)}`}
-    </span>
-  );
-};
-
-/** What the run amounted to, in a line: `5 tool calls`, `3 files read`. One line, cut
- *  with an ellipsis. The caller writes it, because only the caller knows what its steps
- *  were. */
-export const AgentActivitySummary = ({
-  children,
-  className,
-  ...props
-}: AgentActivitySummaryProps) => {
-  if (isEmpty(children)) {
-    return null;
-  }
-
-  return (
-    <span
-      {...props}
-      className={cn(
-        "min-w-0 truncate text-muted-foreground text-xs",
-        className
-      )}
-      data-slot="agent-activity-summary"
-    >
-      {children}
     </span>
   );
 };

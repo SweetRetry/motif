@@ -19,7 +19,7 @@ export {
   PromptInputSubmit,
   PromptInputTextarea,
   PromptInputTrigger,
-  ProviderMark,
+  ProviderLogo,
 } from "@/registry/new-york/agents/prompt-input";
 export type {
   ModelPickerProps,
@@ -34,5 +34,5 @@ export type {
   PromptSegment,
   PromptTriggerItem,
   ProviderId,
-  ProviderMarkProps,
+  ProviderLogoProps,
 } from "@/registry/new-york/agents/prompt-input";

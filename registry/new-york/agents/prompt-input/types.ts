@@ -2,7 +2,7 @@ import type { ComponentProps, ReactNode } from "react";
 
 import type { ButtonProps } from "@/components/ui/button";
 import type { AttachmentProps } from "@/components/ui/motif/attachment";
-import type { ProviderId } from "@/components/ui/motif/provider-mark";
+import type { ProviderId } from "@/components/ui/motif/provider-logo";
 
 /**
  * A file riding along with the draft, the way a composer usually holds them: the chip's

@@ -17,7 +17,7 @@
 - 🧩 **Agents** — `conversation`, `message`, `thinking-block`, `waiting-row`,
   `prompt-input`, `voice-input`, `attachment`, `scroll-rail`, `approval-card`,
   `question-card`, `skill-detail`
-- 🎛️ **Components** — `aspect-ratio-picker`, `resolution-segmented`, `duration-slider`,
+- 🎛️ **Components** — `ratio-picker`, `resolution-picker`, `duration-slider`,
   `generation-overlay`, `cover-fan`, `flow-edge`, `settings-dialog`,
   `activity-heatmap`
 - 🏗️ **Blocks** — whole surfaces assembled from the parts, starting with `agent-run`

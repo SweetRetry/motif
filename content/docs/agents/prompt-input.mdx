@@ -228,16 +228,16 @@ menu covering the thing you are deciding about.
 `models` takes `{ id, name, provider }`. `value` and `onValueChange` make the pick
 controlled; on its own the picker holds it, starting at `defaultValue` or the first model.
 
-`ProviderMark` draws [LobeHub's icon set](https://github.com/lobehub/lobe-icons) (MIT) in
-its coloured cut, and it lives in [Provider Mark](/docs/media/provider-mark) rather
+`ProviderLogo` draws [LobeHub's icon set](https://github.com/lobehub/lobe-icons) (MIT) in
+its coloured cut, and it lives in [Provider Logo](/docs/media/provider-logo) rather
 than here — the marks are the same artwork a browsing picker needs, so they ship once and
-both components depend on them. This item re-exports `ProviderMark` and `PROVIDER_NAMES`
+both components depend on them. This item re-exports `ProviderLogo` and `PROVIDER_NAMES`
 for convenience, and `shadcn add` brings the marks along with it.
 
 ```tsx
-import { ProviderMark } from "@/components/ui/motif/provider-mark";
+import { ProviderLogo } from "@/components/ui/motif/provider-logo";
 
-<ProviderMark className="size-5 text-foreground" provider="anthropic" />;
+<ProviderLogo className="size-5 text-foreground" provider="anthropic" />;
 ```
 
 The classes still matter for the marks whose brand is monochrome — OpenAI, Anthropic, xAI,

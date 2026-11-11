@@ -2,15 +2,15 @@
   "title": "Media",
   "pages": [
     "model-select",
-    "provider-mark",
-    "aspect-ratio-picker",
-    "resolution-segmented",
+    "provider-logo",
+    "ratio-picker",
+    "resolution-picker",
     "duration-slider",
-    "strength-select",
+    "strength-slider",
     "generation-overlay",
     "flow-edge",
     "video-preview",
-    "compare",
+    "compare-slider",
     "gradient-cover"
   ]
 }

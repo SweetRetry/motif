@@ -7,7 +7,6 @@ import {
   AgentActivity,
   AgentActivityContent,
   AgentActivityHeader,
-  AgentActivitySummary,
   AgentActivityTitle,
 } from "@/registry/new-york/agents/agent-activity";
 import { ApprovalCard } from "@/registry/new-york/agents/approval-card";
@@ -43,7 +42,6 @@ import {
   ToolCallSummary,
 } from "@/registry/new-york/agents/tool-call";
 import type { ToolCallStatusValue } from "@/registry/new-york/agents/tool-call";
-import { AspectRatioPicker } from "@/registry/new-york/aspect-ratio-picker";
 import { GenerationCanvas } from "@/registry/new-york/blocks/generation-canvas/generation-canvas";
 import type {
   CanvasEdge,
@@ -56,17 +54,18 @@ import {
   breakdownColors,
 } from "@/registry/new-york/breakdown";
 import {
-  Compare,
-  CompareAfter,
-  CompareBefore,
-  CompareHandle,
-  CompareLabel,
+  CompareSlider,
+  CompareSliderAfter,
+  CompareSliderBefore,
+  CompareSliderHandle,
+  CompareSliderLabel,
   useCompare,
-} from "@/registry/new-york/compare";
+} from "@/registry/new-york/compare-slider";
 import { CoverFan } from "@/registry/new-york/cover-fan";
 import { DurationSlider } from "@/registry/new-york/duration-slider";
 import { Message, MessageContent } from "@/registry/new-york/message";
-import { ResolutionSegmented } from "@/registry/new-york/resolution-segmented";
+import { RatioPicker } from "@/registry/new-york/ratio-picker";
+import { ResolutionPicker } from "@/registry/new-york/resolution-picker";
 
 import {
   clamp01,
@@ -686,9 +685,6 @@ const Surface = ({ explode, t }: { explode: number; t: number }) => {
             <AgentActivity duration={9} running={false}>
               <AgentActivityHeader>
                 <AgentActivityTitle />
-                <AgentActivitySummary>
-                  1 thought, 2 tool calls
-                </AgentActivitySummary>
               </AgentActivityHeader>
             </AgentActivity>
           </div>
@@ -936,7 +932,7 @@ export const Film = () => {
                 [
                   [
                     "Aspect ratio",
-                    <AspectRatioPicker
+                    <RatioPicker
                       aria-label="Aspect ratio"
                       key="ratio"
                       onChange={noop}
@@ -945,7 +941,7 @@ export const Film = () => {
                   ],
                   [
                     "Resolution",
-                    <ResolutionSegmented
+                    <ResolutionPicker
                       aria-label="Resolution"
                       key="res"
                       onChange={noop}
@@ -985,36 +981,32 @@ export const Film = () => {
           </Scene>
           <Names
             from={AT.settingsShown + 0.15}
-            names={[
-              "aspect-ratio-picker",
-              "resolution-segmented",
-              "duration-slider",
-            ]}
+            names={["ratio-picker", "resolution-picker", "duration-slider"]}
             t={t}
             to={CUE.compare - 0.35}
           />
 
           <Scene from={AT.compareShown} rect={COMPARE} t={t} to={CUE.attach}>
-            <Compare defaultPosition={0.82} style={{ height: COMPARE.h }}>
-              <CompareAfter>
+            <CompareSlider defaultPosition={0.82} style={{ height: COMPARE.h }}>
+              <CompareSliderAfter>
                 <img alt="" className="size-full object-cover" src={IMAGE} />
-                <CompareLabel>2K</CompareLabel>
-              </CompareAfter>
-              <CompareBefore>
+                <CompareSliderLabel>2K</CompareSliderLabel>
+              </CompareSliderAfter>
+              <CompareSliderBefore>
                 <img
                   alt=""
                   className="size-full scale-110 object-cover blur-[3px]"
                   src={IMAGE}
                 />
-                <CompareLabel>1K</CompareLabel>
-              </CompareBefore>
-              <CompareHandle />
+                <CompareSliderLabel>1K</CompareSliderLabel>
+              </CompareSliderBefore>
+              <CompareSliderHandle />
               <Divider position={divider} />
-            </Compare>
+            </CompareSlider>
           </Scene>
           <Names
             from={AT.compareShown + 0.15}
-            names={["compare"]}
+            names={["compare-slider"]}
             t={t}
             to={CUE.attach - 0.3}
           />

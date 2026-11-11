@@ -30,7 +30,6 @@ import {
   AgentActivity,
   AgentActivityContent,
   AgentActivityHeader,
-  AgentActivitySummary,
   AgentActivityTitle,
 } from "@/components/ui/motif/agent-activity";
 
@@ -43,9 +42,6 @@ export function Run({ run }) {
     >
       <AgentActivityHeader>
         <AgentActivityTitle />
-        <AgentActivitySummary>
-          {run.calls.length} tool calls
-        </AgentActivitySummary>
       </AgentActivityHeader>
       <AgentActivityContent>
         {run.steps.map((step) => (
@@ -62,7 +58,6 @@ export function Run({ run }) {
 | `AgentActivity`        | The column, whether the run is going, and the fold           |
 | `AgentActivityHeader`  | The row; the control that opens the timeline                 |
 | `AgentActivityTitle`   | The wait while it runs, `Worked for 42s` once it has stopped |
-| `AgentActivitySummary` | A line the caller writes about what the run amounted to      |
 | `AgentActivityContent` | The steps, behind the header, indented under it              |
 
 ## The header follows the run

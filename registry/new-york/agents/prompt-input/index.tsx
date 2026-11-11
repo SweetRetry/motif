@@ -25,8 +25,8 @@ export { ModelPicker } from "./model-picker";
 // for a second import path to draw the marks on it.
 export {
   PROVIDER_NAMES,
-  ProviderMark,
-} from "@/components/ui/motif/provider-mark";
+  ProviderLogo,
+} from "@/components/ui/motif/provider-logo";
 export type {
   ModelPickerProps,
   PromptAttachment,
@@ -42,8 +42,8 @@ export type {
 } from "./types";
 export type {
   ProviderId,
-  ProviderMarkProps,
-} from "@/components/ui/motif/provider-mark";
+  ProviderLogoProps,
+} from "@/components/ui/motif/provider-logo";
 
 /* -- The composer --------------------------------------------------------------
  * Everything an agent surface asks for passes through one box, so the box is mostly the

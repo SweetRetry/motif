@@ -12,8 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   PROVIDER_NAMES,
-  ProviderMark,
-} from "@/components/ui/motif/provider-mark";
+  ProviderLogo,
+} from "@/components/ui/motif/provider-logo";
 import { cn } from "@/lib/utils";
 
 import type { ModelPickerProps } from "./types";
@@ -67,7 +67,7 @@ export const ModelPicker = ({
           )}
           type="button"
         >
-          <ProviderMark
+          <ProviderLogo
             className="size-5 text-foreground"
             provider={active.provider}
           />
@@ -87,7 +87,7 @@ export const ModelPicker = ({
               key={model.id}
               value={model.id}
             >
-              <ProviderMark
+              <ProviderLogo
                 className="size-4.5 text-foreground"
                 provider={model.provider}
               />

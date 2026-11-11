@@ -7,7 +7,6 @@ import {
   AgentActivity,
   AgentActivityContent,
   AgentActivityHeader,
-  AgentActivitySummary,
   AgentActivityTitle,
 } from "@/registry/new-york/agents/agent-activity";
 import { ThinkingBlock } from "@/registry/new-york/agents/thinking-block";
@@ -86,7 +85,6 @@ export const AgentActivityDemo = () => (
   >
     <AgentActivityHeader>
       <AgentActivityTitle />
-      <AgentActivitySummary>1 thought, 4 tool calls</AgentActivitySummary>
     </AgentActivityHeader>
     <AgentActivityContent>
       <ThinkingBlock defaultOpen={false} doneLabel="Thought" duration={6}>
@@ -135,9 +133,6 @@ const LiveRun = () => {
     >
       <AgentActivityHeader>
         <AgentActivityTitle />
-        <AgentActivitySummary>
-          {running ? null : `${STEPS.length} tool calls`}
-        </AgentActivitySummary>
       </AgentActivityHeader>
       <AgentActivityContent>
         {STEPS.slice(0, reached + 1).map((step, index) => (

@@ -43,7 +43,6 @@ import {
 } from "react";
 
 import { Button } from "@/components/ui/button";
-import { AspectRatioPicker } from "@/components/ui/motif/aspect-ratio-picker";
 import { FlowEdge } from "@/components/ui/motif/flow-edge";
 import { GenerationOverlay } from "@/components/ui/motif/generation-overlay";
 import {
@@ -64,8 +63,9 @@ import {
   PromptInputSubmit,
   PromptInputTextarea,
 } from "@/components/ui/motif/prompt-input";
-import { ResolutionSegmented } from "@/components/ui/motif/resolution-segmented";
-import { StrengthSelect } from "@/components/ui/motif/strength-select";
+import { RatioPicker } from "@/components/ui/motif/ratio-picker";
+import { ResolutionPicker } from "@/components/ui/motif/resolution-picker";
+import { StrengthSlider } from "@/components/ui/motif/strength-slider";
 import {
   VideoPreview,
   VideoPreviewPlayOverlay,
@@ -775,7 +775,7 @@ const Canvas = ({
                   >
                     <div>
                       <div className={LABEL}>Aspect ratio</div>
-                      <AspectRatioPicker
+                      <RatioPicker
                         aria-label="Aspect ratio"
                         onChange={(aspect) => edit({ aspect })}
                         value={brief.aspect}
@@ -783,7 +783,7 @@ const Canvas = ({
                     </div>
                     <div>
                       <div className={LABEL}>Resolution</div>
-                      <ResolutionSegmented
+                      <ResolutionPicker
                         aria-label="Resolution"
                         onChange={(resolution) => edit({ resolution })}
                         value={brief.resolution}
@@ -791,7 +791,7 @@ const Canvas = ({
                     </div>
                     <div>
                       <div className={LABEL}>Strength</div>
-                      <StrengthSelect
+                      <StrengthSlider
                         aria-label="Strength"
                         onChange={(strength) => edit({ strength })}
                         options={STRENGTHS}

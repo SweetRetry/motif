@@ -110,16 +110,16 @@
       ]
     },
     {
-      "name": "compare",
+      "name": "compare-slider",
       "type": "registry:ui",
-      "title": "Compare",
+      "title": "Compare Slider",
       "description": "A before and after in one frame: a divider you drag across two pictures of the same place, so the eye sees what changed instead of remembering it.",
       "dependencies": ["lucide-react"],
       "files": [
         {
-          "path": "registry/new-york/compare.tsx",
+          "path": "registry/new-york/compare-slider.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/motif/compare.tsx"
+          "target": "@components/ui/motif/compare-slider.tsx"
         }
       ]
     },
@@ -138,52 +138,52 @@
       ]
     },
     {
-      "name": "date-range-picker",
+      "name": "date-range",
       "type": "registry:ui",
-      "title": "Date Range Picker",
+      "title": "Date Range",
       "description": "A date range made by name, drawn on two months, or typed: one draft behind all three, a shortcut commits in one press, and OK commits the rest.",
       "dependencies": ["date-fns", "lucide-react", "react-day-picker"],
       "registryDependencies": ["button", "calendar", "input", "popover"],
       "files": [
         {
-          "path": "registry/new-york/date-range-picker/index.tsx",
+          "path": "registry/new-york/date-range/index.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/motif/date-range-picker/index.tsx"
+          "target": "@components/ui/motif/date-range/index.tsx"
         },
         {
-          "path": "registry/new-york/date-range-picker/parts.tsx",
+          "path": "registry/new-york/date-range/parts.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/motif/date-range-picker/parts.tsx"
+          "target": "@components/ui/motif/date-range/parts.tsx"
         },
         {
-          "path": "registry/new-york/date-range-picker/range-calendar.tsx",
+          "path": "registry/new-york/date-range/range-calendar.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/motif/date-range-picker/range-calendar.tsx"
+          "target": "@components/ui/motif/date-range/range-calendar.tsx"
         },
         {
-          "path": "registry/new-york/date-range-picker/bounds.ts",
+          "path": "registry/new-york/date-range/bounds.ts",
           "type": "registry:ui",
-          "target": "@components/ui/motif/date-range-picker/bounds.ts"
+          "target": "@components/ui/motif/date-range/bounds.ts"
         },
         {
-          "path": "registry/new-york/date-range-picker/context.ts",
+          "path": "registry/new-york/date-range/context.ts",
           "type": "registry:ui",
-          "target": "@components/ui/motif/date-range-picker/context.ts"
+          "target": "@components/ui/motif/date-range/context.ts"
         },
         {
-          "path": "registry/new-york/date-range-picker/format.ts",
+          "path": "registry/new-york/date-range/format.ts",
           "type": "registry:ui",
-          "target": "@components/ui/motif/date-range-picker/format.ts"
+          "target": "@components/ui/motif/date-range/format.ts"
         },
         {
-          "path": "registry/new-york/date-range-picker/presets.ts",
+          "path": "registry/new-york/date-range/presets.ts",
           "type": "registry:ui",
-          "target": "@components/ui/motif/date-range-picker/presets.ts"
+          "target": "@components/ui/motif/date-range/presets.ts"
         },
         {
-          "path": "registry/new-york/date-range-picker/types.ts",
+          "path": "registry/new-york/date-range/types.ts",
           "type": "registry:ui",
-          "target": "@components/ui/motif/date-range-picker/types.ts"
+          "target": "@components/ui/motif/date-range/types.ts"
         }
       ]
     },
@@ -244,42 +244,42 @@
       ]
     },
     {
-      "name": "aspect-ratio-picker",
+      "name": "ratio-picker",
       "type": "registry:ui",
-      "title": "Aspect Ratio Picker",
+      "title": "Ratio Picker",
       "description": "Aspect ratio as a grid of to-scale glyphs, each drawn inside the same square window so the shapes line up and the ratio reads without the label.",
       "dependencies": ["lucide-react"],
       "files": [
         {
-          "path": "registry/new-york/aspect-ratio-picker.tsx",
+          "path": "registry/new-york/ratio-picker.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/motif/aspect-ratio-picker.tsx"
+          "target": "@components/ui/motif/ratio-picker.tsx"
         }
       ]
     },
     {
-      "name": "resolution-segmented",
+      "name": "resolution-picker",
       "type": "registry:ui",
-      "title": "Resolution Segmented",
+      "title": "Resolution Picker",
       "description": "A segmented resolution control with a sliding plate and a dot-matrix glyph that carries sampling density: two dots standard, three high, four retina.",
       "files": [
         {
-          "path": "registry/new-york/resolution-segmented.tsx",
+          "path": "registry/new-york/resolution-picker.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/motif/resolution-segmented.tsx"
+          "target": "@components/ui/motif/resolution-picker.tsx"
         }
       ]
     },
     {
-      "name": "provider-mark",
+      "name": "provider-logo",
       "type": "registry:ui",
-      "title": "Provider Mark",
+      "title": "Provider Logo",
       "description": "One maker's logo at 20px, in the colour the brand draws it: twenty-three marks, taken from LobeHub's icon set and inlined so a picker never pays for an icon package.",
       "files": [
         {
-          "path": "registry/new-york/provider-mark.tsx",
+          "path": "registry/new-york/provider-logo.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/motif/provider-mark.tsx"
+          "target": "@components/ui/motif/provider-logo.tsx"
         }
       ]
     },
@@ -327,9 +327,9 @@
       ]
     },
     {
-      "name": "strength-select",
+      "name": "strength-slider",
       "type": "registry:ui",
-      "title": "Strength Select",
+      "title": "Strength Slider",
       "description": "Strength as a track you drag: one seat per level, the playhead riding the fill's leading edge, and a slow drift of motes across the fill of the top level.",
       "css": {
         "@keyframes strength-mote": {
@@ -343,9 +343,9 @@
       },
       "files": [
         {
-          "path": "registry/new-york/strength-select.tsx",
+          "path": "registry/new-york/strength-slider.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/motif/strength-select.tsx"
+          "target": "@components/ui/motif/strength-slider.tsx"
         }
       ]
     },
@@ -578,7 +578,7 @@
         "@tiptap/suggestion"
       ],
       "registryDependencies": [
-        "https://motif.sweetretry.com/r/provider-mark.json",
+        "https://motif.sweetretry.com/r/provider-logo.json",
         "button",
         "dropdown-menu",
         "https://motif.sweetretry.com/r/attachment.json"
@@ -627,35 +627,35 @@
       ]
     },
     {
-      "name": "chat-model-menu",
+      "name": "model-menu",
       "type": "registry:ui",
-      "title": "Chat Model Menu",
+      "title": "Model Menu",
       "description": "Which LLM answers and how hard it thinks, in one menu: the thinking steps follow the model in use, and a conversation locked to one protocol keeps the rest listed but disabled.",
       "dependencies": ["lucide-react"],
       "registryDependencies": [
-        "https://motif.sweetretry.com/r/provider-mark.json",
+        "https://motif.sweetretry.com/r/provider-logo.json",
         "dropdown-menu"
       ],
       "files": [
         {
-          "path": "registry/new-york/agents/chat-model-menu/index.tsx",
+          "path": "registry/new-york/agents/model-menu/index.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/motif/chat-model-menu/index.tsx"
+          "target": "@components/ui/motif/model-menu/index.tsx"
         },
         {
-          "path": "registry/new-york/agents/chat-model-menu/parts.tsx",
+          "path": "registry/new-york/agents/model-menu/parts.tsx",
           "type": "registry:ui",
-          "target": "@components/ui/motif/chat-model-menu/parts.tsx"
+          "target": "@components/ui/motif/model-menu/parts.tsx"
         },
         {
-          "path": "registry/new-york/agents/chat-model-menu/context.ts",
+          "path": "registry/new-york/agents/model-menu/context.ts",
           "type": "registry:ui",
-          "target": "@components/ui/motif/chat-model-menu/context.ts"
+          "target": "@components/ui/motif/model-menu/context.ts"
         },
         {
-          "path": "registry/new-york/agents/chat-model-menu/types.ts",
+          "path": "registry/new-york/agents/model-menu/types.ts",
           "type": "registry:ui",
-          "target": "@components/ui/motif/chat-model-menu/types.ts"
+          "target": "@components/ui/motif/model-menu/types.ts"
         }
       ]
     },
@@ -761,13 +761,13 @@
       "dependencies": ["@xyflow/react", "lucide-react"],
       "registryDependencies": [
         "button",
-        "https://motif.sweetretry.com/r/aspect-ratio-picker.json",
+        "https://motif.sweetretry.com/r/ratio-picker.json",
         "https://motif.sweetretry.com/r/flow-edge.json",
         "https://motif.sweetretry.com/r/generation-overlay.json",
         "https://motif.sweetretry.com/r/model-select.json",
         "https://motif.sweetretry.com/r/prompt-input.json",
-        "https://motif.sweetretry.com/r/resolution-segmented.json",
-        "https://motif.sweetretry.com/r/strength-select.json",
+        "https://motif.sweetretry.com/r/resolution-picker.json",
+        "https://motif.sweetretry.com/r/strength-slider.json",
         "https://motif.sweetretry.com/r/video-preview.json",
         "popover"
       ],

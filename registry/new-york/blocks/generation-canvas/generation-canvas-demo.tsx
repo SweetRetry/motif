@@ -2,7 +2,7 @@ import type {
   ModelSelectModel,
   ModelSelectProvider,
 } from "@/components/ui/motif/model-select";
-import { ProviderMark } from "@/components/ui/motif/provider-mark";
+import { ProviderLogo } from "@/components/ui/motif/provider-logo";
 
 import { starterGraph } from "./generation-canvas-graph";
 import type {
@@ -97,15 +97,15 @@ export const demoGraph = () => {
 /** The makers the demo's catalogue draws from, in the order the picker walks them. */
 export const DEMO_PROVIDERS: ModelSelectProvider[] = [
   {
-    icon: <ProviderMark provider="bytedance" />,
+    icon: <ProviderLogo provider="bytedance" />,
     id: "bytedance",
     name: "ByteDance",
   },
-  { icon: <ProviderMark provider="google" />, id: "google", name: "Google" },
-  { icon: <ProviderMark provider="kling" />, id: "kling", name: "Kling" },
-  { icon: <ProviderMark provider="alibaba" />, id: "alibaba", name: "Alibaba" },
+  { icon: <ProviderLogo provider="google" />, id: "google", name: "Google" },
+  { icon: <ProviderLogo provider="kling" />, id: "kling", name: "Kling" },
+  { icon: <ProviderLogo provider="alibaba" />, id: "alibaba", name: "Alibaba" },
   {
-    icon: <ProviderMark provider="bfl" />,
+    icon: <ProviderLogo provider="bfl" />,
     id: "bfl",
     name: "Black Forest Labs",
   },
