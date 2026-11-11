@@ -11,42 +11,82 @@ import {
 } from "@/registry/new-york/agents/skill-detail";
 import type { SkillFile } from "@/registry/new-york/agents/skill-detail";
 
-/** Shipped with the docs so the demo needs no external host — swap in your own covers.
- *  Two crops of one poster: the card draws 16:9, the panel fills the height of its rail. */
-const COVER = "/skill-detail/invoice-reconciler.svg";
-const COVER_PORTRAIT = "/skill-detail/invoice-reconciler-portrait.svg";
+/** Real data: Anthropic's open-source `algorithmic-art` skill, as it stands in
+ *  github.com/anthropics/skills. The file list, front matter and excerpts are copied from
+ *  that folder. The art is not the skill's output: it was generated with Midjourney V8.2
+ *  from the skill's own philosophy examples and ships with the docs so the demo needs no
+ *  external host. Two crops of one cover: the card draws 16:9, the panel fills its rail. */
+const COVER = "/skill-detail/algorithmic-art.webp";
+const COVER_PORTRAIT = "/skill-detail/algorithmic-art-portrait.webp";
 
 /** What the card has room for. */
 const SUMMARY =
-  "Match a month's invoices against the bank feed and flag what still needs a person.";
+  "Generative art in p5.js, with seeded randomness and live parameter exploration.";
 
-/** What the panel has room for. */
+/** What the panel has room for: the skill's own description. */
 const DESCRIPTION =
-  "Match a month's invoices against the bank feed and flag what a human still has to look at. Read this skill before touching the ledger: it owns the matching rules, the rounding tolerance and the wording of the report.";
+  "Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or particle systems.";
 
-/** Four things the skill produced, shipped with the docs like the covers. */
+/** One per philosophy the skill names as an example. */
 const RESULTS = [
-  { label: "Matched", src: "/skill-detail/result-matched.svg" },
-  { label: "Variance", src: "/skill-detail/result-variance.svg" },
-  { label: "Vendors", src: "/skill-detail/result-vendors.svg" },
-  { label: "Flagged", src: "/skill-detail/result-flagged.svg" },
+  {
+    label: "Organic Turbulence",
+    src: "/skill-detail/result-organic-turbulence.webp",
+  },
+  {
+    label: "Quantum Harmonics",
+    src: "/skill-detail/result-quantum-harmonics.webp",
+  },
+  {
+    label: "Recursive Whispers",
+    src: "/skill-detail/result-recursive-whispers.webp",
+  },
+  {
+    label: "Stochastic Crystallization",
+    src: "/skill-detail/result-stochastic-crystallization.webp",
+  },
 ];
 
 const FILES: SkillFile[] = [
   { path: "SKILL.md" },
   { path: "LICENSE.txt" },
-  { path: "references/matching.md" },
-  { path: "references/vendors.md" },
-  { path: "scripts/reconcile.py" },
+  { path: "templates/generator_template.js" },
+  { path: "templates/viewer.html" },
 ];
 
-const FRONT_MATTER = `name: invoice-reconciler
-description: Match invoices against the bank feed and flag the ones that need a human
+const FRONT_MATTER = `name: algorithmic-art
+description: Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or particle systems. Create original algorithmic art rather than copying existing artists' work to avoid copyright violations.
 license: Complete terms in LICENSE.txt`;
 
-const SCRIPT = `def reconcile(invoices, feed, tolerance=0.01):
-    """Match on amount and date, then fall back to the vendor alias table."""
-    return [match(invoice, feed, tolerance) for invoice in invoices]`;
+const LICENSE = `                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/`;
+
+const GENERATOR = `// ALWAYS use seeded random for Art Blocks-style reproducible output
+
+function initializeSeed(seed) {
+    randomSeed(seed);
+    noiseSeed(seed);
+    // Now all random() and noise() calls will be deterministic
+}
+
+function setup() {
+    createCanvas(800, 800);
+
+    // Initialize seed first
+    initializeSeed(params.seed);
+}`;
+
+const VIEWER = `<!-- Seed Section (ALWAYS KEEP THIS) -->
+<div class="control-section">
+    <h3>Seed</h3>
+    <input type="number" id="seed-input" class="seed-input" value="12345" onchange="updateSeed()">
+    <div class="seed-controls">
+        <button class="button secondary" onclick="previousSeed()">← Prev</button>
+        <button class="button secondary" onclick="nextSeed()">Next →</button>
+    </div>
+    <button class="button tertiary regen-button" onclick="randomSeedAndUpdate()">↻ Random</button>
+</div>`;
 
 const Prose = ({ children, title }: { children: ReactNode; title: string }) => (
   <section className="flex flex-col gap-2">
@@ -58,48 +98,34 @@ const Prose = ({ children, title }: { children: ReactNode; title: string }) => (
 /** Stands in for whatever renders the file: the panel hands over the path and takes back
  *  a node, so a markdown pipeline, a diff or an iframe all fit behind the same prop. */
 const PREVIEWS: Record<string, ReactNode> = {
-  "LICENSE.txt": (
-    <Prose title="License">
-      Complete terms in LICENSE.txt. Redistribution without the notice is not
-      permitted.
-    </Prose>
-  ),
+  "LICENSE.txt": <SkillCode code={LICENSE} language="TEXT" />,
   "SKILL.md": (
     <div className="flex flex-col gap-6">
       <SkillCode code={FRONT_MATTER} language="YAML" />
       {/* One step under the panel's own heading: a document inside a surface never outranks
           the surface. */}
       <h2 className="text-lg font-semibold tracking-tight">
-        Invoice Reconciler
+        Algorithmic Philosophy Creation
       </h2>
-      <Prose title="About matching">
-        This skill explains how a month's invoices are matched against the bank
-        feed: amount and date first, vendor aliases second, and a tolerance of
-        one cent for rounding. Anything still unmatched is a question for a
-        person, not a guess.
+      <Prose title="Two steps">
+        Algorithmic philosophies are computational aesthetic movements that are
+        then expressed through code. First an algorithmic philosophy, written as
+        a .md file. Then that philosophy expressed as p5.js generative art, as
+        .html and .js files.
       </Prose>
-      <Prose title="Closing a month">
-        Run the matcher, read the unmatched list, then write the variance
-        report. Never edit the ledger from here — reconciling proposes, the
-        accountant disposes.
+      <Prose title="Variations & exploration">
+        The artifact includes seed navigation by default (prev/next/random
+        buttons), allowing users to explore variations without creating multiple
+        files. This is like creating a series of prints from the same plate -
+        the algorithm is consistent, but each seed reveals different facets of
+        its potential.
       </Prose>
     </div>
   ),
-  "references/matching.md": (
-    <Prose title="Matching">
-      Amount and date within three days is a match. Failing that, check the
-      alias table before proposing a candidate, and only ever propose one — a
-      ranked list of five is a question the reader still has to answer.
-    </Prose>
+  "templates/generator_template.js": (
+    <SkillCode code={GENERATOR} language="JAVASCRIPT" />
   ),
-  "references/vendors.md": (
-    <Prose title="Vendors">
-      One line per vendor: the name as it is invoiced, the name as it appears on
-      the statement, and the account the money actually leaves. Aliases are read
-      top down, first hit wins.
-    </Prose>
-  ),
-  "scripts/reconcile.py": <SkillCode code={SCRIPT} language="PYTHON" />,
+  "templates/viewer.html": <SkillCode code={VIEWER} language="HTML" />,
 };
 
 export const SkillDetailDemo = () => {
@@ -112,7 +138,7 @@ export const SkillDetailDemo = () => {
         cover={COVER}
         description={SUMMARY}
         onOpen={() => setOpen(true)}
-        title="Invoice Reconciler"
+        title="Algorithmic Art"
       />
 
       <p className="text-xs text-muted-foreground">
@@ -120,12 +146,15 @@ export const SkillDetailDemo = () => {
       </p>
 
       <SkillDetailDialog
-        author={{ name: "Tidepool" }}
+        author={{
+          href: "https://github.com/anthropics/skills",
+          name: "Anthropic",
+        }}
         cover={COVER_PORTRAIT}
         defaultEnabled
         description={DESCRIPTION}
         files={FILES}
-        folder="invoice-reconciler"
+        folder="algorithmic-art"
         onEnabledChange={(next) =>
           toast(next ? "Enabled for this session" : "Disabled")
         }
@@ -134,16 +163,16 @@ export const SkillDetailDemo = () => {
         onTry={() => toast("Opening a session")}
         open={open}
         prompts={[
-          "Reconcile last month and list what is unmatched.",
-          "Why didn't invoice 4821 match? Name the closest.",
-          "Write the quarterly variance report, grouped by vendor.",
+          "Make a flow field where fast particles burn bright and slow ones fade.",
+          "Write an algorithmic philosophy for wave interference, then sketch it.",
+          "Turn this viewer into a gallery of six seeds side by side.",
         ]}
         renderPreview={(file) => PREVIEWS[file.path] ?? null}
         results={RESULTS}
-        resultsNote="From the March close: 214 invoices, 6 flagged for a person."
-        tags={["Finance", "Automation"]}
-        title="Invoice Reconciler"
-        updatedAt="March 4, 2026"
+        resultsNote="Generated with Midjourney V8.2 from the skill\u2019s philosophy examples, not by the skill itself."
+        tags={["Creative", "p5.js"]}
+        title="Algorithmic Art"
+        updatedAt="April 20, 2026"
       />
     </div>
   );
