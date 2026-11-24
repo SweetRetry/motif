@@ -62,29 +62,52 @@ export const ContextUsageToneDemo = () => (
   </div>
 );
 
-/** The bar open in a panel of its own, with a turn that can be run to see it fill. */
+const INITIAL_MESSAGES = 31_400;
+
+/** The bar open in a panel of its own, with a real compact control inside and demo
+ *  controls outside so the boundary of the component stays clear. */
 export const ContextUsagePanelDemo = () => {
-  const [messages, setMessages] = useState(31_400);
+  const [messages, setMessages] = useState(INITIAL_MESSAGES);
 
   return (
-    <div className="flex w-full max-w-sm flex-col gap-4 rounded-xl border border-border bg-card p-4">
-      <ContextUsage items={turn(messages)} limit={WINDOW}>
-        <div className="flex items-start justify-between gap-4">
-          <ContextUsageSummary />
-          <ContextUsageRing />
+    <div className="flex w-full max-w-sm flex-col gap-3">
+      <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4">
+        <ContextUsage items={turn(messages)} limit={WINDOW}>
+          <div className="flex items-start justify-between gap-4">
+            <ContextUsageSummary />
+            <ContextUsageRing />
+          </div>
+          <ContextUsageBar />
+          <ContextUsageLegend />
+        </ContextUsage>
+        <div className="flex items-center justify-end border-border border-t pt-3">
+          <Button
+            disabled={messages <= INITIAL_MESSAGES}
+            onClick={() =>
+              setMessages((value) =>
+                Math.max(INITIAL_MESSAGES, Math.round(value * 0.35))
+              )
+            }
+            size="sm"
+            variant="outline"
+          >
+            Compact
+          </Button>
         </div>
-        <ContextUsageBar />
-        <ContextUsageLegend />
-      </ContextUsage>
-      <div className="flex gap-2">
+      </div>
+      <div className="flex items-center gap-2">
         <Button
-          onClick={() => setMessages((value) => value + 24_000)}
+          onClick={() => setMessages((value) => value + 36_000)}
           size="sm"
-          variant="outline"
+          variant="ghost"
         >
           Add a turn
         </Button>
-        <Button onClick={() => setMessages(31_400)} size="sm" variant="ghost">
+        <Button
+          onClick={() => setMessages(INITIAL_MESSAGES)}
+          size="sm"
+          variant="ghost"
+        >
           Reset
         </Button>
       </div>
