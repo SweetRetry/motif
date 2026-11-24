@@ -15,12 +15,26 @@ export default defineConfig({
     ".web-kits/**",
     "audio/**",
   ],
+  jsPlugins: ["./tools/comment-lint/plugin.mjs"],
   overrides: [
     {
-      // Vendored component code is kept as close to its upstream source as possible
-      // so it can be diffed and re-synced. Only the stylistic rules it trips are
-      // relaxed here; it is still formatted by oxfmt and type-checked. Repo-owned
-      // code (examples/, docs, app) is not exempt.
+      files: ["registry/new-york/**/*.ts", "registry/new-york/**/*.tsx"],
+      rules: { "motif/no-comments": "warn" },
+    },
+    {
+      files: [
+        "app/**/*.ts",
+        "app/**/*.tsx",
+        "components/**/*.ts",
+        "components/**/*.tsx",
+        "hooks/**/*.ts",
+        "hooks/**/*.tsx",
+        "lib/**/*.ts",
+        "lib/**/*.tsx",
+      ],
+      rules: { "motif/no-comments": "warn" },
+    },
+    {
       files: [
         "components/motion/**",
         "components/ui/motif/agent-disclosure.tsx",

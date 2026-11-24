@@ -215,7 +215,6 @@ export interface AgentRunProps {
   empty?: ReactNode;
   /** The models the composer can be pointed at. */
   models: PromptModel[];
-  /** Controlled model id. */
   model?: string;
   /** Answer the call a gate is holding. A rejection may carry the reader's reason. Omit it
    *  and a held call leaves the composer where it is. */

@@ -52,7 +52,6 @@ const flip = (direction: SpinDirection): SpinDirection =>
  */
 const toUint32 = (value: number) => (value + 4_294_967_296) % 4_294_967_296;
 
-// 节点和任务使用稳定相位，避免同屏占位齐步旋转。
 const hashString = (input: string, seed: number) => {
   let hash = toUint32(seed);
   for (let index = 0; index < input.length; index += 1) {

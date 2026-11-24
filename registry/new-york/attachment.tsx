@@ -314,8 +314,6 @@ export const Attachment = ({
   const failed = state === "error";
   const percent = clamp(progress ?? 0);
   const image = Boolean(src);
-  // The mock keeps the uploading chip bare — relax this if cancelling an upload
-  // matters more than matching it.
   const removable = Boolean(onRemove) && !uploading;
 
   return (

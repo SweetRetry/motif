@@ -58,6 +58,5 @@ export interface ModelMenuProps {
   models: ChatModel[];
   onEffortChange?: (effort: ReasoningEffort) => void;
   onValueChange?: (id: string) => void;
-  /** Controlled model id. */
   value?: string;
 }

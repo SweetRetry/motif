@@ -69,6 +69,5 @@ export interface ModelSelectProps {
   recommendedLabel?: string;
   /** Said by the trigger when no model is selected. */
   triggerPlaceholder?: string;
-  /** Controlled model id. */
   value?: string;
 }

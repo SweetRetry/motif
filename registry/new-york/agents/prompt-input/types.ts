@@ -28,7 +28,6 @@ export interface ModelPickerProps {
   defaultValue?: string;
   models: PromptModel[];
   onValueChange?: (id: string) => void;
-  /** Controlled model id. */
   value?: string;
 }
 

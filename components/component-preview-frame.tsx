@@ -6,13 +6,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-/**
- * The frame a component preview lives in: a stage on top, its demo source below.
- *
- * The code area only ever shows a peek — a few lines under a fade, with a `View Code`
- * button — so the preview stays the subject of the section instead of being buried
- * under a file. Expanding swaps the peek for the full source with its copy button.
- */
 export const ComponentPreviewFrame = ({
   className,
   previewClassName,
@@ -23,11 +16,8 @@ export const ComponentPreviewFrame = ({
   sourcePreview,
   ...props
 }: React.ComponentProps<"div"> & {
-  /** Height and padding for the stage; use it to unclip a tall demo. */
   previewClassName?: string;
-  /** Where the demo sits in the stage when it is shorter than `min-h`. */
   align?: "center" | "start" | "end";
-  /** Drops the code area entirely, for previews with nothing to copy. */
   hideCode?: boolean;
   component: ReactNode;
   source: ReactNode;
@@ -62,10 +52,7 @@ export const ComponentPreviewFrame = ({
           data-code-visible={isCodeVisible}
           className={cn(
             "relative overflow-hidden border-t bg-code text-code-foreground",
-            // The prose code-block chrome is written for a standalone figure; inside the
-            // frame the background, radius and margins are the frame's job.
             "[&_[data-rehype-pretty-code-figure]]:m-0! [&_[data-rehype-pretty-code-figure]]:mx-0! [&_[data-rehype-pretty-code-figure]]:rounded-none! [&_[data-rehype-pretty-code-figure]]:bg-transparent!",
-            // Nothing to copy while the code is a truncated teaser.
             "[&_[data-slot=copy-button]]:hidden data-[code-visible=true]:[&_[data-slot=copy-button]]:flex",
             "[&_pre]:max-h-96"
           )}

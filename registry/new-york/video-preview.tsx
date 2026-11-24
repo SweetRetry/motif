@@ -54,7 +54,6 @@ export interface VideoPreviewState {
   progress: number;
   /** Move the playhead. Seconds, clamped to the clip. */
   seek: (time: number) => void;
-  /** Play, or pause. */
   toggle: () => void;
 }
 
@@ -97,9 +96,7 @@ export interface VideoPreviewFilmstripProps extends ComponentProps<"div"> {
 
 export interface VideoPreviewPlayButtonProps {
   className?: string;
-  /** Names the button once it is playing. */
   pauseLabel?: string;
-  /** Names the button at rest. */
   playLabel?: string;
   size?: ButtonProps["size"];
   variant?: ButtonProps["variant"];

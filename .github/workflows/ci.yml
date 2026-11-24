@@ -27,6 +27,9 @@ jobs:
       - name: Lint and format
         run: pnpm check
 
+      - name: Comment ratchet
+        run: pnpm comments
+
   typecheck:
     runs-on: ubuntu-latest
     steps:

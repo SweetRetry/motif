@@ -7,7 +7,6 @@ import { AGENT_DOCS_DIRECTIVE_MARKDOWN } from "@/lib/agent-discovery/directive";
 import { docsContentRoute, docsImageRoute } from "@/lib/docs";
 import type { PageTreePage } from "@/lib/page-tree";
 
-/** How long after its `added` date a page is flagged as new. */
 const NEW_FOR_MS = 14 * 24 * 60 * 60 * 1000;
 
 export const source = loader({

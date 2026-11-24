@@ -24,7 +24,6 @@ export interface SettingsDialogProps {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** Controlled active destination. Pair with `onActiveChange`. */
   activeId?: string;
   defaultActiveId?: string;
   onActiveChange?: (id: string) => void;
@@ -32,7 +31,6 @@ export interface SettingsDialogProps {
   title?: string;
   /** Read by assistive tech, never drawn. */
   description?: string;
-  /** Extra classes for the scrolling panel body. */
   panelClassName?: string;
 }
 

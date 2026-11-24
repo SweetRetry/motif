@@ -46,7 +46,6 @@ const getSidebarPages = (folder: PageTreeFolder): SidebarLink[] =>
       )
     : getPagesFromFolder(folder);
 
-/** Hrefs in the order they appear in the sidebar, used to infer slide direction. */
 const getSidebarOrder = (tree: typeof source.pageTree): string[] => {
   const urls: string[] = TOP_LEVEL_SECTIONS.map(({ href }) => href);
 
@@ -63,10 +62,6 @@ const getSidebarOrder = (tree: typeof source.pageTree): string[] => {
   return urls;
 };
 
-/**
- * Animates links that move down the sidebar forwards and links that move up
- * backwards. Pages outside the sidebar keep the page's default (no animation).
- */
 const getTransitionTypesByUrl = (
   order: string[],
   pathname: string

@@ -52,7 +52,6 @@ export const ComponentSource = async ({
   collapsible?: boolean;
   className?: string;
   language?: string;
-  /** Truncates the source to its first n lines, for a preview peek. */
   maxLines?: number;
 }) => {
   let code: string | null = null;
