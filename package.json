@@ -42,7 +42,7 @@
     "lru-cache": "^11.5.3",
     "lucide-react": "1.59.0",
     "motion": "^14.3.0",
-    "next": "16.4.2",
+    "next": "16.4.6",
     "next-themes": "0.4.6",
     "postcss": "^8.5.30",
     "radix-ui": "^1.8.1",
