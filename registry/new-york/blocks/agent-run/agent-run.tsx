@@ -659,10 +659,7 @@ const Batch = ({ steps }: { steps: RunToolStep[] }) => {
     .join(", ");
 
   return (
-    <ToolCall
-      className="fade-in animate-in duration-200 motion-reduce:animate-none"
-      status="done"
-    >
+    <ToolCall status="done">
       <ToolCallHeader>
         <Lead icon={toolOf(steps[0].name).tool.icon} status="done" />
         <ToolCallName className="font-normal font-sans text-muted-foreground text-sm">
@@ -739,12 +736,21 @@ const Question = ({ step }: { step: RunToolStep }) => {
   );
 };
 
-/** What the agent said, as words. Not muted: it is the thread of the run, and the rows
- *  around it are the evidence. */
-const Note = ({ children, live }: { children: string; live: boolean }) => (
+/** Each word the stream adds fades in behind the cursor and outlasts a few beats of the
+ *  stream, so a short gradient trails the newest word. Streamdown marks the words; the
+ *  timing is ours, because on every later render Streamdown rewrites a shown word's
+ *  duration to 0ms, which snaps a fade still running to its end. */
+const WORD_FADE =
+  "**:data-sd-animate:animate-[sd-fadeIn_320ms_ease-out_both] motion-reduce:**:data-sd-animate:animate-none motion-reduce:**:data-sd-animate-marker:marker:animate-none";
+
+/** What the agent said, as words: a note in the timeline or the answer under it. Not
+ *  muted: it is the thread of the run, and the rows around it are the evidence. */
+const Words = ({ children, live }: { children: string; live: boolean }) => (
   <Streamdown
-    className="space-y-2 text-sm leading-relaxed"
+    animated
+    className={cn("space-y-2 text-sm leading-relaxed", WORD_FADE)}
     controls={false}
+    isAnimating={live}
     lineNumbers={false}
     mode={live ? "streaming" : "static"}
   >
@@ -820,16 +826,16 @@ const Activity = ({ turn }: { turn: RunTurn }) => {
       <AgentActivityHeader>
         <AgentActivityTitle />
       </AgentActivityHeader>
-      <AgentActivityContent className="gap-2">
+      <AgentActivityContent className="gap-2 *:animate-in *:fade-in *:duration-200 motion-reduce:*:animate-none">
         {blocks.map((block, index) => {
           if (block.kind === "note") {
             return (
-              <Note
+              <Words
                 key={block.note.id}
                 live={working && index === blocks.length - 1}
               >
                 {block.note.note}
-              </Note>
+              </Words>
             );
           }
           if (block.kind === "batch") {
@@ -870,18 +876,14 @@ const Answer = ({
       {acted && answered ? <Separator /> : null}
 
       {answered ? (
-        <Streamdown
-          className="space-y-2 text-sm leading-relaxed"
-          controls={false}
-          lineNumbers={false}
-          mode={turn.streaming ? "streaming" : "static"}
-        >
-          {turn.content}
-        </Streamdown>
+        <Words live={Boolean(turn.streaming)}>{turn.content}</Words>
       ) : null}
 
       {answered && turn.sources?.length ? (
-        <Sources sources={turn.sources} />
+        <Sources
+          className="animate-in fade-in duration-300 motion-reduce:animate-none"
+          sources={turn.sources}
+        />
       ) : null}
 
       {waiting ? (

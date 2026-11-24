@@ -1,5 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+/* Streamdown's word fade-in, in the base layer so a component's `motion-reduce` utility
+   can switch it off. */
+@import "streamdown/styles.css" layer(base);
 
 @import "./themes.css";
 

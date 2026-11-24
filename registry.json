@@ -745,6 +745,26 @@
         "https://motif.sweetretry.com/r/diff.json",
         "https://motif.sweetretry.com/r/loading-state.json"
       ],
+      "css": {
+        "@keyframes sd-fadeIn": {
+          "from": {
+            "opacity": "0"
+          },
+          "to": {
+            "opacity": "1"
+          }
+        },
+        "@keyframes sd-markerIn": {
+          "from": {
+            "color": "transparent"
+          }
+        },
+        "@layer base": {
+          "[data-sd-animate-marker]::marker": {
+            "animation": "sd-markerIn var(--sd-marker-duration, 150ms) var(--sd-marker-easing, ease) var(--sd-marker-delay, 0ms) both"
+          }
+        }
+      },
       "files": [
         {
           "path": "registry/new-york/blocks/agent-run/agent-run.tsx",
