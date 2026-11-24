@@ -2,13 +2,18 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { PromptModel } from "@/components/ui/motif/prompt-input";
+import type {
+  ChatModel,
+  ReasoningEffort,
+} from "@/components/ui/motif/model-menu";
 
 import type {
   RunAnswers,
+  RunQueued,
   RunQuestion,
   RunSource,
   RunStep,
+  RunTask,
   RunToolStep,
   RunTurn,
   RunUsage,
@@ -96,32 +101,86 @@ const EDIT_PATCH = `--- a/components/thread.tsx
 +    }
    }, [turns]);`;
 
+const PLAN: RunTask[] = [
+  {
+    id: "read",
+    status: "active",
+    text: "Read how the thread follows its tail",
+  },
+  { id: "ask", status: "todo", text: "Agree on the follow behaviour with you" },
+  {
+    id: "scan",
+    status: "todo",
+    text: "Find anything else that scrolls the thread",
+  },
+  {
+    id: "edit",
+    status: "todo",
+    text: "Pin the viewport to the newest turn in thread.tsx",
+  },
+  { id: "test", status: "todo", text: "Run the thread tests" },
+];
+
 const NOTE_MS = 40;
 const ANSWER_MS = 55;
 const CALL_MS = 700;
 
 /** Three models, so the picker's menu says what it is for without a list to read. */
-export const DEMO_MODELS: PromptModel[] = [
-  { id: "gpt-5.2", name: "GPT-5.2", provider: "openai" },
-  { id: "claude-sonnet-4.5", name: "Claude Sonnet 4.5", provider: "anthropic" },
-  { id: "gemini-3-pro", name: "Gemini 3 Pro", provider: "gemini" },
+export const DEMO_MODELS: ChatModel[] = [
+  {
+    family: "openai",
+    id: "gpt-5.2",
+    name: "GPT-5.2",
+    provider: "openai",
+    thinking: {
+      default: "medium",
+      options: ["minimal", "low", "medium", "high"],
+    },
+  },
+  {
+    family: "openai",
+    id: "gpt-5.2-mini",
+    name: "GPT-5.2 mini",
+    provider: "openai",
+    thinking: { default: "low", options: ["minimal", "low", "medium", "high"] },
+  },
+  {
+    family: "anthropic",
+    id: "claude-sonnet-4.5",
+    name: "Claude Sonnet 4.5",
+    provider: "anthropic",
+    thinking: { default: "high", options: ["low", "medium", "high", "max"] },
+  },
+  {
+    family: "gemini",
+    id: "gemini-3-pro",
+    name: "Gemini 3 Pro",
+    provider: "gemini",
+    thinking: { default: "high", options: ["low", "high"] },
+  },
 ];
 
 /** The shape `AgentRun` spreads: everything the surface needs, nothing it does not. */
 export interface DemoRun {
+  effort: ReasoningEffort | null;
   model: string;
-  models: PromptModel[];
+  models: ChatModel[];
   onDecide: (
     id: string,
     decision: "approve" | "reject",
     reason?: string
   ) => void;
   onAnswer: (id: string, answers: RunAnswers) => void;
+  onEffortChange: (effort: ReasoningEffort) => void;
   onModelChange: (id: string) => void;
+  onQueue: (message: string) => void;
   onReset: () => void;
   onRetry: (id: string) => void;
   onSend: (message: string) => void;
+  onSendNow: (id: string) => void;
   onStop: () => void;
+  onUnqueue: (id: string) => void;
+  queued: RunQueued[];
   streaming: boolean;
   turns: RunTurn[];
   usage: RunUsage;
@@ -134,6 +193,51 @@ interface Beat {
   gate?: string;
   ms: number;
 }
+
+const planned = (): Beat => ({
+  apply: (turn) => ({ ...turn, plan: PLAN }),
+  ms: 400,
+});
+
+const moveTo = (id: string, ms = 0): Beat => ({
+  apply: (turn) => {
+    const at = turn.plan?.findIndex((task) => task.id === id) ?? -1;
+
+    return {
+      ...turn,
+      plan: turn.plan?.map((task, index): RunTask => {
+        if (index < at) {
+          return { ...task, status: "done" };
+        }
+
+        return index === at ? { ...task, status: "active" } : task;
+      }),
+    };
+  },
+  ms,
+});
+
+const planDone = (): Beat => ({
+  apply: (turn) => ({
+    ...turn,
+    plan: turn.plan?.map((task): RunTask => ({ ...task, status: "done" })),
+  }),
+  ms: 300,
+});
+
+const dropFrom = (id: string): Beat => ({
+  apply: (turn) => {
+    const at = turn.plan?.findIndex((task) => task.id === id) ?? -1;
+
+    return {
+      ...turn,
+      plan: turn.plan
+        ?.slice(0, at === -1 ? undefined : at)
+        .map((task): RunTask => ({ ...task, status: "done" })),
+    };
+  },
+  ms: 300,
+});
 
 const withStep = (turn: RunTurn, step: RunStep): RunTurn => ({
   ...turn,
@@ -238,6 +342,7 @@ const say = (id: string, text: string): Beat[] => {
 };
 
 const script = (id: string): Beat[] => [
+  planned(),
   ...say(
     `${id}-n1`,
     "Let me look at how the thread follows its tail before I change anything."
@@ -265,6 +370,7 @@ const script = (id: string): Beat[] => [
     `${id}-n2`,
     "The thread scrolls with a smooth `scrollIntoView`, which lags behind a streaming answer. Before I replace it I need one decision from you."
   ),
+  moveTo("ask"),
   {
     apply: (turn) =>
       withStep(turn, {
@@ -283,8 +389,9 @@ const script = (id: string): Beat[] => [
 const afterAnswer = (id: string, answers: RunAnswers): Beat[] => [
   {
     apply: (turn) => patchStep(turn, `${id}-ask`, { answers, status: "done" }),
-    ms: 500,
+    ms: 0,
   },
+  moveTo("scan", 500),
   ...say(
     `${id}-n3`,
     "Thanks. Before I edit, let me see whether anything else scrolls the thread."
@@ -302,6 +409,7 @@ const afterAnswer = (id: string, answers: RunAnswers): Beat[] => [
     `${id}-n4`,
     "That file does not exist, so the follow lives only in `thread.tsx`. The edit is small, and it needs your approval."
   ),
+  moveTo("edit"),
   {
     apply: (turn) =>
       withStep(turn, {
@@ -339,12 +447,14 @@ const aftermath = (
             }),
           ms: 250,
         },
+        moveTo("test"),
         ...call(
           `${id}-test`,
           "run_tests",
           "components/thread.test.tsx",
           "12 passed"
         ),
+        planDone(),
         finish(CITED),
         ...words(answerText(follow), ANSWER_MS, 1),
       ]
@@ -357,6 +467,7 @@ const aftermath = (
             }),
           ms: 250,
         },
+        dropFrom("edit"),
         finish(),
         ...words(ANSWER_REJECTED, ANSWER_MS, 1),
       ];
@@ -415,6 +526,9 @@ export const useDemoRun = (initialTurns: RunTurn[] = []): DemoRun => {
   const [turns, setTurns] = useState<RunTurn[]>(initialTurns);
   const [streaming, setStreaming] = useState(false);
   const [model, setModel] = useState(DEMO_MODELS[0].id);
+  const [queued, setQueued] = useState<RunQueued[]>([]);
+  const [effort, setEffort] = useState<ReasoningEffort | null>(null);
+  const waiting = useRef<RunQueued[]>([]);
   const counter = useRef(0);
   const timer = useRef<number | null>(null);
   const queue = useRef<Beat[]>([]);
@@ -430,6 +544,35 @@ export const useDemoRun = (initialTurns: RunTurn[] = []): DemoRun => {
   }, []);
 
   useEffect(() => clear, [clear]);
+
+  const wait = useCallback((next: RunQueued[]) => {
+    waiting.current = next;
+    setQueued(next);
+  }, []);
+
+  const append = useCallback((message: string) => {
+    const userId = `u-${(counter.current += 1)}`;
+    const assistantId = `a-${(counter.current += 1)}`;
+
+    setTurns((current) => [
+      ...current,
+      { content: message, from: "user", id: userId },
+      assistantTurn(assistantId),
+    ]);
+
+    return assistantId;
+  }, []);
+
+  const begin = useCallback((id: string) => {
+    target.current = id;
+    queue.current = script(id);
+    setStreaming(true);
+    setTurns((current) =>
+      current.map((turn) =>
+        turn.id === id ? { ...turn, startedAt: Date.now() } : turn
+      )
+    );
+  }, []);
 
   const settle = useCallback(() => {
     clear();
@@ -470,6 +613,12 @@ export const useDemoRun = (initialTurns: RunTurn[] = []): DemoRun => {
           )
         );
         settle();
+        const [next, ...rest] = waiting.current;
+        if (next) {
+          wait(rest);
+          begin(append(next.text));
+          tick();
+        }
         return;
       }
 
@@ -484,22 +633,15 @@ export const useDemoRun = (initialTurns: RunTurn[] = []): DemoRun => {
       }
       timer.current = window.setTimeout(tick, beat.ms);
     },
-    [settle]
+    [append, begin, settle, wait]
   );
 
   const run = useCallback(
     (id: string) => {
-      target.current = id;
-      queue.current = script(id);
-      setStreaming(true);
-      setTurns((current) =>
-        current.map((turn) =>
-          turn.id === id ? { ...turn, startedAt: Date.now() } : turn
-        )
-      );
+      begin(id);
       pump();
     },
-    [pump]
+    [begin, pump]
   );
 
   const onDecide = useCallback(
@@ -529,18 +671,8 @@ export const useDemoRun = (initialTurns: RunTurn[] = []): DemoRun => {
   );
 
   const onSend = useCallback(
-    (message: string) => {
-      const userId = `u-${(counter.current += 1)}`;
-      const assistantId = `a-${(counter.current += 1)}`;
-
-      setTurns((current) => [
-        ...current,
-        { content: message, from: "user", id: userId },
-        assistantTurn(assistantId),
-      ]);
-      run(assistantId);
-    },
-    [run]
+    (message: string) => run(append(message)),
+    [append, run]
   );
 
   const onRetry = useCallback(
@@ -559,23 +691,57 @@ export const useDemoRun = (initialTurns: RunTurn[] = []): DemoRun => {
     [run]
   );
 
+  const onQueue = useCallback(
+    (message: string) => {
+      counter.current += 1;
+      wait([...waiting.current, { id: `q-${counter.current}`, text: message }]);
+    },
+    [wait]
+  );
+
+  const onUnqueue = useCallback(
+    (id: string) =>
+      wait(waiting.current.filter((message) => message.id !== id)),
+    [wait]
+  );
+
+  const onSendNow = useCallback(
+    (id: string) => {
+      const message = waiting.current.find((item) => item.id === id);
+      if (!message) {
+        return;
+      }
+      wait(waiting.current.filter((item) => item.id !== id));
+      onStop();
+      onSend(message.text);
+    },
+    [onSend, onStop, wait]
+  );
+
   const onReset = useCallback(() => {
     onStop();
+    wait([]);
     setTurns([]);
-  }, [onStop]);
+  }, [onStop, wait]);
 
   const usage = useMemo(() => usageOf(turns), [turns]);
 
   return {
+    effort,
     model,
     models: DEMO_MODELS,
     onAnswer,
     onDecide,
+    onEffortChange: setEffort,
     onModelChange: setModel,
+    onQueue,
     onReset,
     onRetry,
     onSend,
+    onSendNow,
     onStop,
+    onUnqueue,
+    queued,
     streaming,
     turns,
     usage,

@@ -19,6 +19,14 @@ import { Streamdown } from "streamdown";
 import { Button } from "@/components/ui/button";
 import type { ButtonProps } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   AgentActivity,
   AgentActivityContent,
   AgentActivityHeader,
@@ -52,7 +60,17 @@ import {
   MessageContent,
 } from "@/components/ui/motif/message";
 import {
-  ModelPicker,
+  ModelMenu,
+  ModelMenuContent,
+  ModelMenuEffort,
+  ModelMenuModels,
+  ModelMenuTrigger,
+} from "@/components/ui/motif/model-menu";
+import type {
+  ChatModel,
+  ReasoningEffort,
+} from "@/components/ui/motif/model-menu";
+import {
   PromptInput,
   PromptInputAttach,
   PromptInputAttachment,
@@ -61,12 +79,19 @@ import {
   PromptInputSubmit,
   PromptInputTextarea,
 } from "@/components/ui/motif/prompt-input";
-import type {
-  PromptAttachment,
-  PromptModel,
-} from "@/components/ui/motif/prompt-input";
+import type { PromptAttachment } from "@/components/ui/motif/prompt-input";
 import { QuestionCard } from "@/components/ui/motif/question-card";
 import type { QuestionCardProps } from "@/components/ui/motif/question-card";
+import {
+  Queue,
+  QueueHeader,
+  QueueItem,
+  QueueItemMarker,
+  QueueItemRemove,
+  QueueItemSendNow,
+  QueueItemText,
+  QueueList,
+} from "@/components/ui/motif/queue";
 import {
   ScrollRail,
   ScrollRailPreview,
@@ -78,6 +103,18 @@ import {
   SourceList,
   SourceMark,
 } from "@/components/ui/motif/source";
+import {
+  TaskList,
+  TaskListContent,
+  TaskListHeader,
+  TaskListItem,
+  TaskListItemMarker,
+  TaskListItemText,
+  TaskListProgress,
+  TaskListStatus,
+  TaskListTitle,
+} from "@/components/ui/motif/task-list";
+import type { TaskStatus } from "@/components/ui/motif/task-list";
 import {
   ToolCall,
   ToolCallContent,
@@ -189,6 +226,17 @@ export interface RunNote {
  *  explains. */
 export type RunStep = RunNote | RunToolStep;
 
+export interface RunQueued {
+  id: string;
+  text: string;
+}
+
+export interface RunTask {
+  id: string;
+  status: TaskStatus;
+  text: string;
+}
+
 /** One turn in the thread. */
 export interface RunTurn {
   id: string;
@@ -207,6 +255,7 @@ export interface RunTurn {
   steps?: RunStep[];
   /** Files riding with a reader's turn. */
   files?: RunFile[];
+  plan?: RunTask[];
 }
 
 export interface AgentRunProps {
@@ -214,7 +263,7 @@ export interface AgentRunProps {
   /** First-run surface, in place of the thread while there are no turns. */
   empty?: ReactNode;
   /** The models the composer can be pointed at. */
-  models: PromptModel[];
+  models: ChatModel[];
   model?: string;
   /** Answer the call a gate is holding. A rejection may carry the reader's reason. Omit it
    *  and a held call leaves the composer where it is. */
@@ -227,12 +276,18 @@ export interface AgentRunProps {
    *  Omit it and a held question leaves the composer where it is. */
   onAnswer?: (id: string, answers: RunAnswers) => void;
   onModelChange?: (id: string) => void;
+  effort?: ReasoningEffort | null;
+  onEffortChange?: (effort: ReasoningEffort) => void;
   /** Clear the thread. Omit it and the header keeps only its title. */
   onReset?: () => void;
   /** Re-run an answer. Omit it and the retry control is not drawn. */
   onRetry?: (id: string) => void;
   onSend: (message: string, files: RunFile[]) => void;
   onStop?: () => void;
+  onQueue?: (message: string) => void;
+  onSendNow?: (id: string) => void;
+  onUnqueue?: (id: string) => void;
+  queued?: RunQueued[];
   /** A run is in flight: the composer swaps send for stop and blocks Enter. */
   streaming?: boolean;
   title?: string;
@@ -1046,18 +1101,64 @@ const Thread = ({
   );
 };
 
+const Plan = ({
+  blocked,
+  streaming,
+  turns,
+}: {
+  blocked: boolean;
+  streaming: boolean;
+  turns: RunTurn[];
+}) => {
+  const turn = turns.findLast(({ from }) => from === "assistant");
+  const plan = turn?.plan ?? [];
+  const done = plan.filter(({ status }) => status === "done").length;
+  const working = Boolean(streaming && turn?.streaming);
+
+  if (plan.length === 0 || (!working && done === plan.length)) {
+    return null;
+  }
+
+  const active = plan.find(({ status }) => status === "active");
+  const next = active ?? plan.find(({ status }) => status === "todo");
+
+  return (
+    <TaskList running={working && !blocked}>
+      <TaskListHeader>
+        <TaskListStatus status={active ? "active" : "todo"} />
+        <TaskListTitle>{next?.text}</TaskListTitle>
+        <TaskListProgress done={done} total={plan.length} />
+      </TaskListHeader>
+      <TaskListContent>
+        {plan.map((task) => (
+          <TaskListItem key={task.id} status={task.status}>
+            <TaskListItemMarker />
+            <TaskListItemText>{task.text}</TaskListItemText>
+          </TaskListItem>
+        ))}
+      </TaskListContent>
+    </TaskList>
+  );
+};
+
 export const AgentRun = ({
   className,
+  effort,
   empty,
   model,
   models,
   onAnswer,
   onDecide,
+  onEffortChange,
   onModelChange,
   onReset,
   onRetry,
+  onQueue,
   onSend,
+  onSendNow,
   onStop,
+  onUnqueue,
+  queued = [],
   streaming = false,
   title = "Agent run",
   tools,
@@ -1065,6 +1166,23 @@ export const AgentRun = ({
   usage,
 }: AgentRunProps) => {
   const [files, setFiles] = useState<PromptAttachment[]>([]);
+  const [switching, setSwitching] = useState<ChatModel | null>(null);
+  const inUse = models.find(({ id }) => id === model) ?? models[0];
+
+  const pickModel = (id: string) => {
+    const next = models.find((candidate) => candidate.id === id);
+    const crosses =
+      turns.length > 0 &&
+      next?.family !== undefined &&
+      inUse?.family !== undefined &&
+      next.family !== inUse.family;
+
+    if (crosses) {
+      setSwitching(next);
+      return;
+    }
+    onModelChange?.(id);
+  };
   // The call a gate is holding, if any. The oldest first: a run holds one at a time.
   const held = turns
     .flatMap((turn) => turn.steps ?? [])
@@ -1144,7 +1262,33 @@ export const AgentRun = ({
         </Conversation>
 
         <div className="shrink-0 px-4 pb-4">
-          <div className="mx-auto w-full max-w-3xl">
+          <div className="mx-auto w-full max-w-2xl">
+            <div className="mb-2 flex flex-col gap-2 empty:hidden">
+              <Plan blocked={blocked} streaming={streaming} turns={turns} />
+              {queued.length > 0 ? (
+                <Queue>
+                  <QueueHeader>{queued.length} queued</QueueHeader>
+                  <QueueList>
+                    {queued.map((message) => (
+                      <QueueItem key={message.id}>
+                        <QueueItemMarker />
+                        <QueueItemText>{message.text}</QueueItemText>
+                        <QueueItemSendNow
+                          onClick={
+                            onSendNow ? () => onSendNow(message.id) : undefined
+                          }
+                        />
+                        <QueueItemRemove
+                          onClick={
+                            onUnqueue ? () => onUnqueue(message.id) : undefined
+                          }
+                        />
+                      </QueueItem>
+                    ))}
+                  </QueueList>
+                </Queue>
+              ) : null}
+            </div>
             {blocked && held ? (
               <Gate
                 onAnswer={onAnswer}
@@ -1159,6 +1303,7 @@ export const AgentRun = ({
               tech along with the pointer, which is what blocking means. */}
             <div hidden={blocked} inert={blocked}>
               <PromptInput
+                onQueue={onQueue}
                 onStop={onStop}
                 onSubmit={submit}
                 streaming={streaming}
@@ -1173,15 +1318,29 @@ export const AgentRun = ({
                   ))}
                 </PromptInputHeader>
 
-                <PromptInputTextarea placeholder="Give the agent a task, or drop in a file." />
+                <PromptInputTextarea
+                  placeholder={
+                    streaming && onQueue
+                      ? "Add a follow-up. It's sent when this run finishes."
+                      : "Give the agent a task, or drop in a file."
+                  }
+                />
 
                 <PromptInputFooter>
                   <PromptInputAttach onFiles={pick} />
-                  <ModelPicker
+                  <ModelMenu
+                    effort={effort}
                     models={models}
-                    onValueChange={onModelChange}
+                    onEffortChange={onEffortChange}
+                    onValueChange={pickModel}
                     value={model}
-                  />
+                  >
+                    <ModelMenuTrigger />
+                    <ModelMenuContent>
+                      <ModelMenuModels />
+                      <ModelMenuEffort />
+                    </ModelMenuContent>
+                  </ModelMenu>
                   {/* The ring and the send button are one group at the right edge; the
                   submit's own auto margin would otherwise leave the ring beside the
                   picker. */}
@@ -1195,6 +1354,46 @@ export const AgentRun = ({
           </div>
         </div>
       </div>
+
+      <Dialog
+        onOpenChange={(open) => {
+          if (!open) {
+            setSwitching(null);
+          }
+        }}
+        open={switching !== null}
+      >
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>Switch to {switching?.name}?</DialogTitle>
+            <DialogDescription>
+              This conversation so far ran on {inUse?.name}. {switching?.name}{" "}
+              will read the messages, but not the earlier reasoning, so it may
+              pick up with less context.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              onClick={() => setSwitching(null)}
+              type="button"
+              variant="outline"
+            >
+              Keep {inUse?.name}
+            </Button>
+            <Button
+              onClick={() => {
+                if (switching) {
+                  onModelChange?.(switching.id);
+                }
+                setSwitching(null);
+              }}
+              type="button"
+            >
+              Switch model
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </ToolsContext.Provider>
   );
 };

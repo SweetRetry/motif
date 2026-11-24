@@ -100,6 +100,14 @@ _Avoid_: steer、interrupt、jump the queue
 queue 里的一条。它是消息，不是 tool call，`queued` 这个词只属于 tool call status。
 _Avoid_: pending item、draft、task
 
+**Task list**（任务清单）：
+agent 自己为这一轮写下的计划，贴在 composer 上方。默认折成一行：做到第几步、正在做哪一步；点开才是全部步骤。和 queue 是一对：queue 是用户等着要说的话，task list 是 agent 正在做的事。
+_Avoid_: todo list、plan card、checklist、progress panel
+
+**Task status**（步骤状态）：
+task list 里一步所处的位置，只有三个词：`todo` 还没做、`active` 正在做、`done` 做完了。同一时刻只有一步是 `active`。没有 failed：失败属于 tool call，agent 放弃的步骤从计划里删掉。
+_Avoid_: pending、in_progress、completed、skipped
+
 **Video preview**（视频预览）：
 一条生成出来的视频在播放前就能读：画面、帧条，播放键盖在画面上，读数放在帧条的轴上。根不画外框，几个部分各是各的形状。
 _Avoid_: video player、video card、media preview

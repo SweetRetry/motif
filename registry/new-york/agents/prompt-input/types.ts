@@ -39,6 +39,7 @@ export interface PromptInputProps extends Omit<
   /** Draft the composer starts with. Ignored under a controlled `value`. */
   defaultValue?: string;
   disabled?: boolean;
+  onQueue?: (value: string, segments: PromptSegment[]) => void;
   /** Pairs with `streaming`: what the submit part's stop face calls. */
   onStop?: () => void;
   /**

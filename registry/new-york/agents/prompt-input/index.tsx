@@ -82,6 +82,7 @@ export const PromptInput = ({
   className,
   defaultValue,
   disabled = false,
+  onQueue,
   onStop,
   onSubmit,
   onValueChange,
@@ -110,10 +111,10 @@ export const PromptInput = ({
 
   const submit = useCallback(() => {
     const message = text.trim();
-    if (message.length === 0 || disabled || streaming) {
+    if (message.length === 0 || disabled || (streaming && !onQueue)) {
       return;
     }
-    onSubmit?.(
+    (streaming ? onQueue : onSubmit)?.(
       message,
       segments.current?.() ?? [{ text: message, type: "text" }]
     );
@@ -121,7 +122,7 @@ export const PromptInput = ({
       setValue("");
     }
     field.current?.focus();
-  }, [controlled, disabled, onSubmit, setValue, streaming, text]);
+  }, [controlled, disabled, onQueue, onSubmit, setValue, streaming, text]);
 
   const state = useMemo<PromptInputState>(
     () => ({

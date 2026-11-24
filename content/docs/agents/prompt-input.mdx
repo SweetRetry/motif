@@ -251,8 +251,13 @@ that has to say "Anthropic" somewhere.
 Pass `streaming` and submit becomes stop — one button with two jobs, because while an
 answer is streaming the only thing worth doing to the composer is stopping it, and a
 second button beside send would make the reader choose between two live actions on every
-frame. Enter cannot send while it is true. `onStop` is called when it is pressed; flipping
-`streaming` back to false is what returns the arrow.
+frame. `onStop` is called when it is pressed; flipping `streaming` back to false is what
+returns the arrow.
+
+Enter does not send while it is true. Pass `onQueue` and it queues instead: the draft goes
+to `onQueue` and the field clears, so the reader can write the next instruction while the
+agent works and hand it to a [Queue](/docs/agents/queue). Without `onQueue`, Enter does
+nothing until the answer has arrived.
 
 <ComponentPreview name="prompt-input" align="start">
   <PromptInputStreamingDemo />
@@ -262,16 +267,17 @@ frame. Enter cannot send while it is true. `onStop` is called when it is pressed
 
 ### PromptInput
 
-| Prop            | Default | Meaning                                                                    |
-| --------------- | ------- | -------------------------------------------------------------------------- |
-| `value`         | —       | Controlled draft, never cleared by a send                                  |
-| `defaultValue`  | `""`    | Draft the composer starts with                                             |
-| `onValueChange` | —       | Called with the draft on every change                                      |
-| `onSubmit`      | —       | Called with the trimmed draft and its segments; <kbd>Enter</kbd> or submit |
-| `streaming`     | `false` | Swaps the submit part's arrow for stop, and blocks <kbd>Enter</kbd>        |
-| `onStop`        | —       | Called when the stop face is pressed                                       |
-| `disabled`      | `false` | Disables the field and the submit button                                   |
-| `className`     | —       | Extra classes for the card                                                 |
+| Prop            | Default | Meaning                                                                             |
+| --------------- | ------- | ----------------------------------------------------------------------------------- |
+| `value`         | —       | Controlled draft, never cleared by a send                                           |
+| `defaultValue`  | `""`    | Draft the composer starts with                                                      |
+| `onValueChange` | —       | Called with the draft on every change                                               |
+| `onSubmit`      | —       | Called with the trimmed draft and its segments; <kbd>Enter</kbd> or submit          |
+| `streaming`     | `false` | Swaps the submit part's arrow for stop, and blocks <kbd>Enter</kbd>                 |
+| `onStop`        | —       | Called when the stop face is pressed                                                |
+| `onQueue`       | —       | Under `streaming`, called with the draft on <kbd>Enter</kbd> in place of `onSubmit` |
+| `disabled`      | `false` | Disables the field and the submit button                                            |
+| `className`     | —       | Extra classes for the card                                                          |
 
 Anything else goes to the underlying `form`.
 

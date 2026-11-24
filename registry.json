@@ -433,6 +433,28 @@
       ]
     },
     {
+      "name": "task-list",
+      "type": "registry:ui",
+      "title": "Task List",
+      "description": "The agent's own plan for the run: one folded line that says how far it has got and what it is on now, and behind it every step, to do, in progress or done.",
+      "dependencies": ["lucide-react", "motion"],
+      "registryDependencies": [
+        "https://motif.sweetretry.com/r/loading-state.json"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/agents/task-list.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/motif/task-list.tsx"
+        },
+        {
+          "path": "components/ui/motif/agent-disclosure.tsx",
+          "type": "registry:ui",
+          "target": "@components/ui/motif/agent-disclosure.tsx"
+        }
+      ]
+    },
+    {
       "name": "source",
       "type": "registry:ui",
       "title": "Source",
@@ -724,10 +746,11 @@
       "name": "agent-run",
       "type": "registry:block",
       "title": "Agent Run",
-      "description": "A whole agent run for a page: a thread that follows its own tail, turns that carry reasoning, tool calls and approvals, and a composer that holds files and a model. Assembled from conversation, message, agent-activity, tool-call, diff, source, approval-card, question-card, loading-state, context-usage and prompt-input.",
+      "description": "A whole agent run for a page: a thread that follows its own tail, turns that carry reasoning, tool calls and approvals, and a composer that holds files and a model. Assembled from conversation, message, agent-activity, tool-call, diff, source, approval-card, question-card, loading-state, context-usage, task-list, queue, model-menu and prompt-input.",
       "dependencies": ["lucide-react", "streamdown"],
       "registryDependencies": [
         "button",
+        "dialog",
         "popover",
         "separator",
         "tooltip",
@@ -743,7 +766,10 @@
         "https://motif.sweetretry.com/r/scroll-rail.json",
         "https://motif.sweetretry.com/r/tool-call.json",
         "https://motif.sweetretry.com/r/diff.json",
-        "https://motif.sweetretry.com/r/loading-state.json"
+        "https://motif.sweetretry.com/r/loading-state.json",
+        "https://motif.sweetretry.com/r/task-list.json",
+        "https://motif.sweetretry.com/r/queue.json",
+        "https://motif.sweetretry.com/r/model-menu.json"
       ],
       "css": {
         "@keyframes sd-fadeIn": {
