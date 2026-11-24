@@ -183,8 +183,6 @@ export const ScrollRailDemo = () => {
   );
 };
 
-/** The other focus mode: no item measurement, just how far through the document the
- *  reader is. */
 export const ScrollRailProgressDemo = () => {
   const scroller = useRef<HTMLDivElement>(null);
   const focus = useScrollProgress(scroller, { count: SECTIONS.length });

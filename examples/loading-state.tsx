@@ -15,8 +15,6 @@ export const LoadingStateDemo = () => (
   </LoadingState>
 );
 
-/** The same parts with one left out each. The mark alone is the wait before there is
- *  anything to name; the label without a clock is a wait nobody is counting. */
 export const LoadingStatePartsDemo = () => (
   <div className="flex flex-col items-start gap-4">
     <LoadingState>

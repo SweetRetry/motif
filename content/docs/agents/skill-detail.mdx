@@ -1,6 +1,6 @@
 ---
 title: Skill Detail
-description: "A skill's detail surface, in two columns: a cover rail that says what the skill is and a workspace that shows what it makes and what is inside it. A card opens it, the dialog is optional."
+description: A two-column skill detail surface with an identity cover rail, results and file-tree workspace, and optional card and dialog wrappers.
 added: 2026-09-11
 ---
 
@@ -69,111 +69,18 @@ export function Library({ skills }: { skills: Skill[] }) {
 }
 ```
 
-## Card, panel, dialog
+## Parts
 
-The panel is not a modal and the card is not a button the panel knows about: three
-pieces, three jobs, and you can leave any of them out.
+- `SkillCard`: Summary card with a 16:9 cropped cover, title, and clamped description; pass `href` instead of `onOpen` to navigate to a dedicated route.
+- `SkillDetail`: Two-column panel that fills its container height and switches to a top banner layout below `48rem` via a container query; ship a portrait `cover` for the rail.
+- `SkillDetailDialog`: Dialog wrapper sized to `min(46rem, 88dvh)` and `max-w-5xl` that wires `onClose` and supports controlled (`open` / `onOpenChange`) or uncontrolled (`defaultOpen`) state.
 
-- **`SkillCard`** is the summary and nothing else — cover, name, one clamped line. It
-  holds no actions of its own, because every action a skill has belongs in the panel,
-  where there is room to explain it. Pass `href` instead of `onOpen` and the card
-  navigates to a page of its own rather than opening in place. Its cover is drawn at 16:9
-  whatever the art is, so a portrait poster loses its top and its tail.
-- **`SkillDetail`** is the surface: a rail of identity down the left edge, next to a
-  workspace with two tabs, what the skill makes and what it is made of. It fills whatever
-  box you give it, so give it a height. The cover is the rail's background rather than a
-  thumbnail inside it: it is the only colour in an otherwise monochrome surface, and a skill
-  is a visual thing, so it gets 22rem by the full height of the dialog rather than 63px.
-- **`SkillDetailDialog`** is the handful of lines of plumbing: it sizes the panel at
-  `min(46rem, 88dvh)` and `max-w-5xl`, names the dialog for assistive tech, and wires the
-  panel's close control to closing. Leave it out and the panel sits in a page just as
-  happily.
+## Workspace & Files
 
-The dialog leans on the panel rather than the other way around: `onClose` is dropped from
-`SkillDetailDialog` because the dialog owns it. Everything else passes straight through,
-and `open` works controlled or uncontrolled with `defaultOpen`, like the panel's own
-selection.
-
-## A rail and a workspace
-
-The panel is two columns, and they answer different questions. The rail on the left says what
-the skill is: the cover, then on top of it the tags, the name, the sentence about what it does,
-who made it and when, and the one thing to do about it. The workspace on the right says what is
-in it. Neither needs the other's width, and the workspace gets the panel's whole height, which
-is where a file tree and a document need it.
-
-The text sits on the cover, at its foot, over a scrim. The scrim is the one place the component
-draws literal black and white: it is measured against the artwork, not against the theme, so a
-token would be wrong the moment the art changed. It is heavy at the foot, where the words are,
-and gone by the top so the art keeps its colour. The action is the last thing in the rail and
-spans its width, because it is the rail's one verb. A skill with no `cover` gets the same
-rail without the art: the text starts at the top in ordinary foreground colours, so nothing is
-ever white on white.
-
-The art is cropped to the rail, not letterboxed, because a cover that keeps its own ratio cannot
-also fill a column whose height is the dialog's. Ship two crops of the art: 16:9 for the card,
-portrait for the panel.
-
-The split happens at 48rem of the panel's own width, with a container query rather than a
-viewport one. Below it the rail becomes a 13rem banner across the top, carrying the tags, name,
-byline and action; the description moves under it, above the tabs, because a banner has no room
-for a paragraph and dropping it would lose the one sentence that says what the skill does. The
-same panel is a dialog here, a sheet there, a route of its own somewhere else; only its own box
-knows whether there is room.
-
-## Results first
-
-The first tab is what the skill makes: `results` as a row of pictures, a `resultsNote` line under
-them for where they came from or what they cost, and the example prompts beneath. It opens on
-that tab because for a visual skill the output is the argument, and a file tree is the proof you
-reach for second. The second tab is the file tree and its preview.
-
-A skill with only one of the two draws only that one, without a tab strip to switch nothing: no
-`files` means the first tab alone, no `results` and no `prompts` means the files alone. The first
-tab's name is `resultsLabel`, `"Results"` by default.
-
-An example prompt is a line you might have typed, so it is drawn as one rather than boxed like a
-card: a number to scan by, two clamped lines of text, and the whole row as the button, with the
-rows ruled apart rather than carded. The arrow is there at rest, dimmed, because a hit target
-that only admits it is one under a pointer does not admit it at all on a touch screen. Without
-`onPrompt` the rows are not buttons at all and render as plain text, because an example that
-cannot be sent anywhere is just documentation.
-
-Every block in the workspace starts on the same 24px gutter: the tabs, the results, the section
-label, the example rows and the preview. The first level of the file tree is inset 16px and its
-rows carry the last 8px, so a folder's chevron lands on the same edge.
-
-## Files are paths
-
-`files` is a list of paths — `references/api.md` — and folders are implied by the
-slashes. There is no nested model to build and nothing is sorted: the order you wrote the
-paths in is the order the tree draws them, because a skill folder has an intended reading
-order and a generic sort (`SKILL.md` above `LICENSE.txt`) is a guess.
-
-Pass `folder` and that name becomes the root row, expanded, with everything nested under
-it collapsed to start — a deep tree opens as a short list. The first file is selected
-until told otherwise: a panel that opens on an empty preview pane reads as broken rather
-than as unselected.
-
-A folder row carries the disclosure chevron and a folder glyph — open while it is open —
-and a file row carries a glyph picked from its extension. Files keep the chevron's width
-as an empty slot, so every glyph in a level sits in one column and the labels never
-stagger.
-
-Selection and expansion are uncontrolled by default. Pass `selectedPath` and you own the
-selection; pass `onFileSelect` and you get told about it either way.
-
-## The preview is yours
-
-The panel hands `renderPreview` the selected `SkillFile` and draws whatever comes back, so
-a markdown pipeline, a syntax highlighter, a diff or an iframe all sit behind one prop
-without the panel knowing what a file is. Omit it and the tree stands on its own as a
-read-only manifest, in a single column.
-
-`SkillCode` is exported for the common case — a labelled, read-only block with a copy
-button that confirms in place — and it is deliberately uncoloured. Highlighting a skill's
-front matter would mean pulling a highlighter into the bundle to colour four lines that
-read fine in the foreground.
+- `results` and `prompts` render in the first tab (`resultsLabel`, default `"Results"`) and `files` in the second; if only one exists, the tab strip is omitted.
+- Example prompt rows only render as buttons when `onPrompt` is provided; toolbar `onClose` and `menu` controls only render when passed.
+- `files` accepts slash-delimited paths in display order (unsorted); `folder` sets the collapsed root, and the first file is selected by default (`selectedPath` / `onFileSelect` to control).
+- `renderPreview` renders the selected `SkillFile` (omit for a single-column manifest); `SkillCode` is exported for unstyled read-only code blocks with copy.
 
 ```tsx
 <div className="flex flex-col gap-6">
@@ -182,25 +89,12 @@ read fine in the foreground.
 </div>
 ```
 
-## Anatomy
+## Keyboard & Motion
 
-The toolbar is a header, not a sticky bar over the scroller: the body is its own scroll
-box, so nothing ever passes underneath the controls and there is no translucent corner to
-get wrong. It draws a control only when you pass the handler that makes it do something —
-no `onClose` means no close button, and the panel never offers an action it cannot
-perform. `menu` is where a "…" dropdown goes when you have one.
+- File tree uses roving focus: <kbd>ArrowUp</kbd>/<kbd>ArrowDown</kbd> move rows, <kbd>ArrowRight</kbd> opens or enters a folder, <kbd>ArrowLeft</kbd> closes or steps out, <kbd>Home</kbd>/<kbd>End</kbd> jump to ends, and <kbd>Enter</kbd>/<kbd>Space</kbd> toggle or select.
+- Respects `prefers-reduced-motion` by disabling folder height and preview fade animations.
 
-The tree is one tab stop with a roving focus, and the arrow keys walk it the way a file
-tree is expected to: down and up move a row, right opens a folder (or steps into an open
-one), left closes it (or steps back out to the folder that owns the row), `Home` and `End`
-jump to the ends. Enter and Space are the row's own click, so a folder toggles and a file
-selects.
-
-Because the tree is drawn flat — one list of rows, indented — a collapsing folder animates
-every row it owns at once instead of one nested block, and the levels are named in ARIA
-(`aria-level`, `aria-posinset`, `aria-setsize`) rather than implied by real nesting. The
-enable switch is a real switch with a label of its own (`Enable {title}`), not a
-decoration beside the heading.
+## Props
 
 | Region   | Prop                            | Notes                                                             |
 | -------- | ------------------------------- | ----------------------------------------------------------------- |
@@ -219,17 +113,6 @@ decoration beside the heading.
 | Files    | `files`, `folder`               | Paths in; the tree is built for you                               |
 | Files    | `renderPreview`                 | The only part of the tree the panel does not draw                 |
 | Dialog   | `open` / `onOpenChange`         | Uncontrolled with `defaultOpen`, like the panel's selection       |
-
-## Motion
-
-Expanding a folder is a layout change, so it stays short and eases out, with a fade that
-keeps rows from landing at full strength while their height is still near zero. A file's
-contents are a place rather than a direction, so the incoming preview fades instead of
-sliding in from one side — and only the incoming one animates, so half the duration never
-lands between the click and the contents.
-
-Under `prefers-reduced-motion` the rows still open and close, but without the height
-animation, and the preview swaps without the fade.
 
 ## Component source
 

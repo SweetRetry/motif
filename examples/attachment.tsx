@@ -4,12 +4,10 @@ import { useEffect, useState } from "react";
 
 import { Attachment } from "@/registry/new-york/attachment";
 
-/** Shipped with the docs so the demo needs no external host — swap in your own `src`. */
 const THUMB = "/attachment-demo.jpg";
 
 interface DemoItem {
   id: string;
-  /** `live` chips track the shared demo percentage; the rest are static. */
   live?: boolean;
   name: string;
   src?: string;
@@ -27,7 +25,6 @@ const INITIAL: DemoItem[] = [
 
 export const AttachmentDemo = () => {
   const [items, setItems] = useState(INITIAL);
-  // Stops short of 100 so the uploading chips keep uploading instead of flashing ready.
   const [percent, setPercent] = useState(8);
 
   useEffect(() => {

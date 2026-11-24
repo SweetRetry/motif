@@ -5,8 +5,6 @@ import { useState } from "react";
 import { CoverFan } from "@/registry/new-york/cover-fan";
 import type { CoverFanItem } from "@/registry/new-york/cover-fan";
 
-/** Shipped with the docs so the demo needs no external host — swap in your own covers.
- *  Cropped to 3:4, which is the shape the card draws. */
 const PRESETS: CoverFanItem[] = [
   {
     id: "watercolor-rose",
@@ -43,8 +41,6 @@ export const CoverFanDemo = () => {
   );
 };
 
-/** The same fan in a narrower column: the container decides the size, so nothing else
- *  has to change. */
 export const CoverFanCompactDemo = () => {
   const [picked, setPicked] = useState<string | null>(null);
 

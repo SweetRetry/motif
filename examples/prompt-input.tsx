@@ -26,25 +26,19 @@ import type {
   PromptTriggerItem,
 } from "@/registry/new-york/agents/prompt-input";
 
-/** Shipped with the docs so the demo needs no external host. */
 const THUMB = "/attachment-demo.jpg";
 
-/** Three vendors, which is as many as a menu of models needs to show what it
- *  does: a mark, a name, and the maker on the far side to tell two `Pro`s apart. */
 const MODELS: PromptModel[] = [
   { id: "gpt-5.2", name: "GPT-5.2", provider: "openai" },
   { id: "claude-sonnet-4.5", name: "Claude Sonnet 4.5", provider: "anthropic" },
   { id: "gemini-3-pro", name: "Gemini 3 Pro", provider: "gemini" },
 ];
 
-/** A finished image and one upload still in flight, so the header shows both states. */
 const SEEDED: PromptAttachment[] = [
   { id: "raven", name: "raven.jpg", src: THUMB },
   { id: "assets", name: "brand-assets.zip", progress: 34 },
 ];
 
-/** Stands in for an upload service: everything under 100 climbs, and anything that
- *  reaches it stops reporting progress and reads as ready on its own. */
 const useUploads = (
   setAttachments: React.Dispatch<React.SetStateAction<PromptAttachment[]>>
 ) => {
@@ -66,7 +60,6 @@ export const PromptInputDemo = () => {
   const [attachments, setAttachments] = useState<PromptAttachment[]>(SEEDED);
   const [model, setModel] = useState(MODELS[0].id);
   const [sent, setSent] = useState<string | null>(null);
-  // Thumbnails for picked files are object URLs, which nothing else will free.
   const previews = useRef<string[]>([]);
 
   useUploads(setAttachments);
@@ -128,8 +121,6 @@ export const PromptInputDemo = () => {
         </PromptInputFooter>
       </PromptInput>
 
-      {/* The sent line keeps its height while it is empty, so sending a message does
-          not move the composer out from under the pointer that sent it. */}
       <p aria-live="polite" className="min-h-5 text-muted-foreground text-xs">
         {sent ? `Sent to ${answer}: “${sent}”` : null}
       </p>
@@ -142,9 +133,6 @@ const NARROW: PromptModel[] = [
   { id: "claude-sonnet-4.5", name: "Claude Sonnet 4.5", provider: "anthropic" },
 ];
 
-/** Sending holds the composer in `streaming` for a beat, which is what the stop button
- *  and the answered-in-place state are for. No header: an attachment-less composer is
- *  the same parts with one of them left out. */
 export const PromptInputStreamingDemo = () => {
   const [streaming, setStreaming] = useState(false);
 
@@ -191,9 +179,6 @@ const COMMANDS: PromptTriggerItem[] = [
   { description: "Clear the conversation", id: "clear", label: "clear" },
 ];
 
-/** `@` points at something and stays in the message as a chip. `/clear` acts on the spot,
- *  so it returns `false` and leaves nothing behind. Sending shows the segments the caller
- *  receives, which is where the ids are. */
 export const PromptInputMentionDemo = () => {
   const [sent, setSent] = useState<PromptSegment[] | null>(null);
 

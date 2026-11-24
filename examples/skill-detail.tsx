@@ -11,23 +11,15 @@ import {
 } from "@/registry/new-york/agents/skill-detail";
 import type { SkillFile } from "@/registry/new-york/agents/skill-detail";
 
-/** Real data: Anthropic's open-source `algorithmic-art` skill, as it stands in
- *  github.com/anthropics/skills. The file list, front matter and excerpts are copied from
- *  that folder. The art is not the skill's output: it was generated with Midjourney V8.2
- *  from the skill's own philosophy examples and ships with the docs so the demo needs no
- *  external host. Two crops of one cover: the card draws 16:9, the panel fills its rail. */
 const COVER = "/skill-detail/algorithmic-art.webp";
 const COVER_PORTRAIT = "/skill-detail/algorithmic-art-portrait.webp";
 
-/** What the card has room for. */
 const SUMMARY =
   "Generative art in p5.js, with seeded randomness and live parameter exploration.";
 
-/** What the panel has room for: the skill's own description. */
 const DESCRIPTION =
   "Creating algorithmic art using p5.js with seeded randomness and interactive parameter exploration. Use this when users request creating art using code, generative art, algorithmic art, flow fields, or particle systems.";
 
-/** One per philosophy the skill names as an example. */
 const RESULTS = [
   {
     label: "Organic Turbulence",
@@ -95,15 +87,11 @@ const Prose = ({ children, title }: { children: ReactNode; title: string }) => (
   </section>
 );
 
-/** Stands in for whatever renders the file: the panel hands over the path and takes back
- *  a node, so a markdown pipeline, a diff or an iframe all fit behind the same prop. */
 const PREVIEWS: Record<string, ReactNode> = {
   "LICENSE.txt": <SkillCode code={LICENSE} language="TEXT" />,
   "SKILL.md": (
     <div className="flex flex-col gap-6">
       <SkillCode code={FRONT_MATTER} language="YAML" />
-      {/* One step under the panel's own heading: a document inside a surface never outranks
-          the surface. */}
       <h2 className="text-lg font-semibold tracking-tight">
         Algorithmic Philosophy Creation
       </h2>
@@ -140,10 +128,6 @@ export const SkillDetailDemo = () => {
         onOpen={() => setOpen(true)}
         title="Algorithmic Art"
       />
-
-      <p className="text-xs text-muted-foreground">
-        Press the card to open the panel.
-      </p>
 
       <SkillDetailDialog
         author={{

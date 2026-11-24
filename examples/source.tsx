@@ -20,9 +20,6 @@ const SOURCES = [
   },
 ];
 
-/** The tags in a row of their own. The host on each is read off its `href`: nothing here
- *  writes a domain, so the one shown is the one the link goes to. The page's title waits
- *  in the tooltip. */
 export const SourceDemo = () => (
   <SourceList className="w-full max-w-xl">
     {SOURCES.map((source) => (
@@ -34,7 +31,6 @@ export const SourceDemo = () => (
   </SourceList>
 );
 
-/** A tag is the size of a word, so it sits in a line of text. */
 export const SourceInlineDemo = () => (
   <p className="w-full max-w-xl text-sm leading-7">
     A token should name a role, not a colour, because the colour is the

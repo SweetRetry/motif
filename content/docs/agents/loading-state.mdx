@@ -1,6 +1,6 @@
 ---
 title: Loading State
-description: "A wait, said once: a 3×3 mark with a diagonal wave, a word for what the agent is doing, and a count of how long it has been."
+description: "Diagonal 3×3 wave mark, status label, and elapsed timer for agent waits."
 added: 2026-09-11
 ---
 
@@ -36,67 +36,23 @@ import {
 </LoadingState>;
 ```
 
-The root is the row. The parts do not read from it, so a caller can leave one out or
-move it.
-
-| Part                | Draws                              |
-| ------------------- | ---------------------------------- |
-| `LoadingState`      | The row, as a live region          |
-| `LoadingStateMark`  | The 3×3 grid and its wave          |
-| `LoadingStateLabel` | What the agent is doing, in a word |
-| `LoadingStateClock` | How long it has been               |
+| Part                | Role                                                       |
+| ------------------- | ---------------------------------------------------------- |
+| `LoadingState`      | Root `role="status"` row; parts are independent and optional |
+| `LoadingStateMark`  | 3×3 opacity-animated grid (`text-foreground` by default)   |
+| `LoadingStateLabel` | Status word                                                |
+| `LoadingStateClock` | Elapsed timer                                              |
 
 <ComponentPreview name="loading-state" align="start">
   <LoadingStatePartsDemo />
 </ComponentPreview>
 
-## One state
+## Behavior & Accessibility
 
-The agent is working and nothing has come back. That is one thing to say, so there is one
-mark. An earlier version changed shape for thinking, for calling a tool and for streaming,
-which asked the reader to learn a vocabulary to read a spinner. What the agent is doing is a
-word, and the word is the label.
-
-## The wave
-
-Nine cells and one sampled cosine curve, with each cell's phase read off the anti-diagonal
-it sits on. The sweep is already travelling on the first frame rather than building up from
-rest.
-
-Every animation is opacity only. Nothing here repaints the page on a frame.
-
-## The clock
-
-Tenths under a minute, whole seconds after: `46.8s`, then `1m 05s`. A wait that is ten
-seconds old is told apart from one that is twenty by the digit that moves, and a
-whole-second count moves once a second. Nobody reads the tenth of a minute-long wait.
-
-Tenths are floored rather than rounded, so the count never reads `60.0s` a moment before it
-reads `1m 00s`.
-
-It ticks ten times a second and is written straight into the DOM, so the row around it
-never re-renders. Pass `startedAt` (epoch ms) when the component can be remounted and the
-count must not restart.
-
-The digits are mono and tabular so the row holds still as they change.
-
-## Colour
-
-The mark takes the text colour, `text-foreground` by default, and the row around it is
-`muted-foreground`, so the mark is the one bright thing in the line. Pass a `text-*` class
-to `LoadingStateMark` to recolour it.
-
-## Reduced motion
-
-When `prefers-reduced-motion` is active the animation is skipped and the cells show their
-resting opacity, the frozen first frame of the wave. The label and the clock carry the
-meaning without it.
-
-## Accessibility
-
-The root is `role="status"`, so the label is read when the row appears. The mark and the
-clock are `aria-hidden`: a count that announced every tenth of a second would be the only
-thing a screen reader said.
+- `LoadingStateMark` animates opacity only and freezes on the first frame under `prefers-reduced-motion`; override its color with a `text-*` class.
+- `LoadingStateClock` updates at 10Hz directly in the DOM without React re-renders, flooring tenths under 1 minute (`46.8s`) and switching to whole seconds after (`1m 05s`).
+- Pass `startedAt` (epoch ms) to `LoadingStateClock` to preserve elapsed time across remounts.
+- `LoadingState` uses `role="status"` while the mark and clock are `aria-hidden` so screen readers announce the label once without timer chatter.
 
 ## Component source
 

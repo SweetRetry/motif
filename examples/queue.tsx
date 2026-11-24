@@ -26,10 +26,6 @@ const SENT = [
   "Leave the migration files alone",
 ];
 
-/** The queue as a caller writes it: a list they own, a row per entry. Remove takes the
- *  entry back; send now delivers it into the run, so it leaves the queue and shows up as
- *  what the agent is now working from. Each press of the button is the user typing while
- *  the agent is still running. */
 export const QueueDemo = () => {
   const [sent, setSent] = useState(3);
   const [waiting, setWaiting] = useState<Waiting[]>(

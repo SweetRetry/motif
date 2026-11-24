@@ -4,42 +4,26 @@ description: An open shadcn registry of interface parts for AI agents and genera
 added: 2026-09-11
 ---
 
-**Motif** is a [shadcn registry](https://ui.shadcn.com/docs/registry) of interface parts
-for AI agents and generative media. Every piece ships as source you install with
-`npx shadcn add` and then own — there is no package to fight and no runtime to keep in
-step.
+**Motif** is a [shadcn registry](https://ui.shadcn.com/docs/registry) of interface parts for AI agents and generative media. Install components with `npx shadcn add` to own the source directly.
 
 ## What's in it
 
-- **Agents** — the surfaces a conversation is made of: `conversation`, `message`,
-  `thinking-block`, `loading-state`, `prompt-input`, `voice-input`, `attachment`,
-  `scroll-rail`, `approval-card`, `question-card` and `skill-detail`.
-- **Components** — the controls that frame a media surface: `ratio-picker`,
-  `resolution-picker`, `duration-slider`, `generation-overlay`, `cover-fan`,
-  `flow-edge`, `settings-dialog` and `activity-heatmap`.
-- **Blocks** — whole surfaces assembled from the parts, starting with `agent-run`.
+- **Agents** — `conversation`, `message`, `thinking-block`, `loading-state`, `prompt-input`, `voice-input`, `attachment`, `scroll-rail`, `approval-card`, `question-card`, `skill-detail`.
+- **Components** — `ratio-picker`, `resolution-picker`, `duration-slider`, `generation-overlay`, `cover-fan`, `flow-edge`, `settings-dialog`, `activity-heatmap`.
+- **Blocks** — `agent-run`.
 
 ## How the parts are built
 
-- 🧩 **Compound components** — a root owns the state and named parts compose it. A caller
-  rearranges the parts, drops one into another frame, or leaves one out. A slot with
-  nothing in it draws nothing; a part with no handler behind it is not drawn at all.
-- 🎨 **Theme tokens** — every colour is a shadcn token (`bg-card`,
-  `text-muted-foreground`, `text-success`), so dark mode and a theme swap restyle a
-  component for free. Registry items carry the tokens they need in `cssVars`.
-- ✨ **[Motion](https://motion.dev/)** — animation is used where it explains the surface:
-  a follow that keeps a thread at its tail, a wave that says a turn is still coming, a
-  lift that names the card under the pointer.
-- 🤖 **Agent ready** — the site publishes `llms.txt`, `llms-full.txt`, an API catalog and
-  agent-skill discovery routes, so an assistant can read the registry without a browser.
+- **Compound components** — A root owns the state and named parts compose it; empty slots and unhandled parts render nothing.
+- **Theme tokens** — Every color uses shadcn tokens (`bg-card`, `text-muted-foreground`, `text-success`) and ships required tokens in `cssVars`.
+- **[Motion](https://motion.dev/)** — Used for state transitions like thread auto-follow, loading waves, and card hover lift.
+- **Agent ready** — Publishes `llms.txt`, `llms-full.txt`, an API catalog, and agent-skill discovery routes.
 
 ## Install
 
 ```bash
 npx shadcn@latest add https://motif.sweetretry.com/r/question-card.json
 ```
-
-Then import it from the path `shadcn add` wrote it to:
 
 ```tsx
 import { QuestionCard } from "@/components/ui/motif/question-card";
@@ -55,7 +39,7 @@ Why copy/paste instead of npm packages?
 </AccordionTrigger>
 <AccordionContent>
 
-The shadcn philosophy gives you **ownership** of the code. You can customize components to your exact needs without fighting library constraints.
+You own the source code and can customize components directly without fighting package constraints.
 
 </AccordionContent>
 </AccordionItem>
@@ -77,8 +61,7 @@ Do I have to take a whole surface?
 </AccordionTrigger>
 <AccordionContent>
 
-No. Every part installs on its own, and `shadcn add` brings its base components with it
-through the registry dependencies. Take the piece you need and compose the rest yourself.
+No. Every part installs on its own, and `shadcn add` brings its base registry dependencies along automatically.
 
 </AccordionContent>
 </AccordionItem>

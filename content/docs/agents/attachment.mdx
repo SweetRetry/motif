@@ -1,6 +1,6 @@
 ---
 title: Attachment
-description: A square attachment chip for composer rows — image thumbnails, file glyphs, and upload progress drawn around the card's own border.
+description: "Square attachment chip with image previews, file-type glyphs, and a border progress arc."
 added: 2026-09-11
 ---
 
@@ -32,43 +32,26 @@ export function Composer() {
 }
 ```
 
-## Size
+## Sizing
 
-The chip is 56px, which is the floor — smaller and the name and remove button stop being
-usable. There is no `size` prop: the chip is a container query context and every internal
-dimension is a share of its own width, so a width in `className` scales the whole thing
-(glyph, type, ring, button) proportionally. Text keeps an absolute minimum so it stays
-legible at 56px.
+- Minimum width is `56px` with no `size` prop; internal dimensions scale proportionally via CSS container queries when given a larger width in `className`.
 
 ## States
 
-`status` defaults to `uploading` while `progress` is under 100 and `ready` after, so
-passing `progress` is usually enough. Every attachment shares one status layer — the
-percentage marker, the ring and the remove button; `src` only swaps the glyph for a
-preview, which carries its own identity and never shows the name.
+`status` defaults to `"uploading"` while `progress < 100` and `"ready"` otherwise.
 
 | Status      | Renders                                                                                 |
 | ----------- | --------------------------------------------------------------------------------------- |
-| `uploading` | Progress arc around the card plus the percentage; a preview fades toward the background |
-| `ready`     | Glyph and file name, or a bare preview, with the remove button when `onRemove` is set   |
-| `error`     | The arc fills and turns `text-destructive`; a file's name follows suit                  |
+| `uploading` | Border progress arc (`primary`) and percentage; image previews fade toward `background` |
+| `ready`     | Glyph + filename, or bare preview; shows remove button when `onRemove` is passed        |
+| `error`     | Full border arc and filename in `text-destructive`                                      |
 
-The remove button stays hidden while uploading — the mock keeps in-flight chips bare, so
-cancelling mid-upload is out of scope.
-
-The arc is an SVG `path` tracing the chip's border: it starts at the top centre and runs
-clockwise in the theme's `primary`, or `destructive` once an upload has failed. Because a
-preview can be any image, its uploading and error states fade it toward `background`
-instead of dimming it, so the arc and percentage keep the same contrast as they do on a
-glyph chip. The reference mock used a blue accent; swap the token for a literal blue if
-you want that hue.
+- The remove button stays hidden while `status === "uploading"`.
 
 ## Glyph
 
-File attachments pick their glyph from the extension — `pdf`/`docx`/`txt` a page,
-`xlsx`/`csv` a spreadsheet, `zip`/`tar` an archive, `mp3`/`wav` audio, `mp4`/`mov` video,
-`ts`/`js` code, `json`, and images an image — falling back to a plain page for anything
-unlisted. Pass `icon` to override it, or `src` to render a real thumbnail instead.
+- Maps common extensions (`pdf`/`docx`/`txt`, `xlsx`/`csv`, `zip`/`tar`, `mp3`/`wav`, `mp4`/`mov`, `ts`/`js`, `json`, image formats) to matching icons, falling back to a generic page icon.
+- Pass `icon` to override the glyph, or `src` to render an image thumbnail without a filename label.
 
 ## Component source
 

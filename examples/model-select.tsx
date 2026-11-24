@@ -17,8 +17,6 @@ import type {
   ModelSelectProvider,
 } from "@/registry/new-york/model-select";
 
-/** A mark each, so the rail reads as a column of brands. The colour is the artwork's:
- *  these are the cuts LobeHub draws, sized by the slot they land in. */
 const PROVIDERS: ModelSelectProvider[] = [
   {
     icon: <ProviderLogo provider="bytedance" />,
@@ -37,8 +35,6 @@ const PROVIDERS: ModelSelectProvider[] = [
   { icon: <ProviderLogo provider="runway" />, id: "runway", name: "Runway" },
 ];
 
-/** What a model can do, as glyphs. The caller's own vocabulary: the picker only knows
- *  that something belongs beside the name. */
 const CAPS = {
   audio: { icon: <Music className="size-3.5" />, label: "Native audio" },
   frame: {
@@ -66,8 +62,6 @@ const meta = (duration: string, caps: (keyof typeof CAPS)[]) => (
   </>
 );
 
-/** Long enough to be worth indexing: seven makers, fifteen models, four of them
- *  recommended for what the trigger says is being made. */
 const MODELS: ModelSelectModel[] = [
   {
     description: "Single-shot video up to 30 seconds with native audio.",
@@ -194,9 +188,6 @@ export const ModelSelectDemo = () => {
       <ModelSelectTrigger />
       <ModelSelectContent>
         <ModelSelectSearch />
-        {/* The rail and the list are one arrangement of the parts; leaving the rail out
-            is another, and it is the whole difference between a browsable catalogue and
-            a searchable one. */}
         <div className="flex min-h-0 flex-1">
           <ModelSelectIndex />
           <ModelSelectList />
@@ -206,8 +197,6 @@ export const ModelSelectDemo = () => {
   );
 };
 
-/** A short list, one maker, no rail: the same parts, arranged for a picker that has
- *  nothing to index. */
 const CHAT_MODELS: ModelSelectModel[] = [
   {
     description: "Best for long, careful work.",

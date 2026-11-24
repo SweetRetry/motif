@@ -5,14 +5,10 @@ import { useState } from "react";
 import { StrengthSlider } from "@/registry/new-york/strength-slider";
 
 export const StrengthSliderDemo = () => {
-  // The demo opens at the ceiling: the drift is the one thing about this control you
-  // cannot see from a screenshot of its default.
   const [strength, setStrength] = useState("Ultra");
 
   return (
     <div className="w-full max-w-sm">
-      {/* The heading is the caller's: the control ships none, so the words on screen
-          and the words a screen reader hears are written in one place. */}
       <div className="mb-3 font-medium text-muted-foreground text-xs">
         Strength
       </div>
@@ -28,7 +24,6 @@ export const StrengthSliderDemo = () => {
   );
 };
 
-/** The count sets the segments, so any ordered list of levels rides the same track. */
 export const StrengthSliderEffortDemo = () => {
   const [effort, setEffort] = useState("Deep");
 

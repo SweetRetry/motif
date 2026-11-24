@@ -17,8 +17,6 @@ export const GenerationOverlayDemo = () => {
   const [nonce, setNonce] = useState(0);
   const [pending, setPending] = useState(true);
 
-  // Stands in for a generation: hold the surface pending long enough for the flow to
-  // read, then hand it the result.
   useEffect(() => {
     if (!pending) {
       return;
@@ -61,11 +59,6 @@ export const GenerationOverlayDemo = () => {
   );
 };
 
-/**
- * Six seeds side by side. The colour is the same everywhere; only the motion moves —
- * where each layer starts, which way it turns and how fast — so a wall of concurrent
- * generations reads as separate pieces of work instead of one repeated placeholder.
- */
 export const GenerationOverlaySeedsDemo = () => (
   <div className="grid w-full max-w-2xl grid-cols-2 gap-3 sm:grid-cols-3">
     {SEEDS.map((seed) => (
@@ -76,7 +69,6 @@ export const GenerationOverlaySeedsDemo = () => (
   </div>
 );
 
-/** A source that never loads: the flow gives way and the failure line takes over. */
 export const GenerationOverlayFailureDemo = () => {
   const [pending, setPending] = useState(true);
 

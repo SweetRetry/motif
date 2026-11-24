@@ -5,8 +5,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ApprovalCard } from "@/registry/new-york/agents/approval-card";
 
-/** The card is only there while the call is held. Once it is answered it is gone, and the
- *  call's row is what says how it went, so the demo leaves a line of text in its place. */
 export const ApprovalCardDemo = () => {
   const [outcome, setOutcome] = useState<string | null>(null);
 

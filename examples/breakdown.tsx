@@ -9,8 +9,6 @@ import {
 } from "@/registry/new-york/breakdown";
 import type { BreakdownDatum } from "@/registry/new-york/breakdown";
 
-/** A month of model spend, already ordered the way it should be drawn — the component
- *  never sorts, because the caller's order is the one the legend has to read in. */
 const SPEND: BreakdownDatum[] = [
   { key: "seedance-2-5", label: "Seedance 2.5", value: 486_200 },
   { key: "claude-sonnet-4-5", label: "Claude Sonnet 4.5", value: 312_450 },
@@ -20,10 +18,6 @@ const SPEND: BreakdownDatum[] = [
   { key: "flux-2-video", label: "FLUX.2 Video", value: 12_400 },
 ];
 
-/** The palette is built from the catalogue — every model the workspace can spend on, not
- *  the six that spent this month — so a model that drops out and comes back is the same
- *  colour it was. Built from `SPEND` instead, it would be a different colour every month,
- *  which is the failure the required `colors` prop exists to keep visible. */
 const COLORS = breakdownColors([
   "seedance-2-5",
   "claude-sonnet-4-5",
@@ -38,8 +32,6 @@ const COLORS = breakdownColors([
 const pt = (value: number) => `${value.toLocaleString()} pt`;
 
 export const BreakdownDemo = () => (
-  // The heading, the period and the card are the page's: the component is the bar and
-  // the legend, and everything around them is what the caller already knows.
   <div className="w-full max-w-2xl rounded-xl border border-border bg-card p-5">
     <div className="mb-4">
       <p className="font-medium text-sm">Model consumption</p>
@@ -57,9 +49,6 @@ export const BreakdownDemo = () => (
   </div>
 );
 
-/** The same breakdown in a frame of its own: one row per model, each row's bar drawn in
- *  that model's colour. Nothing here is a second implementation of the shares — the hook
- *  hands over the same slices the bar and the legend are drawn from. */
 const Rows = () => {
   const { formatValue, items } = useBreakdown();
 

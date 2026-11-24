@@ -16,10 +16,7 @@ import { ApprovalCardDemo } from "@/examples/approval-card";
 npx shadcn@latest add https://motif.sweetretry.com/r/approval-card.json
 ```
 
-Pulls in the platform [`button`](https://ui.shadcn.com/docs/components/button) and
-[`input`](https://ui.shadcn.com/docs/components/input), the same bases Prompt Input builds
-on. For questions with options and a free-text answer, see
-[Question Card](/docs/agents/question-card).
+Pulls in [`button`](https://ui.shadcn.com/docs/components/button) and [`input`](https://ui.shadcn.com/docs/components/input). For multi-option prompts, see [Question Card](/docs/agents/question-card).
 
 ## Usage
 
@@ -39,34 +36,20 @@ export function Review() {
 }
 ```
 
-## What the card is for
+## Props & Behavior
 
-An approval is not something the agent asks for. A tool call reaches a gate, the gate holds
-it, and the card is what the reader sees while it waits. So there is no question and no
-reason in it that anyone wrote. The card is one sentence about the call and two buttons.
+| Prop           | Description                                                |
+| -------------- | ---------------------------------------------------------- |
+| `children`     | Action summary; inline `<code>` elements render as chips   |
+| `onApprove`    | Renders the approve button when provided                   |
+| `onReject`     | Renders the reject button when provided; receives optional reason string |
+| `approveLabel` | Custom label for the approve button                        |
+| `rejectLabel`  | Custom label for the reject button                         |
+| `submitting`   | Disables both action buttons while a decision is in flight |
 
-The sentence is the children. Name the verb and put the target in `<code>`, which the card
-draws as a chip, so what is being touched reads at a glance and the whole of it is on screen
-when the button is pressed.
-
-In a run, the card is not a step of its own. The held call is a [Tool Call](/docs/agents/tool-call)
-row with the `approval` status, and the card sits under it for as long as that lasts. The
-card unmounts when the call moves on, so a decided card there is the same row, now
-running, done or failed.
-
-`Approve` is one press, because nothing more is needed to go on. `Reject` opens a field in
-place of the buttons for why, or what to do instead, and `onReject` is called with that
-text, or with nothing if it is left empty. Without it the agent cannot tell "never" from
-"not like that". Enter sends it and Escape goes back.
-
-`Approve` and `Reject` are each drawn only when their handler is passed. `approveLabel` and
-`rejectLabel` rename them. `submitting` locks both while the answer is on its way.
-
-The card has no approved or rejected state. It exists while the call is held and is gone
-once the call moves on, and how it went is the row's to say.
-
-The root is a `bg-card` container with a border, so it reads as raised on the page or
-inside a `bg-muted` panel.
+- Pressing Reject opens an inline reason input in place of the buttons; `Enter` calls `onReject(reason)` and `Escape` returns to the buttons.
+- Designed to mount under a [Tool Call](/docs/agents/tool-call) in the `approval` status and unmount once the call moves on.
+- Uses `bg-card` with a border so it separates cleanly from `bg-background` and `bg-muted`.
 
 ## Component source
 

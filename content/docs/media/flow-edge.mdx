@@ -1,6 +1,6 @@
 ---
 title: Flow Edge
-description: "A bezier connector that carries a pulse of light from one end to the other while work is in flight — bright in the middle, faded at both ends — and rests as a plain line when it is not."
+description: "Animated bezier connector that pulses while work is active and rests as a dim line when idle."
 added: 2026-09-11
 ---
 
@@ -18,8 +18,6 @@ npx shadcn@latest add https://motif.sweetretry.com/r/flow-edge.json
 
 ## Usage
 
-Draw the line once and tell it whether the work between the two ends is running:
-
 ```tsx
 import { FlowEdge } from "@/components/ui/motif/flow-edge";
 
@@ -28,50 +26,18 @@ export function Connector({ running }: { running: boolean }) {
 }
 ```
 
-It is an `<svg>` with no intrinsic size: it takes the width of its container and keeps
-the frame's aspect ratio, so a connector is sized by the box it is dropped into. Colour
-comes from `currentColor`, so `className` is the only styling it usually needs.
+The `<svg>` scales to its container width and derives its color from `currentColor`.
 
 ## States
 
-| `active` | Renders                                                                      |
-| -------- | ---------------------------------------------------------------------------- |
-| `false`  | The line alone, at a quarter strength — a connection that exists and is idle |
-| `true`   | The same line with a lit pulse crossing it, one pass after another           |
-
-Every pass starts from the near end the moment the line goes live, rather than wherever
-the cycle happened to be, and the light fades out _while it is still moving_ when it goes
-idle. Both of those come from the same decision: the pulse is parked off the end of the
-line between passes, so a restarted pass always enters from the source, and the opacity
-fade acts on a moving band rather than a frozen one — a light that stops in place and then
-dims reads as a bug.
+| `active` | Renders                                       |
+| -------- | --------------------------------------------- |
+| `false`  | Dimmed idle line at quarter opacity           |
+| `true`   | Repeated lit pulse travelling from start to end |
 
 ## Geometry
 
-The light is cut out of a gradient rather than drawn with one. The line is masked by a
-rectangle filled with a white-to-transparent white that is opaque at its centre, so
-the visible stretch is always bright in the middle and tapered at both ends — no
-per-frame fading, and nothing to re-aim as the curve turns. The rectangle then slides
-along x, which is the only thing animated.
-
-Two things follow from travelling in x instead of along the path, and they are the
-contract for `d`:
-
-- **The path should be monotonic in x.** On a line that doubles back, the band covers
-  two stretches at once and lights both.
-- **A steep stretch is crossed at an angle**, so the light is a little shorter along the
-  path there than on the flat. On the S that ships as the default this is a few percent;
-  on a hairpin it would show.
-
-The default curve is one cubic — `M 0 239 C 500 239 500 0 1000 0` — with both control
-points at half the width, each at the height of the end it belongs to. That pairing is the
-whole trick: it leaves the tangents at the two ends horizontal, so the line eases out of a
-port and into the next one instead of kinking away from it. Pull the controls in and the S
-stands up; push them out and it flattens toward a diagonal.
-
-Pass `d` and `viewBox` together. The viewBox is where the light's geometry comes from —
-where the run starts, how far it travels, how much room the halo needs — so a box that
-does not fit the path draws it against the wrong frame:
+Pass `d` and `viewBox` together so the mask and halo travel match the path; `d` should be monotonic in `x`.
 
 ```tsx
 <FlowEdge
@@ -82,30 +48,19 @@ does not fit the path draws it against the wrong frame:
 />
 ```
 
-## Tuning the light
+## Props
 
-| Prop          | Default | Does                                                                  |
-| ------------- | ------- | --------------------------------------------------------------------- |
-| `duration`    | `1400`  | One pass, in ms                                                       |
-| `rest`        | `0.28`  | Share of the cycle spent parked before the next pass; `0` streams     |
-| `streak`      | `0.2`   | Share of the viewBox width the light spans — the length of the pulse  |
-| `strokeWidth` | `3.5`   | Width of the lit line, in user units; the halo is drawn at twice this |
-| `glow`        | `2.5`   | Halo blur radius, in user units; `0` leaves a clean lit line          |
+| Prop          | Default | Description                                                  |
+| ------------- | ------- | ------------------------------------------------------------ |
+| `duration`    | `1400`  | Duration of one pass in milliseconds                         |
+| `rest`        | `0.28`  | Fraction of the cycle parked between passes (`0` streams)    |
+| `streak`      | `0.2`   | Pulse length as a fraction of `viewBox` width                |
+| `strokeWidth` | `3.5`   | Lit stroke width in user units (halo is `2x`)                |
+| `glow`        | `2.5`   | Halo blur radius in user units (`0` disables the halo)       |
 
-The rest is what makes this read as a pulse entering a line instead of a stripe scrolling
-through one — a light that never leaves is furniture, and the eye stops following it. The
-same instinct sets the glow: a wide blur does not read as a bright line on a dark stage, it
-reads as fog sitting on top of one, so the halo stays close to the stroke it came off.
+## CSS variables
 
-Everything scales with the frame, so a connector in a small box gets a proportionally
-thinner line and a tighter halo without a second set of numbers.
-
-## Colour and contrast
-
-The track, the core and the halo all derive from `currentColor`, so `className` is usually
-the whole story: the light lands in whatever colour the line is connecting. The middle of
-the pulse is often wanted hotter than its edges, though, and that is the one thing
-`currentColor` cannot say — so all three tones are overridable:
+`--edge-core`, `--edge-glow`, and `--edge-track` all default to `currentColor` and can be overridden on a wrapper:
 
 ```tsx
 <div
@@ -116,28 +71,10 @@ the pulse is often wanted hotter than its edges, though, and that is the one thi
 </div>
 ```
 
-`--edge-core` is the middle of the pulse and `--edge-glow` is the halo; both default to
-`currentColor`. Pulling the core toward white is what a dark stage wants — under a halo of
-its own colour, a core at full strength reads as a thick line rather than a bright one —
-and leaving both alone is what a light theme wants, where a white core would simply vanish.
-
-`--edge-track` is the odd one out: the unlit wire. It defaults to `currentColor` too,
-because a connector dropped into a themed surface should look native there. But a wire the
-same colour as its own light has nothing left to say once the light is gone, so a dark
-stage sets it to white and lets colour mean "work is running".
-
-## Reduced motion
-
-With `prefers-reduced-motion` the pass stops being animated and the light is parked at
-the middle of the run — the one position that reads as "in flight" from a still frame.
-Nothing else about the component changes: the connection, the state and the colour all
-survive, and only the movement goes.
-
 ## Accessibility
 
-The SVG is `aria-hidden`. It has no text to offer, and how far along a job is has to be
-said in words rather than inferred from where a glow is — put that beside the line, the way
-`LoadingState` does.
+- The `<svg>` is `aria-hidden`; pair it with adjacent status text when conveying progress.
+- Under `prefers-reduced-motion`, animation stops and the pulse rests at mid-run.
 
 ## Component source
 

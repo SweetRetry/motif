@@ -9,8 +9,6 @@ import {
   MessageContent,
 } from "@/registry/new-york/message";
 
-/** The three roles beside each other: the reader against the trailing edge, the answer
- *  full width, the system note centred and quiet. */
 export const MessageDemo = () => (
   <div className="flex w-full max-w-2xl flex-col gap-6">
     <Message from="user">

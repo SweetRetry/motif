@@ -9,8 +9,6 @@ export const ResolutionPickerDemo = () => {
 
   return (
     <div className="w-full max-w-sm">
-      {/* The heading is the caller's: the control ships none, so the words on screen
-          and the words a screen reader hears are written in one place. */}
       <div className="mb-2 font-medium text-muted-foreground text-xs">
         Resolution
       </div>
@@ -26,7 +24,6 @@ export const ResolutionPickerDemo = () => {
   );
 };
 
-/** Two stops skip the middle tier, and the glyphs fall back to the endpoints. */
 export const ResolutionPickerPairDemo = () => (
   <div className="w-full max-w-sm">
     <div className="mb-2 font-medium text-muted-foreground text-xs">Output</div>

@@ -49,8 +49,6 @@ const SOURCES = [
   },
 ];
 
-/** A search's detail is what the search found, not what it was sent: the sources, as
- *  tags. The query is already in the row. */
 const Sources = () => (
   <SourceList>
     {SOURCES.map((source) => (
@@ -70,8 +68,6 @@ const IMAGES = [
   { alt: "Watercolor rose, second take", src: "/cover-fan/verdant-notes.webp" },
 ];
 
-/** A generation's detail is the picture. The prompt is the row's summary, so the detail
- *  does not repeat it. */
 const Images = () => (
   <div className="flex flex-col gap-1.5">
     <div className="grid grid-cols-2 gap-2">
@@ -88,9 +84,6 @@ const Images = () => (
   </div>
 );
 
-/** The kinds of detail a row can hold. What the reader wants behind a call depends on
- *  what the call was: the results of a search, the picture from a generation. Raw
- *  arguments are the fallback, for a call that has nothing better to show. */
 export const ToolCallDemo = () => (
   <div className="flex w-full max-w-xl flex-col gap-2">
     <ToolCall status="done" defaultOpen>
@@ -150,8 +143,6 @@ export const ToolCallDemo = () => (
   </div>
 );
 
-/** The raw end of the range: the arguments and the result as text, for a call that has
- *  nothing better to show. */
 export const ToolCallRawDemo = () => (
   <div className="flex w-full max-w-xl flex-col gap-2">
     <ToolCall status="done" defaultOpen>
@@ -171,8 +162,6 @@ export const ToolCallRawDemo = () => (
 const LIFECYCLE: ToolCallStatusValue[] = ["queued", "running", "done"];
 const STEP_MS = 1400;
 
-/** One call walked through its life. The row is the same row throughout: the status
- *  changes in place, and the detail only exists once there is a result to show. */
 export const ToolCallLifecycleDemo = () => {
   const [step, setStep] = useState(0);
   const [run, setRun] = useState(0);

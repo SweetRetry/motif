@@ -95,6 +95,17 @@ The `ego-browser` skill lives at
 `/Users/zhangzimin/.agents/skills/ego-browser/SKILL.md`. Read it only after the
 user has confirmed.
 
+## Examples show, they do not explain
+
+`examples/` feeds both the live preview and the View Code panel. Prose comments in an
+example file that restate what the component or its JSX already makes obvious belong on the
+docs page, not in the example source.
+
+The rendered demo uses realistic product copy rather than meta-instructions or captions
+explaining behaviour that is visibly obvious on screen ("Press the card to open the
+panel", "Scroll up and...", "Anatomy of a row"). Leave status lines empty until an
+interaction produces a result.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know

@@ -1,6 +1,6 @@
 ---
 title: Prompt Input
-description: "The box a message is written in, assembled from parts: a field that grows and then scrolls, the files riding with the draft as chips above it, the model answering it, and the one button that ends the turn."
+description: A composable message composer with auto-growing input, file attachments, mentions, model selection, and streaming controls.
 added: 2026-09-11
 ---
 
@@ -20,16 +20,9 @@ import {
 npx shadcn@latest add https://motif.sweetretry.com/r/prompt-input.json
 ```
 
-Pulls in [attachment](https://motif.sweetretry.com/docs/agents/attachment) for the chips
-in the header, plus `dropdown-menu` for the model picker. The editor and triggers bring
-[Tiptap](https://tiptap.dev) with them; a composer that only uses `PromptInputTextarea` never
-loads it.
+Pulls in [attachment](https://motif.sweetretry.com/docs/agents/attachment) and `dropdown-menu`; `PromptInputEditor` and `PromptInputTrigger` also include [Tiptap](https://tiptap.dev).
 
 ## Usage
-
-The root owns the state and draws the card; everything in it is a part. This is the whole
-frame in one place — a header that holds chips, the field, and a footer with an attach
-button, a model picker and submit.
 
 ```tsx
 import { useState } from "react";
@@ -85,95 +78,29 @@ export function Composer() {
 }
 ```
 
-The draft is the composer's own until you pass `value`, and a send clears it. A controlled
-draft is never cleared for you — `onValueChange` reports every keystroke and `onSubmit`
-hands over the trimmed text, so the caller decides where the sentence goes next.
+Uncontrolled drafts clear on submit; pass `value` and `onValueChange` to control the draft yourself (`onSubmit` receives trimmed text).
 
-## The frame is the frame
+## Parts
 
-A composer is where a surface grows its own conventions. A tools menu, a microphone, a
-quoted reply, a token counter, a composer in a thread with no attach button — every one of
-those is an arrangement of these parts, and none of them is a prop the root has to learn
-about first. So the root takes the message and nothing else.
-
-| Part                    | What it is                                                                   |
+| Part                    | Role                                                                         |
 | ----------------------- | ---------------------------------------------------------------------------- |
-| `PromptInput`           | The root: the card, the draft, the submit contract                           |
-| `PromptInputHeader`     | Flex row above the field; draws nothing while it holds nothing               |
-| `PromptInputTextarea`   | The field, with the growth cap, the two-line floor and the Enter binding     |
-| `PromptInputEditor`     | The field when the draft holds mentions; same rules, a document under it     |
-| `PromptInputTrigger`    | Inside the editor: a character, its menu, and what picking a row does        |
-| `PromptInputFooter`     | Flex row under the field                                                     |
-| `PromptInputAttachment` | A chip in the header: the attachment card plus its entrance                  |
-| `PromptInputButton`     | A round control for the row: the platform `Button` at `size-10 rounded-full` |
-| `PromptInputAttach`     | The plus, and the file dialog behind it                                      |
-| `PromptInputSubmit`     | Send, or stop while `streaming`; takes the trailing edge of the row          |
-| `ModelPicker`           | Which model answers; standalone, and usable outside a composer               |
+| `PromptInput`           | Root card, draft state, and submit contract                                  |
+| `PromptInputHeader`     | Flex row above the field; renders nothing when empty                         |
+| `PromptInputTextarea`   | Auto-growing textarea with two-line floor and Enter binding                  |
+| `PromptInputEditor`     | Rich-text document field for mentions and slash commands                     |
+| `PromptInputTrigger`    | Trigger character and menu config inside `PromptInputEditor`                 |
+| `PromptInputFooter`     | Flex row below the field                                                     |
+| `PromptInputAttachment` | Animated [attachment](https://motif.sweetretry.com/docs/agents/attachment) chip |
+| `PromptInputButton`     | Platform [`button`](https://ui.shadcn.com/docs/components/button) at `size-10 rounded-full` |
+| `PromptInputAttach`     | File picker button; renders nothing without `onFiles`                        |
+| `PromptInputSubmit`     | Submit or stop button; disabled when the draft is empty                      |
+| `ModelPicker`           | Standalone model selector                                                    |
 
-`PromptInputHeader`, `PromptInputFooter` and `PromptInputAttachment` take no composer state
-— they are ordinary elements named after where they sit. `PromptInputTextarea`,
-`PromptInputAttach` and `PromptInputSubmit` read the root from context, so they must be
-inside one.
-
-Two of the parts are other components rather than new ones: the chip is
-[attachment](https://motif.sweetretry.com/docs/agents/attachment), and the round controls
-in the row are the platform [`button`](https://ui.shadcn.com/docs/components/button) at one
-size — hover, focus ring, disabled treatment and sound/haptic feedback all come from it, so
-`PromptInputButton` takes `ButtonProps` with the geometry already applied. The field is the
-one piece with no base to build on: the platform ships no textarea, and the growth cap, the
-two-line floor and the Enter binding are the composer's own.
-
-Nothing here is drawn that cannot act: `PromptInputAttach` without `onFiles` renders
-nothing, a header with no children renders nothing, and a submit button with an empty draft
-is disabled rather than hidden — the send button is the one fixed point of the row, and a
-row where it comes and goes is a row you have to re-find.
-
-## The field grows, then scrolls
-
-The textarea is measured against its content on every change and capped at `maxHeight`
-(200px by default, four lines of `text-base` and a wrap). Past the cap it scrolls, and it
-never shrinks below two lines — one line of text in a box this wide reads as a single-line
-input, which is not what this is.
-
-Both halves of that matter. A composer is anchored to the bottom of the window in every
-app that has one, so a draft that grows the card without a ceiling ends up being a draft
-whose beginning is off-screen. And a field that scrolls while it is still short is a field
-that hides a line for no reason, which is why the size is measured rather than fixed.
-
-## Enter sends
-
-<kbd>Enter</kbd> submits, <kbd>Shift</kbd>+<kbd>Enter</kbd> breaks the line. A
-composer is typed into and then sent far more often than it is asked to hold a
-second line, and the reverse binding is right for a form, not for this one.
-
-A composition in progress is left alone: an IME's <kbd>Enter</kbd> commits the candidate
-under it, and sending on that key would eat the word the user was still assembling.
-
-## Attachments ride in the header
-
-Files sit above the field as the same chips used everywhere else — the same component, the
-same size, the same ring while an upload is in flight. They are what the message is
-_about_, so they go on the near side of the thing that says what the message says. In the
-footer they would have to share a line with controls that are deliberately one fixed size,
-and a row of 56px chips would set that size for everything.
-
-`PromptInputAttachment` is the chip with one thing added: it fades in. Chips land one at a
-time and the row reflows around them, so a chip that appears whole is a tear in the row.
-Everything else is the chip's own props — `name`, `src` for a preview, `progress` while an
-upload is in flight, `onRemove` to make it removable.
-
-`PromptInputAttach` is what makes the plus real: the composer opens the file dialog and
-hands over the `File`s as `onFiles`. Whatever you do with them — upload them, read them,
-keep the last one — ends in the same place: new chips in the header with progress running
-from 0 to 100.
+- `PromptInputTextarea`, `PromptInputEditor`, `PromptInputAttach`, and `PromptInputSubmit` read root context and must sit inside `PromptInput`.
+- The field starts at two lines, grows up to `maxHeight` (`200px` default), and then scrolls.
+- <kbd>Enter</kbd> submits, <kbd>Shift</kbd>+<kbd>Enter</kbd> inserts a newline, and IME composition <kbd>Enter</kbd> is ignored.
 
 ## Mentions and commands
-
-Swap `PromptInputTextarea` for `PromptInputEditor` and the draft can hold more than text.
-Typing `@` or `/` opens a menu at the caret, and picking a row replaces what was typed with a
-chip. The chip is one thing: the caret cannot stop inside it, Backspace takes it whole, and a
-selection holds all of it or none. A textarea cannot do that, which is why the editor is a
-document and not a field.
 
 <ComponentPreview name="prompt-input" align="start">
   <PromptInputMentionDemo />
@@ -196,17 +123,9 @@ document and not a field.
 </PromptInput>
 ```
 
-A trigger is a character and its rows, and `@` and `/` are the same part. `lineStart` keeps a
-command from opening mid-sentence. The menu keeps focus in the field: arrows move, Enter or
-Tab picks, Escape closes, and with no row matching nothing is drawn and Enter sends as
-usual. `items` can also be a function of the query, for rows that live behind a search.
-
-`onSelect` returns `false` for a row that acts on the spot. Nothing is left in the draft, so
-a command like `/clear` does not become part of the message.
-
-`value` stays a string, with a mention written as its trigger and label, so everything that
-reads the draft as text keeps working. `onSubmit` receives the same draft as segments as its
-second argument, where each mention keeps the `id` the string cannot carry:
+- `PromptInputTrigger` configures a trigger character (`lineStart` restricts it to line start; `items` accepts an array or search function).
+- Arrow keys navigate, <kbd>Enter</kbd> or <kbd>Tab</kbd> selects, <kbd>Escape</kbd> closes, and returning `false` from `onSelect` runs the command without inserting text.
+- `onSubmit` receives `(text, segments)` where mentions keep their `id`; setting `value` externally resets the document to plain text.
 
 ```ts
 type PromptSegment =
@@ -214,25 +133,9 @@ type PromptSegment =
   | { type: "mention"; trigger: string; id: string; label: string };
 ```
 
-Setting `value` from outside, as a prompt card does, replaces the document with plain text.
-Mentions do not survive that, and there is no way yet to start the editor from segments.
-
 ## Models
 
-The picker is one mark, one name and one chevron. The mark is the loud part because it is
-the part read at a glance; the name sits in the muted tone the rest of the row uses, so
-the row has one subject instead of two. The menu opens upward — a composer lives at the
-bottom of the window, and a menu that unfolds over the message you are about to send is a
-menu covering the thing you are deciding about.
-
-`models` takes `{ id, name, provider }`. `value` and `onValueChange` make the pick
-controlled; on its own the picker holds it, starting at `defaultValue` or the first model.
-
-`ProviderLogo` draws [LobeHub's icon set](https://github.com/lobehub/lobe-icons) (MIT) in
-its coloured cut, and it lives in [Provider Logo](/docs/media/provider-logo) rather
-than here — the marks are the same artwork a browsing picker needs, so they ship once and
-both components depend on them. This item re-exports `ProviderLogo` and `PROVIDER_NAMES`
-for convenience, and `shadcn add` brings the marks along with it.
+`ModelPicker` accepts `{ id, name, provider }[]` (controlled via `value`/`onValueChange` or uncontrolled via `defaultValue`) and opens upward. `ProviderLogo` (from [Provider Logo](/docs/media/provider-logo)) and `PROVIDER_NAMES` are re-exported; monochrome marks inherit `text-*` color classes while colored marks ignore them.
 
 ```tsx
 import { ProviderLogo } from "@/components/ui/motif/provider-logo";
@@ -240,24 +143,10 @@ import { ProviderLogo } from "@/components/ui/motif/provider-logo";
 <ProviderLogo className="size-5 text-foreground" provider="anthropic" />;
 ```
 
-The classes still matter for the marks whose brand is monochrome — OpenAI, Anthropic, xAI,
-Groq and the rest take the tone of the text they sit in; the coloured ones ignore it.
+## Streaming
 
-`PROVIDER_NAMES` is exported beside it for the times the mark is not enough — a menu
-that has to say "Anthropic" somewhere.
-
-## While an answer is arriving
-
-Pass `streaming` and submit becomes stop — one button with two jobs, because while an
-answer is streaming the only thing worth doing to the composer is stopping it, and a
-second button beside send would make the reader choose between two live actions on every
-frame. `onStop` is called when it is pressed; flipping `streaming` back to false is what
-returns the arrow.
-
-Enter does not send while it is true. Pass `onQueue` and it queues instead: the draft goes
-to `onQueue` and the field clears, so the reader can write the next instruction while the
-agent works and hand it to a [Queue](/docs/agents/queue). Without `onQueue`, Enter does
-nothing until the answer has arrived.
+- Passing `streaming` swaps `PromptInputSubmit` to a stop button (`onStop`) and blocks <kbd>Enter</kbd> submission.
+- Pass `onQueue` to queue drafts on <kbd>Enter</kbd> while streaming (e.g. for [Queue](/docs/agents/queue)).
 
 <ComponentPreview name="prompt-input" align="start">
   <PromptInputStreamingDemo />
@@ -279,7 +168,7 @@ nothing until the answer has arrived.
 | `disabled`      | `false` | Disables the field and the submit button                                            |
 | `className`     | —       | Extra classes for the card                                                          |
 
-Anything else goes to the underlying `form`.
+Extra props pass through to the underlying `form`.
 
 ### Parts
 

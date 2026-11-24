@@ -19,7 +19,6 @@ import type { ContextUsageDatum } from "@/registry/new-york/agents/context-usage
 
 const WINDOW = 200_000;
 
-/** Where a turn's tokens went. The order is the legend's order and fixes each hue. */
 const turn = (messages: number): ContextUsageDatum[] => [
   { key: "system", label: "System prompt", value: 3800 },
   { key: "tools", label: "Tool definitions", value: 14_200 },
@@ -27,8 +26,6 @@ const turn = (messages: number): ContextUsageDatum[] => [
   { key: "messages", label: "Messages", value: messages },
 ];
 
-/** The ring in a footer, the rest behind it. The trigger is a button the caller draws,
- *  because opening something is the caller's decision and the ring is only a value. */
 export const ContextUsageDemo = () => (
   <ContextUsage items={turn(31_400)} limit={WINDOW}>
     <Popover>
@@ -46,8 +43,6 @@ export const ContextUsageDemo = () => (
   </ContextUsage>
 );
 
-/** The same window three times. The ring changes role, not hue: ok, then warning once it
- *  is near, then destructive when there is no room. */
 export const ContextUsageToneDemo = () => (
   <div className="flex items-center gap-8">
     {[60_000, 158_000, 205_000].map((used) => (
@@ -64,8 +59,6 @@ export const ContextUsageToneDemo = () => (
 
 const INITIAL_MESSAGES = 31_400;
 
-/** The bar open in a panel of its own, with a real compact control inside and demo
- *  controls outside so the boundary of the component stays clear. */
 export const ContextUsagePanelDemo = () => {
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
 

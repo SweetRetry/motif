@@ -6,8 +6,7 @@ added: 2026-09-11
 
 ## Prerequisites
 
-Motif ships plain React, so any framework works — Next.js, Remix, Astro, Vite, Gatsby.
-You need [Tailwind CSS](https://tailwindcss.com/) and a shadcn project already set up:
+Requires React (Next.js, Remix, Astro, Vite, Gatsby), [Tailwind CSS](https://tailwindcss.com/), and an initialized shadcn project:
 
 ```bash
 npx shadcn@latest init
@@ -15,16 +14,11 @@ npx shadcn@latest init
 
 ## Install a component
 
-Every component installs from its URL. `shadcn add` pulls the source into your repo at
-the path the registry item names, and brings the base components it is built on along
-with it:
+Components install into `components/ui/motif/` along with their registry dependencies:
 
 ```bash
 npx shadcn@latest add https://motif.sweetretry.com/r/question-card.json
 ```
-
-Every Motif file lands in one folder, `components/ui/motif/`, so our names never collide with yours
-and you can see everything it added. Import it from there:
 
 ```tsx
 import { QuestionCard } from "@/components/ui/motif/question-card";
@@ -50,32 +44,20 @@ export function Review() {
 
 ## Install a block
 
-A block is a whole surface assembled from parts the registry already publishes — the
-`agent-run` block is `conversation`, `message`, `agent-activity`, `tool-call`,
-`source`, `approval-card`, `question-card`, `loading-state`, `context-usage`, `prompt-input`, `scroll-rail` and
-`attachment` wired together:
+Blocks install a full surface and all of its underlying part components in one command:
 
 ```bash
 npx shadcn@latest add https://motif.sweetretry.com/r/agent-run.json
 ```
 
-Because the dependencies travel with it, you get every part in one command — and you can
-swap any one of them for your own without touching the rest.
-
 ## Theme tokens
 
-A component that needs a state the base theme does not name brings it along. A step
-walked past, for instance, is drawn in `warning`, and the registry item declares it in
-`:root`, `.dark` and `@theme` — the same three places `styles/globals.css` keeps it, so
-`shadcn add` adds it to your CSS.
-
-If you already have the token, nothing is overwritten. If you would rather it read
-differently, change the variable — every surface that uses it follows.
+Registry items declare custom state tokens (such as `warning`) in `cssVars`, which `shadcn add` appends to `:root`, `.dark`, and `@theme` in your CSS without overwriting existing tokens.
 
 ## Browse the registry
 
-- [Agents](/docs/agents) — the conversation surfaces
-- [Media](/docs/media) — the controls and canvas pieces for generation
-- [Data](/docs/data) — heatmaps, breakdowns and dates
-- [Components](/docs/components) — the shared chrome
-- [Playground](/playground) — the chat app and the canvas app, assembled
+- [Agents](/docs/agents) — conversation surfaces
+- [Media](/docs/media) — controls and canvas pieces for generation
+- [Data](/docs/data) — heatmaps, breakdowns, and dates
+- [Components](/docs/components) — shared chrome
+- [Playground](/playground) — assembled chat and canvas apps

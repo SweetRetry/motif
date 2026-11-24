@@ -1,6 +1,6 @@
 ---
 title: Agent Activity
-description: "A run as one thing: the wait while it goes, one line once it is over, and the steps it took folded behind that line for the reader who doubts the answer."
+description: "Collapsible run timeline showing a live loading indicator while running and a duration summary once complete."
 added: 2026-10-23
 ---
 
@@ -19,9 +19,7 @@ import {
 npx shadcn@latest add https://motif.sweetretry.com/r/agent-activity.json
 ```
 
-It is built on [Loading State](/docs/agents/loading-state), which `shadcn add` brings along. The
-steps inside it are [Tool Call](/docs/agents/tool-call) and
-[Thinking Block](/docs/agents/thinking-block), which you add on their own.
+Built on [Loading State](/docs/agents/loading-state); steps typically compose [Tool Call](/docs/agents/tool-call) and [Thinking Block](/docs/agents/thinking-block).
 
 ## Usage
 
@@ -53,62 +51,33 @@ export function Run({ run }) {
 }
 ```
 
-| Part                   | Draws                                                        |
+| Part                   | Role                                                         |
 | ---------------------- | ------------------------------------------------------------ |
-| `AgentActivity`        | The column, whether the run is going, and the fold           |
-| `AgentActivityHeader`  | The row; the control that opens the timeline                 |
-| `AgentActivityTitle`   | The wait while it runs, `Worked for 42s` once it has stopped |
-| `AgentActivityContent` | The steps, behind the header, indented under it              |
-
-## The header follows the run
-
-While `running`, the title is Loading State whole: the mark, a word and a clock, and the
-timeline is open so the steps can be watched arriving. Once it stops, the title is plain text
-and the timeline folds, because the reader wants the answer and the steps are a receipt for
-the one who doubts it.
+| `AgentActivity`        | Root state provider for `running`, `duration`, and open state |
+| `AgentActivityHeader`  | Toggle button that expands or collapses the timeline         |
+| `AgentActivityTitle`   | Renders `LoadingState` while running, or `Worked for {duration}s` once stopped |
+| `AgentActivityContent` | Collapsible step container indented beneath the header       |
 
 <ComponentPreview name="agent-activity">
   <AgentActivityLiveDemo />
 </ComponentPreview>
 
-The fold needs no effect and no timer. The root keeps what the reader picked, and while that
-is empty the timeline is open exactly when `running` is. Once the reader presses the header
-the choice is theirs, and a run that ends does not close what they opened.
+## Props
 
-`duration` is the caller's, in seconds, because the caller is the one who knows when the run
-began. Without it the title says `Worked`. `startedAt` is the epoch ms the run began, so a
-remount does not restart the clock.
-
-## Steps are not parts
-
-A step is a Tool Call, a Thinking Block, or anything you draw, and they stack in the order
-they are given. There is no `AgentActivityStep`: wrapping each in a part that drew a dot on
-the rail would put a second status beside the one the row already has. A Tool Call inside
-the timeline still opens its own detail.
-
-## Open and closed
-
-| Prop           | Does                                                       |
+| Prop           | Description                                                |
 | -------------- | ---------------------------------------------------------- |
-| `defaultOpen`  | Where it starts. Without it, open exactly while the run is |
-| `open`         | Controlled. Passed, the root never opens or closes itself  |
-| `onOpenChange` | Called when the reader presses the header                  |
+| `running`      | Shows the live loading title and auto-opens when `defaultOpen` is unset |
+| `duration`     | Elapsed seconds shown after completion (renders `Worked` if omitted) |
+| `startedAt`    | Epoch ms timestamp so remounting preserves the running clock |
+| `defaultOpen`  | Initial open state; defaults to matching `running`         |
+| `open`         | Controlled open state                                      |
+| `onOpenChange` | Called when the header is toggled                          |
 
-A run with no steps is never open, whatever `open` says. Without a content part the header
-is a plain row and draws no chevron: a chevron that pointed at nothing would be a promise
-the part could not keep.
+## Behavior & Accessibility
 
-## Your own part
-
-`useAgentActivity` hands over `running`, `duration`, `isOpen` and `toggle`, so a stop button
-that only exists while the run does reads from the same state the title does.
-
-## Accessibility
-
-The header is a real `button` with `aria-expanded` and `aria-controls` while there are steps,
-and the running title is a live region, so the word is read when the run starts. The clock is
-hidden from it, since a count that announced itself every tenth of a second would be the only
-thing a screen reader said. The folded timeline is `inert`.
+- Once the user toggles the header, auto-folding on completion is bypassed; a run with no steps stays closed and omits the chevron.
+- `useAgentActivity()` returns `{ running, duration, isOpen, toggle }` for custom child controls.
+- `AgentActivityHeader` renders a `<button>` with `aria-expanded` and `aria-controls`; the running title is a live region with the clock hidden from screen readers, and folded content is `inert`.
 
 ## Component source
 

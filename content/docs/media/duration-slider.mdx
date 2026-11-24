@@ -1,6 +1,6 @@
 ---
 title: Duration Slider
-description: "Duration as a compact clip on a timeline: drag the playhead, read the live value in a HUD, commit one settled number on release."
+description: "Compact timeline slider that previews live values in a HUD and commits on release."
 added: 2026-09-11
 ---
 
@@ -42,77 +42,15 @@ export function Clip() {
 }
 ```
 
-## The heading is yours
-
-The control draws no label. A field's label belongs to the form around it — above, beside,
-in a `<legend>` — and that is layout the caller owns, not something a select should decide
-for the page it lands in. So the component renders the track and nothing else.
-
-The consequence is one extra line of wiring: a heading you write is plain text, so the
-accessible name has to come with the control. Pass `aria-label` with the same words.
-
-## Committing, not streaming
-
-A duration is a value someone settles on, not a continuous gesture to broadcast. The
-control keeps the in-flight number in its own state and calls `onCommit` **once**, when
-the drag ends or a key is pressed — so the state that owns the value is written once per
-interaction instead of once per pointer move. `value` still wins: change it from outside
-and the track follows, except mid-drag, where following would yank the handle out from
-under the pointer.
-
-`step` snaps the committed number, and the arrow keys move by one step so the control is
-operable without a pointer.
-
-## The track
-
-The chosen span is drawn as a clip whose leading edge is the value — the amount of time is
-a length, so it is shown as a length. The **track itself is the ruler**: `min` sits on its
-left edge and `max` on its right, which is where the `1s` and `15s` labels under the ends
-sit too, so every interval between two dots is the same width.
-
-The playhead's bar is the one thing held back from an edge, by half a bar at each end
-(`PLAYHEAD_INSET`), because a handle cut in half by the track's rounded corner reads as a
-rendering bug. Clamping the bar rather than insetting the ruler is the point. An earlier
-version reserved a fixed width at the left of the track and made the clip, the dots and the
-pointer all share that shortened travel: the first interval came out half again as wide as
-the rest, the `1s` label sat eleven pixels away from the zero it named, and the ruler never
-looked even. The pointer now maps over the track's whole width, so the handle still lands
-under the cursor — and at `min` the clip has no length at all, which is exactly what that
-end of the range says.
-
-The clip's leading edge is **straight**, not rounded. That edge is a number — the point on
-the track you have chosen — and a corner drawn there reads as a value rounded off in the
-drawing as well. It is also the edge the strength select draws, so the two controls that
-share a column of a form say the same thing about the same kind of boundary.
-
-The step is drawn as well: one dot per snapping interval, thinned to a stride when the
-span holds more steps than the track can space out. The dots sit over the clip, so the
-intervals you have already passed stay legible on it — the track reads as a length and a
-ruler at the same time. Being an alpha of the foreground, they land a shade lighter on the
-clip than on the empty track; an opaque token was tried for that and dropped, because one
-mark half a shade off is not worth a variable in everyone's theme.
-
-The playhead stands **on** the dot of the value it marks rather than beside it: the bar is
-centred on the value's own position, so it covers that interval's dot and leaves the rest of
-the ruler in step. It used to sit a few pixels inside the clip's leading edge, which left
-two marks a few pixels apart wherever the handle happened to be.
-
-The number itself lives in a HUD above the track, clamped off the edges so it never gets
-cut off. It is shown while hovering or dragging and hidden otherwise: the read-out is for
-the moment you are choosing, and leaving it up all the time would compete with the track.
-
-The read-out is the only thing that changes as you drag — the track's fill is a single
-width transition on release, not a stream of re-renders.
+- Renders no label; pass `aria-label` alongside your own heading.
+- Keeps in-flight drag state local and fires `onCommit` once on pointer release or key press, snapped to `step`.
 
 <DurationSliderSecondsDemo />
 
 ## Accessibility
 
-The track is a `role="slider"` with `aria-valuemin`, `aria-valuemax` and `aria-valuenow`,
-plus `tabIndex={0}` so it is keyboard reachable. `↑`/`→` raise the value by a step and
-`↓`/`←` lower it, with the commit firing on each press. `touch-none` stops the browser
-from claiming the horizontal drag as a scroll. Its name comes from `aria-label`, which is
-why the caller passes one alongside the heading it drew.
+- Renders `role="slider"` with `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, and `touch-none`.
+- `↑` / `→` raise the value by one `step` and `↓` / `←` lower it, firing `onCommit` on each press.
 
 ## Component source
 

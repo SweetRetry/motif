@@ -6,8 +6,6 @@ import {
 } from "@/components/ui/motif/provider-logo";
 import type { ProviderId } from "@/components/ui/motif/provider-logo";
 
-/** Every mark in the set, named underneath so it is clear which is which — a logo grid
- *  is a riddle without the labels. */
 const PROVIDERS: ProviderId[] = [
   "alibaba",
   "anthropic",
@@ -50,16 +48,15 @@ export const ProviderLogoDemo = () => (
   </div>
 );
 
-/** One mark, toned by its parent — the mono cuts follow the text they are planted in. */
 export const ProviderLogoMonoDemo = () => (
   <div className="flex items-center gap-6">
     <span className="flex items-center gap-2 text-foreground text-sm">
       <ProviderLogo className="size-5" provider="openai" />
-      OpenAI, in the text's own tone
+      OpenAI
     </span>
     <span className="flex items-center gap-2 text-muted-foreground text-sm">
       <ProviderLogo className="size-5" provider="xai" />
-      xAI, muted with the sentence
+      xAI
     </span>
   </div>
 );

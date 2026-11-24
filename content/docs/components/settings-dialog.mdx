@@ -1,6 +1,6 @@
 ---
 title: Settings Dialog
-description: "Destinations down the left, one panel on the right: a rail you can walk with the arrow keys, a panel that fades in, and the row, section and card the panel is built from."
+description: A two-pane settings modal with a keyboard-navigable destination rail and composable section, card, and row primitives.
 added: 2026-09-11
 ---
 
@@ -20,11 +20,6 @@ npx shadcn@latest add https://motif.sweetretry.com/r/settings-dialog.json
 ```
 
 ## Usage
-
-The rail takes data; the panel takes anything. Give the rail an `id`, `label` and
-optionally an icon per destination, then render the panel for the active id — pass a
-function as `children` and it receives that id, so the modal can own the selection
-without giving up control of the panel.
 
 ```tsx
 import { Building2, Cpu } from "lucide-react";
@@ -66,92 +61,20 @@ export function Preferences() {
 }
 ```
 
-`activeId` and `onActiveChange` make the selection controlled when something outside the
-modal owns it — a deep link, a command palette entry, a first-run step. On its own the
-modal keeps the selection and the first destination opens.
+## Behavior
 
-## The rail is a tablist
+- **Single active panel**: Only the active panel mounts; switching destinations unmounts the previous panel (resetting local state) and scrolls the new panel to the top.
+- **Keyboard navigation**: The rail uses `role="tablist"` (`aria-orientation="vertical"`) with roving `tabIndex`. Selection follows focus: <kbd>↑</kbd> / <kbd>↓</kbd> (or <kbd>←</kbd> / <kbd>→</kbd> below `md`) move between destinations, and <kbd>Home</kbd> / <kbd>End</kbd> jump to the ends.
+- **Responsive**: Below `md`, the rail becomes a horizontally scrollable strip and scrolls the active destination into view.
+- **Reduced motion**: Panel fade-in is skipped when `prefers-reduced-motion` is enabled.
 
-Switching a panel is what tabs do, so the rail is one: `role="tablist"`,
-`aria-orientation="vertical"`, one tab per destination, and the panel wears
-`role="tabpanel"` with the active tab as its label. The rail is a single tab stop — the
-selected destination holds `tabIndex={0}` and the rest sit at `-1` — so <kbd>Tab</kbd>
-walks past the whole rail instead of through every word in it.
+## Standalone panels
 
-<kbd>↑</kbd> <kbd>↓</kbd> walk the destinations, <kbd>←</kbd> <kbd>→</kbd> do
-the same below `md` where the rail turns into a horizontal strip, and
-<kbd>Home</kbd> /<kbd>End</kbd> jump to the ends. Selection follows focus, which
-is what a settings rail should do: the panel is the answer to the tab you just
-landed on, and waiting for
-<kbd>Enter</kbd> would show a rail pointing one way and a panel reading another.
-
-The rail is a plain list of buttons with two backgrounds and no shared-layout indicator
-sliding between them. The selected destination wears `bg-muted`; every other one answers
-the pointer with a lighter `bg-muted/50` and full-strength text.
-
-An animated pill is the tempting default for a rail, and it was the first thing this
-component did — it glided from row to row on a spring. It earns its keep in a segmented
-control, where the stops are adjacent and the point is that the choice _moved_. A rail is
-the opposite case: the travel crosses the labels of the rows in between, and the distance
-is a couple of rows, so the glide is mostly a way of making a static answer look busy.
-
-Hover, on the other hand, is asked a question — "am I about to click this?" — and a
-background answers it better than a colour change, because the rail is already using
-colour for selection. Two greys, two jobs: the darker one is where you are, the lighter
-one is where you are pointing.
-
-## One panel at a time
-
-Only the active panel is mounted. Settings panels hold text fields, uploads and test
-connections — mounting nine of them so eight can hide is work nobody asked for, and it
-makes stale form state the caller's problem. The cost is that a panel loses its local
-state when you walk away from it, which is the behaviour most settings screens want.
-
-Panels fade in and the new one starts at the top: a panel is a place you arrive at, not a
-direction you travel in, and landing halfway down the last panel's scroll is
-disorienting. There is no exit animation to wait on — only the incoming panel moves, so
-the click lands on the next panel in one beat instead of two. The fade is skipped
-entirely under `prefers-reduced-motion`.
-
-## Rows, sections and cards
-
-The panel is not a mystery box. `SettingsSection` is a muted label above a `SettingsCard`;
-`SettingsRow` is a title, an optional description, and a control at the trailing edge.
-Both are exported, so a surface that outgrows the modal — an inline preferences page, a
-drawer, a full-screen wizard — reuses the same rows and stays visually identical.
+`SettingsSection`, `SettingsCard`, and `SettingsRow` are exported for reuse outside the modal:
 
 <ComponentPreview name="settings-dialog" align="start">
   <SettingsPanelsDemo />
 </ComponentPreview>
-
-A row's title is a name, not a subtitle: it stays on one line and reads on its own, with
-the description under it. A row with no control is a legitimate way to explain something
-without asking for anything, and a section with no `label` continues the section above
-it — use that when the heading would only repeat the destination you are already on.
-
-Cards are `divide-y` containers, so rows separate themselves, and the card owns the
-horizontal padding: separators stop at the text column instead of running to the card's
-edge and slicing the card into one slab per row. A plain block in a `SettingsCard` becomes
-a summary block instead of a row, on that same column — which is how the run history card
-in the demo is built.
-
-That column is the whole panel's, not the card's alone. The section label above a card and
-the panel's own title draw the same `px-5`, so every line of text in a panel — title,
-section name, row title, description — is set on one axis, and the cards are the only
-thing at the panel's gutter. A heading belongs with the words it introduces rather than
-with the surface it sits on; two axes inside one panel read as two panels.
-
-The rail's heading works the same way: the dialog's `title` is the opening group's
-heading, so it wears what every other group heading wears — the same muted line at the
-same left edge as `Agent` and `Files`. A rail is a list of labelled groups, and a title
-set apart from them is a third kind of thing in a column that has room for two.
-
-## Narrow screens
-
-Below `md` the rail stops being a column: it becomes a horizontally scrollable strip
-above the panel, and the destinations that fit stay reachable without a hamburger. The
-active destination is scrolled into view, so the rail never opens showing someone else's
-selection.
 
 ## Props
 
@@ -169,8 +92,7 @@ selection.
 | `onOpenChange`    | —            | Called when the dialog opens or dismisses                                          |
 | `panelClassName`  | —            | Extra classes for the scrolling panel body                                         |
 
-`SettingsSection` takes `label` and `cardClassName`; `SettingsRow` takes `title`,
-`description`, and `align` (`"center"` or `"start"`) for controls taller than one line.
+`SettingsSection` takes `label` and `cardClassName`; `SettingsRow` takes `title`, `description`, and `align` (`"center"` or `"start"`).
 
 ## Component source
 

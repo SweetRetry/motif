@@ -30,8 +30,6 @@ import {
 } from "@/registry/new-york/settings-dialog";
 import type { SettingsNavGroup } from "@/registry/new-york/settings-dialog";
 
-/** A workspace rail: the three things that are the workspace, then the two groups that
- *  only exist because the app runs an agent inside it. */
 const NAV: SettingsNavGroup[] = [
   {
     items: [
@@ -63,7 +61,6 @@ const LABELS = new Map(
   NAV.flatMap((group) => group.items).map((item) => [item.id, item.label])
 );
 
-/** A trailing-edge control that reads as a pill: the current value, and a caret. */
 const Choice = ({
   initial,
   options,
@@ -127,8 +124,6 @@ const WorkspacePanel = () => (
       </SettingsRow>
     </SettingsSection>
 
-    {/* A card is a `divide-y` container, so a plain block inside one becomes a summary
-        block rather than a row. */}
     <SettingsCard className="flex flex-col gap-3 py-5">
       <div className="flex items-baseline justify-between gap-4">
         <p className="text-sm font-medium">Run history</p>
@@ -147,21 +142,17 @@ const WorkspacePanel = () => (
   </>
 );
 
-/** Every other destination renders the same pieces, so the rail still feels real. */
 const StubPanel = ({ label }: { label: string }) => (
   <SettingsSection label={label}>
     <SettingsRow
-      description="A destination is a heading, some sections, and the rows inside them."
+      description="Manage defaults for this section."
       title={`${label} settings`}
     >
       <Button size="sm" variant="outline">
         Configure
       </Button>
     </SettingsRow>
-    <SettingsRow
-      description="Booleans sit at the trailing edge, same as every other control."
-      title="A switch row"
-    >
+    <SettingsRow description="Allow access in this workspace." title="Enabled">
       <Switch defaultChecked />
     </SettingsRow>
   </SettingsSection>
@@ -194,25 +185,24 @@ export const SettingsDialogDemo = () => {
   );
 };
 
-/** The same pieces without the dialog, for docs and for panels that live in a page. */
 export const SettingsPanelsDemo = () => (
   <div className="w-full max-w-lg">
-    <SettingsSection label="Anatomy of a row">
+    <SettingsSection label="General">
       <SettingsRow
-        description="The description is a second line, so the title reads alone."
-        title="Title and description"
+        description="Receive run summaries when a task finishes."
+        title="Notifications"
       >
         <Switch defaultChecked />
       </SettingsRow>
       <SettingsRow
-        description="The control is optional — a row can just explain something."
-        title="No control"
+        description="Logs are kept for 30 days in this workspace."
+        title="Audit retention"
       />
       <SettingsRow
-        description="Any control fits: a field, a button, a menu, a switch."
-        title="A field"
+        description="Used when creating new worktrees."
+        title="Default branch"
       >
-        <Input className="w-32" placeholder="Value" />
+        <Input className="w-32" placeholder="main" />
       </SettingsRow>
     </SettingsSection>
   </div>

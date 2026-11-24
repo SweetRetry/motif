@@ -14,8 +14,6 @@ import type {
   ReasoningEffort,
 } from "@/registry/new-york/agents/model-menu";
 
-/** Three protocols, four models, and four different sets of thinking steps: each set
- *  is what that vendor's API accepts, so no two lists in the menu are the same. */
 const MODELS: ChatModel[] = [
   {
     family: "deepseek",
@@ -74,8 +72,6 @@ export const ModelMenuDemo = () => {
   );
 };
 
-/** A conversation that already ran on Gemini: the other Gemini stays open, the rest
- *  stay listed and disabled. */
 export const ModelMenuLockedDemo = () => (
   <ModelMenu defaultValue="gemini-3.8-flash" family="gemini" models={MODELS}>
     <ModelMenuTrigger />

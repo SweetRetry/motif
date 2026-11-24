@@ -16,8 +16,6 @@ interface Turn {
   text: string;
 }
 
-/** Long enough to overflow the window below, so the scroll button has something to
- *  appear for the moment the reader scrolls up. */
 const SEED: Turn[] = [
   {
     from: "user",
@@ -84,10 +82,7 @@ export const ConversationDemo = () => {
         <ConversationScrollButton />
       </Conversation>
 
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-xs text-muted-foreground">
-          Scroll up and the way back appears; scroll to the end and it goes.
-        </p>
+      <div className="flex justify-end">
         <Button onClick={append} size="sm" type="button" variant="outline">
           Append a turn
         </Button>

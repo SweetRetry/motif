@@ -15,7 +15,6 @@ import type {
   GradientCoverPattern,
 } from "@/registry/new-york/gradient-cover";
 
-/** A shelf of newsletters, each with the palette and pattern it was given. */
 const SHELF: {
   palette: GradientCoverPalette;
   pattern: GradientCoverPattern;
@@ -46,7 +45,6 @@ export const GradientCoverDemo = () => (
 
 const PALETTES = Object.keys(GRADIENT_COVER_PALETTES) as GradientCoverPalette[];
 
-/** Every palette against every pattern, one seed throughout. */
 export const GradientCoverMatrixDemo = () => (
   <div className="w-full max-w-2xl overflow-x-auto">
     <table className="w-full border-separate border-spacing-1.5 text-xs text-muted-foreground">
@@ -93,7 +91,6 @@ const PROJECTS = [
   "Docs migration",
 ];
 
-/** No palette, no pattern: the seed picks both. Rename a project to see its cover change. */
 export const GradientCoverSeedDemo = () => {
   const [names, setNames] = useState(PROJECTS);
 
@@ -120,7 +117,6 @@ export const GradientCoverSeedDemo = () => {
   );
 };
 
-/** The art as an image source, so a Cover Fan can be filled without shipping a single file. */
 const STARTERS = [
   { palette: "lagoon", pattern: "waves", title: "Research brief" },
   { palette: "sunset", pattern: "plain", title: "Launch post" },

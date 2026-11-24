@@ -16,8 +16,6 @@ import {
   ToolCallSummary,
 } from "@/registry/new-york/agents/tool-call";
 
-/** What `git diff` prints for a two-hunk change. The file header is read for the path,
- *  and the hunk headers give the lines their numbers. */
 const SESSION_PATCH = `diff --git a/src/auth/session.ts b/src/auth/session.ts
 index 3f1c2a9..8d0e4b1 100644
 --- a/src/auth/session.ts
@@ -47,7 +45,6 @@ index 3f1c2a9..8d0e4b1 100644
 +  return session;
  };`;
 
-/** What an agent's edit tool hands back: the lines alone, no headers, no numbers. */
 const EDIT_PATCH = `   useLayoutEffect(() => {
 -    end.current?.scrollIntoView({ behavior: "smooth" });
 +    const viewport = scroller.current;
@@ -56,8 +53,6 @@ const EDIT_PATCH = `   useLayoutEffect(() => {
 +    }
    }, [turns]);`;
 
-/** An edit tool's call, as most of them hand it over: the text it found and the text it
- *  put in its place. */
 const EDIT_CALL = {
   firstLine: 18,
   new_string: `  useLayoutEffect(() => {
@@ -71,8 +66,6 @@ const EDIT_CALL = {
   }, [turns]);`,
 };
 
-/** A README paragraph the agent tightened. A paragraph is one line, so the words that
- *  changed are what the reader needs found for them. */
 const README_BEFORE = `## Install
 
 Run the command below in the root of your project and the component will be copied into your components folder.
@@ -87,7 +80,6 @@ Run the command below in the root of your app and the component will be copied i
 Every component is yours to edit after it is installed.
 `;
 
-/** A whole file's change: the path and the count above, the lines below. */
 export const DiffDemo = () => (
   <Diff className="w-full max-w-xl" patch={SESSION_PATCH}>
     <DiffHeader>
@@ -98,8 +90,6 @@ export const DiffDemo = () => (
   </Diff>
 );
 
-/** Behind an edit's row, from the text the tool replaced and the text it wrote. The row
- *  already names the file, so the detail is the lines. */
 export const DiffToolCallDemo = () => (
   <ToolCall className="w-full max-w-xl" defaultOpen status="done">
     <ToolCallHeader>
@@ -119,7 +109,6 @@ export const DiffToolCallDemo = () => (
   </ToolCall>
 );
 
-/** A list of changed files is the header alone, once per patch. */
 export const DiffFilesDemo = () => (
   <div className="flex w-full max-w-xl flex-col gap-2">
     {[
@@ -136,8 +125,6 @@ export const DiffFilesDemo = () => (
   </div>
 );
 
-/** Prose, from the text before and after. The paragraph is one line, and only the words
- *  that changed in it are marked. */
 export const DiffProseDemo = () => (
   <Diff
     after={README_AFTER}

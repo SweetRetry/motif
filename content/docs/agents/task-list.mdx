@@ -1,6 +1,6 @@
 ---
 title: Task List
-description: "The agent's own plan for the run: one line above the composer that says how far it has got and what it is on now, and behind it every step, to do, in progress or done."
+description: A collapsible plan card showing current step progress above the composer and the full ordered step list when expanded.
 added: 2026-11-25
 ---
 
@@ -67,78 +67,13 @@ export function Plan({ tasks }) {
 | `TaskListItemMarker` | A ring to do, the loading mark in progress, a check done        |
 | `TaskListItemText`   | What the step is                                                |
 
-## Folded by default
+## Behavior & Accessibility
 
-A plan is something the reader glances at, not something they read. Folded, the list is
-one line: how far the agent has got and what it is on now. That is enough to answer
-"where is it" without pushing the conversation up. Pressing the line shows every step.
-
-Pass `defaultOpen` to start open, or `open` and `onOpenChange` to own it. The header is
-only a button while there is a `TaskListContent` to open; without one it is a plain line
-and draws no chevron.
-
-## Three statuses
-
-`todo`, `active`, `done`. One step is `active` at a time, and the marker for it is the
-same loading mark Loading State and Tool Call use, because it means the same thing: the
-agent is working on this now. A done step is a muted check and muted text. It recedes,
-since the steps still ahead are the ones the reader wants to see. It is not struck
-through: a list that has finished would be a column of lines, and a line through text
-reads as cancelled, not done.
-
-There is no `failed` or `skipped`. A step is a plan, not a call. When a call fails, the
-Tool Call says so; when the agent drops a step, it rewrites its plan, and the step leaves
-the list.
-
-The status is said to a screen reader as `To do`, `In progress` or `Done`. Pass
-`label` to `TaskListItemMarker` to translate it. The active item also carries
-`aria-current="step"`.
-
-## One column of marks
-
-The header is drawn like a step: a mark, the words, and at the end the count and the
-chevron. Pass `TaskListStatus` the status of the run, `active` while a step is going
-and `done` once none is left, and its mark sits in the same column as every step's.
-Folded, the line reads as the step the agent is on; open, it reads as the title of the
-list under it.
-
-## A long plan
-
-A real plan runs to ten or fifteen steps, and this sits above the composer, where every
-line it grows is a line of conversation pushed off the screen. Open, the list stops at
-18rem and scrolls inside itself. When the step in progress is out of view, the list
-scrolls to put it in the middle, so the reader sees what is done just before it and what
-is coming after.
-
-Folded, a step is one line and is cut with an ellipsis. Open, it wraps: the reader opened
-the list to read it, and a step cut short there would leave nothing to open.
-
-## When the run stops
-
-The user stops the agent, or the run fails, part-way through a step. The step is still
-`active`, because that is where the work was left, but the loading mark would be saying
-the agent is still on it. Pass `running={false}` to `TaskList` and the active step's
-mark becomes a still dot: this is where it stopped. Pass `running` again when the run
-resumes. It defaults to `true`.
-
-## Read aloud
-
-Folded, the only thing that changes is the title. It is a polite live region, so a
-screen reader hears the new step when the agent moves on, without the reader opening
-the list.
-
-## The list is yours
-
-The header does not count anything. Its words are yours, because the steps are: pass the
-number done to `TaskListProgress` and the active step's text to `TaskListTitle`. When
-nothing is active, as after the last step, write what fits, such as `All done`, or
-leave `TaskListTitle` empty and it draws nothing.
-
-## Beside the queue
-
-Task List and [Queue](/docs/agents/queue) are drawn to sit together above the composer.
-The queue is what the user is waiting to say; the task list is what the agent is doing.
-Both are cards with the same radius and border, so they stack as two of a kind.
+- Collapsed by default (`defaultOpen`, `open`, `onOpenChange`); `TaskListHeader` only renders as a toggle button when `TaskListContent` is present.
+- Step statuses are `todo`, `active` (carries `aria-current="step"`), and `done`; pass `running={false}` to `TaskList` (default `true`) to show a still dot when paused.
+- Pass `label` to `TaskListItemMarker` to translate default screen-reader status labels (`To do`, `In progress`, `Done`).
+- Expanded lists cap at `18rem`, scroll internally, and auto-center the active step; `TaskListTitle` is a polite live region and renders nothing when empty.
+- Designed to stack above the composer alongside [Queue](/docs/agents/queue).
 
 ## Component source
 

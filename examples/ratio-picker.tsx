@@ -9,8 +9,6 @@ export const RatioPickerDemo = () => {
 
   return (
     <div className="w-full max-w-sm">
-      {/* The heading is the caller's: the control ships none, so the words on screen
-          and the words a screen reader hears are written in one place. */}
       <div className="mb-2 font-medium text-muted-foreground text-xs">
         Aspect ratio
       </div>
@@ -26,7 +24,6 @@ export const RatioPickerDemo = () => {
   );
 };
 
-/** The glyphs on their own, to show the fixed window the shapes are drawn in. */
 export const RatioPickerAdaptiveDemo = () => (
   <div className="w-full max-w-sm">
     <div className="mb-2 font-medium text-muted-foreground text-xs">Canvas</div>

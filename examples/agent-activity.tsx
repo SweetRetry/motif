@@ -74,8 +74,6 @@ const Call = ({
   </ToolCall>
 );
 
-/** A finished run. It is open here so the timeline is on show; left alone, a run that has
- *  stopped is the one line in the header and nothing else. */
 export const AgentActivityDemo = () => (
   <AgentActivity
     className="w-full max-w-xl"
@@ -99,10 +97,7 @@ export const AgentActivityDemo = () => (
 
 const STEP_MS = 1500;
 
-/** One live run. Mounted fresh for each replay, so every piece of state starts from its
- *  own initial value rather than being reset by an effect. */
 const LiveRun = () => {
-  // How many steps have been reached; the last one reached is the one in flight.
   const [reached, setReached] = useState(0);
   const [startedAt] = useState(() => Date.now());
   const [duration, setDuration] = useState<number>();
@@ -147,8 +142,6 @@ const LiveRun = () => {
   );
 };
 
-/** The same run, live. The timeline is open while it goes, and folds into the one-line
- *  receipt the moment it stops, unless the header has been pressed in between. */
 export const AgentActivityLiveDemo = () => {
   const [run, setRun] = useState(0);
 

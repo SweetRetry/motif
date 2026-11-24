@@ -9,8 +9,6 @@ export const DurationSliderDemo = () => {
 
   return (
     <div className="w-full max-w-sm">
-      {/* The heading is the caller's: the control ships none, so the words on screen
-          and the words a screen reader hears are written in one place. */}
       <div className="mb-2 font-medium text-muted-foreground text-xs">
         Duration
       </div>
@@ -28,7 +26,6 @@ export const DurationSliderDemo = () => {
   );
 };
 
-/** A tighter range, to show the track reads at any span. */
 export const DurationSliderSecondsDemo = () => (
   <div className="w-full max-w-sm">
     <div className="mb-2 font-medium text-muted-foreground text-xs">

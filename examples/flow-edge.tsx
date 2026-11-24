@@ -5,9 +5,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FlowEdge } from "@/registry/new-york/flow-edge";
 
-/** Where the line is attached. Both ends get one, so the connection has somewhere to
- *  have come from and somewhere to be going. Each is centred on the corner it sits in,
- *  which is where the path starts and ends. */
 const PORT = "absolute size-2 rounded-full bg-foreground/35";
 
 export const FlowEdgeDemo = () => {

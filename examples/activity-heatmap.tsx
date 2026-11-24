@@ -6,15 +6,12 @@ import { Button } from "@/components/ui/button";
 import { ActivityHeatmap } from "@/registry/new-york/activity-heatmap";
 import type { HeatmapDatum } from "@/registry/new-york/activity-heatmap";
 
-/** The three windows the demo switches between. `weeks` is all the heatmap needs; the
- *  label is only here so the header can say what the total is counting. */
 const RANGES = [
   { label: "3 months", weeks: 13 },
   { label: "6 months", weeks: 27 },
   { label: "12 months", weeks: 53 },
 ];
 
-/** How far back the demo fabricates data — the widest range plus its own slack. */
 const HISTORY_DAYS = 371;
 
 const pad = (value: number) => String(value).padStart(2, "0");
@@ -22,18 +19,6 @@ const pad = (value: number) => String(value).padStart(2, "0");
 const dayKey = (date: Date) =>
   `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 
-/** A value in [0, 1) that depends on nothing but the day it is asked about.
- *
- *  This is the whole reason the demo can be server-rendered: a random walk would be
- *  generated once on the server and again in the browser, and the two would disagree at
- *  hydration. Hashing the day gives both of them the same year, and it has the second
- *  property a demo wants — the counts do not move when the range changes, so shortening
- *  the window reveals a subset instead of a different history.
- *
- *  A Lehmer step per character, not a bitwise hash: multiplying by a large odd constant
- *  and taking a prime modulus spreads neighbouring dates as well as any XOR-shift does,
- *  and stays inside the exact-integer range a float64 can represent, so the server and
- *  the browser cannot round their way to different answers. */
 const hash = (value: string) => {
   let result = 1;
 
@@ -46,12 +31,6 @@ const hash = (value: string) => {
   return (result % 9973) / 9973;
 };
 
-/** Agent runs for one day, shaped like a usage graph rather than noise: weekends drop
- *  to a third, the year trends upward as the habit takes hold, and a small share of
- *  days are bursts — the days a long job ran. The seed is raised to a power rather than
- *  used raw, which is what pushes most days toward empty and leaves the busy ones as
- *  the exception. That shape is the point: it is what real usage looks like, and it is
- *  the only shape a quantile scale can read. */
 const runsFor = (date: Date) => {
   const seed = hash(dayKey(date));
   const weekend = date.getDay() === 0 || date.getDay() === 6;
@@ -84,10 +63,6 @@ export const ActivityHeatmapDemo = () => {
   const [history] = useState(buildHistory);
   const [range, setRange] = useState(RANGES[2]);
 
-  // The range the heatmap derives, worked out the same way so the total under the
-  // header counts exactly the days on the grid: the last column is the week `today`
-  // is in, and the grid runs back from that week's first day. Summarising is the
-  // caller's job — the component draws the grid and nothing else.
   const today = new Date();
   const weekStart = new Date(
     today.getFullYear(),
@@ -117,8 +92,6 @@ export const ActivityHeatmapDemo = () => {
           </p>
         </div>
 
-        {/* A range switch is the one control a heatmap really needs: the same data at
-            three densities, and the colour scale holds still across all three. */}
         <div className="flex items-center gap-1">
           {RANGES.map((option) => (
             <Button
