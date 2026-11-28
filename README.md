@@ -16,7 +16,7 @@
 
 - 🧩 **Agents** — `conversation`, `message`, `thinking-block`, `waiting-row`,
   `prompt-input`, `voice-input`, `attachment`, `scroll-rail`, `approval-card`,
-  `question-card`, `skill-detail`
+  `question-card`
 - 🎛️ **Components** — `ratio-picker`, `resolution-picker`, `duration-slider`,
   `generation-overlay`, `cover-fan`, `flow-edge`, `settings-dialog`,
   `activity-heatmap`

@@ -55,8 +55,6 @@
   "registry/new-york/agents/prompt-input/types.ts": 23,
   "registry/new-york/agents/question-card/index.tsx": 6,
   "registry/new-york/agents/queue.tsx": 11,
-  "registry/new-york/agents/skill-detail/index.tsx": 36,
-  "registry/new-york/agents/skill-detail/types.ts": 35,
   "registry/new-york/agents/source.tsx": 8,
   "registry/new-york/agents/thinking-block/index.tsx": 1,
   "registry/new-york/agents/tool-call.tsx": 21,

@@ -32,7 +32,7 @@ Agents 覆盖了"人说话"（输入框、语音、附件）和"agent 想"（思
 
 ## 不做
 
-- Suggestions。提示词小标签，`skill-detail` 里已有示例卡的概念。
+- Suggestions。提示词小标签。
 - Code Block。`streamdown` 已经渲染代码。
 - Loader。`loading-state` 够用。
 - 折线图、统计卡。shadcn 自己的 charts 能覆盖，Data 区不自己造。
